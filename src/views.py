@@ -47,8 +47,8 @@ class AppView:
             frame.pack(fill='x', padx=5, pady=5)
             label = ctk.CTkLabel(frame, text=f"{account.provider} ({account.label}): {otp}")
             label.pack(side='left', padx=5)
-            #copy_button = ctk.CTkButton(frame, text="Copy", command=lambda otp=otp: self.copy_to_clipboard(otp))
-            copy_button = ctk.CTkButton(frame, text="Copy")
+            copy_button = ctk.CTkButton(frame, text="Copy", command=lambda otp=otp: self.copy_to_clipboard(otp))
+            #copy_button = ctk.CTkButton(frame, text="Copy")
             copy_button.pack(side='right', padx=5)
 
     # def start_timer(self):

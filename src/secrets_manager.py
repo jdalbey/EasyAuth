@@ -1,5 +1,4 @@
 from cryptography.fernet import Fernet
-import os
 import hashlib
 import base64
 
