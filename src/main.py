@@ -10,7 +10,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # Initialize the application settings with a config file
-    config = AppConfig('../src/appconfig.ini')
+    AppConfig('../src/appconfig.ini')
 
     # Initialize the controller and view
     controller = AppController()

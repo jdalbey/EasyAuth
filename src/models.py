@@ -1,7 +1,7 @@
 
 import json
 import os
-
+from pathlib import Path # Python 3.5+
 class Account:
     def __init__(self, provider, label, secret):
         self.provider = provider
@@ -9,17 +9,26 @@ class Account:
         self.secret = secret
 
 class AccountManager:
-    kPathToVault = "src/vault.json"
+    kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
     def __init__(self, filename=kPathToVault):
         self.filename = filename
         self.accounts = self.load_accounts()
 
     def load_accounts(self):
-        if os.path.exists(self.filename):
-            with open(self.filename, 'r') as f:
+        home_dir_str = str(Path.home())
+        filepath = Path.home().joinpath(home_dir_str, self.filename)
+        if os.path.exists(filepath):
+            with open(filepath, 'r') as f:
                 content = json.load(f)
                 return [Account(**acc) for acc in content]
-        return []
+        else:
+            print (f"Missing vault file {filepath}")
+            raise FileNotFoundError
+
+    def set_accounts(self,account_string):
+        """Set accounts from a string - dependency injection for testing
+        @param account_string is JSON string of vault data"""
+        self.accounts = json.loads(account_string)
 
     def save_accounts(self):
         with open(self.filename, 'w') as f:
