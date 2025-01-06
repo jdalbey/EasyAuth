@@ -12,7 +12,7 @@ class AppView:
         self.controller.set_view(self)
         self.root = ctk.CTk()
         self.root.title("Easy Auth")
-        self.root.geometry('600x300')
+        self.root.geometry('500x300')
         self.create_widgets()
 
     # def create_widgets(self):
