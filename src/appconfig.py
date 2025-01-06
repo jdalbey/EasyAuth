@@ -24,7 +24,7 @@ The actual file reading happens inside the read method, which is called after th
         """
         Get the path to the application database.
         """
-        return self._config.get('settings', 'database_path', fallback='default.db')
+        return self._config.get('settings', 'vault_path', fallback='default.db')
 
     def is_smart_filtering_enabled(self):
         """
@@ -37,6 +37,12 @@ The actual file reading happens inside the read method, which is called after th
         Get the name of the theme.
         """
         return self._config.get('settings', 'theme_name', fallback='default')
+
+    def get_alt_id(self):
+        """
+        Get the alternate id
+        """
+        return self._config.get('settings', 'alt_id', fallback=None)
 
     def reload(self, config_file):
         """

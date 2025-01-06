@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+from appconfig import AppConfig
 import hashlib
 import base64
 
@@ -28,8 +29,13 @@ class SecretsManager:
     # Derive a Fernet Key from the Machine UUID
     @staticmethod
     def derive_key_from_uuid():
-        with open("/etc/machine-id", "r") as f:
-            uuid = f.read().strip()
+        config = AppConfig()
+        alt_id = config.get_alt_id()
+        if alt_id:
+            uuid = alt_id
+        else:
+            with open("/etc/machine-id", "r") as f:
+                uuid = f.read().strip()
         # Hash the UUID to create a 32-byte key
         key = hashlib.sha256(uuid.encode()).digest()
         # Encode the key to Base64 (required by Fernet)
