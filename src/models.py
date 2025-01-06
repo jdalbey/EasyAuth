@@ -42,6 +42,6 @@ class AccountManager:
         self.accounts[index] = account
         self.save_accounts()
 
-    def delete_account(self, index):
-        del self.accounts[index]
+    def delete_account(self, account):
+        self.accounts.remove(account)
         self.save_accounts()

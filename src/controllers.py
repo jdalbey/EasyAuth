@@ -32,13 +32,18 @@ class AppController:
         self.account_manager.add_account(account)
         self.logger.info(f"Added account: {provider} ({label})")
 
-    def update_account(self):
-        # Placeholder for updating an account
-        pass
+    def update_account(self, index, provider, label, secret):
+        encrypted_secret = self.secrets_manager.encrypt(secret)
+        account = Account(provider, label, encrypted_secret)
+        self.account_manager.update_account(index, account)
+        self.logger.info(f"Updated account: {provider} ({label})")
+        self.view.refresh_accounts()
+        self.view.edit_account_window.destroy()
 
-    def delete_account(self):
+    def delete_account(self,account):
         # Placeholder for deleting an account
-        pass
+        self.account_manager.delete_account(account)
+        self.view.refresh_accounts()
 
     def find_qr_code(self):
         url = scan_screen_for_qr_code()
@@ -70,6 +75,6 @@ class AppController:
         encrypted_secret = self.secrets_manager.encrypt(secret)
         account = Account(provider, label, encrypted_secret)
         self.account_manager.add_account(account)
-        self.logger.info(f"Added account: {provider} ({label})")
+        self.logger.info(f"Saved account: {provider} ({label})")
         self.view.refresh_accounts()
         self.view.add_account_window.destroy()

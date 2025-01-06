@@ -9,6 +9,9 @@ def main():
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
+    # Suppress log messages from the tkinter module
+    logging.getLogger('PIL').setLevel(logging.WARNING)
+
     # Initialize the application settings with a config file
     kConfigPath = ".config/EasyAuth/config.ini"
     home_dir_str = str(Path.home())
