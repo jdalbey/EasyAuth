@@ -71,3 +71,5 @@ class AppController:
         account = Account(provider, label, encrypted_secret)
         self.account_manager.add_account(account)
         self.logger.info(f"Added account: {provider} ({label})")
+        self.view.refresh_accounts()
+        self.view.add_account_window.destroy()

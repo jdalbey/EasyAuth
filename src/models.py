@@ -11,18 +11,17 @@ class Account:
 class AccountManager:
     kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
     def __init__(self, filename=kPathToVault):
-        self.filename = filename
+        home_dir_str = str(Path.home())
+        self.vault_path = Path.home().joinpath(home_dir_str, filename)
         self.accounts = self.load_accounts()
 
     def load_accounts(self):
-        home_dir_str = str(Path.home())
-        filepath = Path.home().joinpath(home_dir_str, self.filename)
-        if os.path.exists(filepath):
-            with open(filepath, 'r') as f:
+        if os.path.exists(self.vault_path):
+            with open(self.vault_path, 'r') as f:
                 content = json.load(f)
                 return [Account(**acc) for acc in content]
         else:
-            print (f"Missing vault file {filepath}")
+            print (f"Missing vault file {self.vault_path}")
             raise FileNotFoundError
 
     def set_accounts(self,account_string):
@@ -31,7 +30,7 @@ class AccountManager:
         self.accounts = json.loads(account_string)
 
     def save_accounts(self):
-        with open(self.filename, 'w') as f:
+        with open(self.vault_path, 'w') as f:
             json.dump([acc.__dict__ for acc in self.accounts], f)
 
     def add_account(self, account):
