@@ -35,6 +35,7 @@ class AccountManager:
             json.dump([acc.__dict__ for acc in self.accounts], f)
 
     def add_account(self, account):
+        #TODO: Don't allow duplicate accounts (i.e., duplicate secret key)
         self.accounts.append(account)
         self.save_accounts()
 
