@@ -63,13 +63,13 @@ class AppView:
         menu_button = tk.Menubutton(menu_bar_frame, text="Tools")
         tools_menu = tk.Menu(menu_button, tearoff=0)
 
-        def toggle_menu(self):
+        def toggle_menu(event):
             if tools_menu.winfo_ismapped():
+                # collapse the menu
                 tools_menu.unpost()
             else:
                 tools_menu.post(menu_button.winfo_rootx(), menu_button.winfo_rooty() + menu_button.winfo_height())
 
-        menu_button.config(menu=tools_menu)
         menu_button.bind("<Button-1>", toggle_menu)  # Bind left mouse click to toggle_menu
 
         tools_menu.add_command(label="Backup/Restore", command=self.backup_restore)
