@@ -1,4 +1,3 @@
-import customtkinter as ctk
 import pyotp
 import time
 import pyperclip
@@ -8,6 +7,9 @@ from tktooltip import ToolTip
 import tkinter as tk
 from tkinter import ttk
 from tkinter.ttk import *
+import customtkinter as ctk
+from CTkMenuBar import *
+
 # Tips on form fields https://www.pythontutorial.net/tkinter/tkinter-entry/
 class AppView:
     def __init__(self, controller):
@@ -16,8 +18,32 @@ class AppView:
         self.root = ctk.CTk()
         self.root.title("Easy Auth")
         self.root.geometry('700x300')
+        self.create_ctkmenubar()
         self.create_menu()
         self.create_widgets()
+
+    def create_ctkmenubar(self):
+        menu = CTkMenuBar(self.root, bg_color="lightgray")
+        menuitem_file = menu.add_cascade("File")
+        menuitem_tools = menu.add_cascade("Tools")
+        menuitem_help = menu.add_cascade("Help")
+
+        dropdown_file = CustomDropdownMenu(widget=menuitem_file)
+        dropdown_file.add_option(option="Backup/Restore", command=self.backup_restore)
+        dropdown_file.add_option(option="Import", command=self.import_accounts)
+
+        dropdown_file.add_separator()
+
+        dropdown_file.add_option(option="Settings", command=lambda: tk.messagebox.showinfo("Settings", "Settings will appear here."))
+
+        dropdown_tools = CustomDropdownMenu(widget=menuitem_tools)
+        dropdown_tools.add_option(option="Reorder Accounts", command=self.reorder_accounts)
+        dropdown_tools.add_option(option="Providers", command=self.manage_providers)
+
+        dropdown_help = CustomDropdownMenu(widget=menuitem_help)
+        dropdown_help.add_option(option="Quick Start")
+        dropdown_help.add_option(option="User Guide")
+        dropdown_help.add_option(option="About", command=self.show_about_dialog)
 
     def create_widgets(self):
         self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
@@ -27,7 +53,7 @@ class AppView:
         self.start_timer()
 
     def create_menu(self):
-        menu_bar = tk.Menu(self.root)
+        #menu_bar = tk.Menu(self.root)
         # Create a frame to act as the menu bar
         menu_bar_frame = tk.Frame(self.root, bg="lightgray", relief="raised", bd=2)
         menu_bar_frame.pack(side="top", fill="x")
@@ -59,36 +85,16 @@ class AppView:
         self.timer_label = ctk.CTkLabel(menu_bar_frame, text="30", font=timer_font, text_color="yellow", fg_color="gray",
                        corner_radius=15, anchor='s')
         self.timer_label.pack(side='right', padx=20, pady=1, ipady=3)
-        # Tools menu
-        menu_button = tk.Menubutton(menu_bar_frame, text="Tools")
-        tools_menu = tk.Menu(menu_button, tearoff=0)
 
-        def toggle_menu(event):
-            if tools_menu.winfo_ismapped():
-                # collapse the menu
-                tools_menu.unpost()
-            else:
-                tools_menu.post(menu_button.winfo_rootx(), menu_button.winfo_rooty() + menu_button.winfo_height())
-
-        menu_button.bind("<Button-1>", toggle_menu)  # Bind left mouse click to toggle_menu
-
-        tools_menu.add_command(label="Backup/Restore", command=self.backup_restore)
-        tools_menu.add_command(label="Import", command=self.import_accounts)
-        tools_menu.add_command(label="Reorder Accounts", command=self.reorder_accounts)
-        tools_menu.add_command(label="Providers", command=self.manage_providers)
-        tools_menu.add_command(label="Settings", command=self.settings)
-        tools_menu.add_command(label="About", command=self.show_about_dialog)
-        #menu_bar.add_cascade(label="Tools", menu=tools_menu)
-        menu_button.config(menu=tools_menu)
-        menu_button.pack(side="right", padx=5)
-        # Add Account button on the menu bar
-        st = Style()
-        st.configure('addButton', background='#345', foreground='black', font=('Arial', 14 ))
+        # st = Style()
+        # st.configure('addButton', background='#345', foreground='black', font=('Arial', 14 ))
         # filter button
         filter_button = tk.Menubutton(menu_bar_frame, text="Filter")
         fmenu = tk.Menu(filter_button, tearoff=0)
-        fmenu.add_command(label="Option 1")
-        fmenu.add_command(label="Option 2")
+        fmenu.add_command(label="Provider A-Z")
+        fmenu.add_command(label="User A-Z")
+        fmenu.add_command(label="Last used ^")
+        fmenu.add_command(label="Last used v")
         filter_button.config(menu=fmenu)
         filter_button.pack(side="right", padx=10)
 
@@ -117,7 +123,7 @@ class AppView:
     def settings(self):
         print("Settings selected")
     def show_about_dialog(self):
-        tk.messagebox.showinfo("About", "Easy Auth\nVersion 1.0")
+        tk.messagebox.showinfo("About", "Easy Auth\nVersion 0.0.1\nhttps://github.com/jdalbey/EasyAuth")
 
     # def create_widgets(self):
     #     self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
