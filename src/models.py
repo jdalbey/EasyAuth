@@ -21,17 +21,24 @@ class AccountManager:
                 content = json.load(f)
                 return [Account(**acc) for acc in content]
         else:
+            #TODO Report no entries in vault
             print (f"Missing vault file {self.vault_path}")
-            raise FileNotFoundError
+            return []
+            #raise FileNotFoundError
 
     def set_accounts(self,account_string):
         """Set accounts from a string - dependency injection for testing
         @param account_string is JSON string of vault data"""
         self.accounts = json.loads(account_string)
 
+    # TODO: Need a way to report errors in the model back to the view.
     def save_accounts(self):
-        with open(self.vault_path, 'w') as f:
-            json.dump([acc.__dict__ for acc in self.accounts], f)
+        # TODO: Handle missing vault (so create it).
+        try:
+            with open(self.vault_path, 'w') as f:
+                json.dump([acc.__dict__ for acc in self.accounts], f)
+        except FileNotFoundError:
+            print ("Missing Vault, can't save account.")
 
     def add_account(self, account):
         #TODO: Don't allow duplicate accounts (i.e., duplicate secret key)

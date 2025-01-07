@@ -5,15 +5,109 @@ import pyperclip
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from tktooltip import ToolTip
-
+import tkinter as tk
+from tkinter import ttk
+from tkinter.ttk import *
+# Tips on form fields https://www.pythontutorial.net/tkinter/tkinter-entry/
 class AppView:
     def __init__(self, controller):
         self.controller = controller
         self.controller.set_view(self)
         self.root = ctk.CTk()
         self.root.title("Easy Auth")
-        self.root.geometry('500x300')
+        self.root.geometry('700x300')
+        self.create_menu()
         self.create_widgets()
+
+    def create_widgets(self):
+        self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
+        self.scrollable_frame.pack(fill='both', expand=True, padx=10, pady=10)
+
+        self.refresh_accounts()
+        self.start_timer()
+
+    def create_menu(self):
+        menu_bar = tk.Menu(self.root)
+        # Create a frame to act as the menu bar
+        menu_bar_frame = tk.Frame(self.root, bg="lightgray", relief="raised", bd=2)
+        menu_bar_frame.pack(side="top", fill="x")
+
+        # Add the "Add Account" button to the menu bar frame
+        add_account_button = tk.Button(menu_bar_frame, text="Add Account", command=self.show_add_account_form, relief="groove",
+                                       highlightthickness=0, bd=2)
+        add_account_button.pack(side="left", padx=5)
+        add_account_button.configure(highlightbackground="lightgray")  # To simulate rounded corners
+
+        # center-aligned labels in a nested frame
+        center_frame = tk.Frame(menu_bar_frame, bg="lightgray")
+        center_frame.pack(side="left", expand=True)
+        # Center-aligned label
+        # Search field
+        keyword = tk.StringVar()
+        textbox = ttk.Entry(center_frame, textvariable=keyword)
+        textbox.pack(side="left", padx=10)
+        # search icon
+        search_label = tk.Label(center_frame, text="Q")
+        search_label.pack(side="right", padx=10)
+        # Add a label for the "Timer" to the menu bar frame
+        import customtkinter as ctk
+        timer_font = ctk.CTkFont(family='Courier', weight="bold", size=24)
+        # timer_label = tk.Label(menu_bar, text=" 30 ", font=timer_font, fg="yellow", bg="gray")
+        # timer_label = tk.Label(menu_bar_frame, text=" 30 ", font=timer_font, bg="gray", fg="yellow")
+        # timer_label.pack(side="right", padx=20)
+        # timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
+        timer_label = ctk.CTkLabel(menu_bar_frame, text="30", font=timer_font, text_color="yellow", fg_color="gray",
+                                   corner_radius=15)
+        timer_label.pack(side='right', padx=20)
+        # Tools menu
+        menu_button = tk.Menubutton(menu_bar_frame, text="Tools")
+        tools_menu = tk.Menu(menu_button, tearoff=0)
+        tools_menu.add_command(label="Backup/Restore", command=self.backup_restore)
+        tools_menu.add_command(label="Import", command=self.import_accounts)
+        tools_menu.add_command(label="Reorder Accounts", command=self.reorder_accounts)
+        tools_menu.add_command(label="Providers", command=self.manage_providers)
+        tools_menu.add_command(label="Settings", command=self.settings)
+        tools_menu.add_command(label="About", command=self.show_about_dialog)
+        #menu_bar.add_cascade(label="Tools", menu=tools_menu)
+        menu_button.config(menu=tools_menu)
+        menu_button.pack(side="right", padx=5)
+        # Add Account button on the menu bar
+        st = Style()
+        st.configure('addButton', background='#345', foreground='black', font=('Arial', 14 ))
+        # filter button
+        filter_button = tk.Menubutton(menu_bar_frame, text="Filter")
+        fmenu = tk.Menu(filter_button, tearoff=0)
+        fmenu.add_command(label="Option 1")
+        fmenu.add_command(label="Option 2")
+        filter_button.config(menu=fmenu)
+        filter_button.pack(side="right", padx=10)
+
+        #add_account_button = tk.Button(menu_bar, text="Add Account", command=self.show_add_account_form, bg='#345', fg='black', font=('Arial', 14))
+        #menu_bar.add_command(label="Add Account", command=add_account_button)
+        #add_account_button.pack(side='left', padx=5)
+        # Timer label on the right-hand side of the menu bar
+        #timer_font = ctk.CTkFont(family='Courier', weight="bold", size=20)
+        #self.timer_label = tk.Label(menu_bar, text=" 30 ", font=timer_font, fg="yellow", bg="gray")
+        #self.timer_label.pack(side='right', padx=5)
+
+        #self.root.config(menu=menu_bar)
+
+    def backup_restore(self):
+        print("Backup/Restore selected")
+
+    def import_accounts(self):
+        print("Import selected")
+
+    def reorder_accounts(self):
+        print("Reorder Accounts selected")
+
+    def manage_providers(self):
+        print("Providers selected")
+
+    def settings(self):
+        print("Settings selected")
+    def show_about_dialog(self):
+        tk.messagebox.showinfo("About", "Easy Auth\nVersion 1.0")
 
     # def create_widgets(self):
     #     self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
@@ -31,21 +125,21 @@ class AppView:
 
     #     self.refresh_accounts()
     #     self.start_timer()
-    def create_widgets(self):
-        top_frame = ctk.CTkFrame(self.root)
-        top_frame.pack(side='top', fill='x', padx=10, pady=10)
+    # def create_widgets(self):
+    #     top_frame = ctk.CTkFrame(self.root)
+    #     top_frame.pack(side='top', fill='x', padx=10, pady=10)
 
-        self.add_button = ctk.CTkButton(top_frame, text="Add Account", command=self.show_add_account_form)
-        self.add_button.pack(side='left', padx=5)
-        timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
-        self.timer_label = ctk.CTkLabel(top_frame, text=" 30 ", font=timer_font, text_color="yellow", fg_color = "gray", corner_radius=5)
-        self.timer_label.pack(side='right', padx=5)
+    #     self.add_button = ctk.CTkButton(top_frame, text="Add Account", command=self.show_add_account_form)
+    #     self.add_button.pack(side='left', padx=5)
+    #     timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
+    #     self.timer_label = ctk.CTkLabel(top_frame, text=" 30 ", font=timer_font, text_color="yellow", fg_color = "gray", corner_radius=5)
+    #     self.timer_label.pack(side='right', padx=5)
 
-        self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
-        self.scrollable_frame.pack(fill='both', expand=True, padx=10, pady=10)
+    #     self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
+    #     self.scrollable_frame.pack(fill='both', expand=True, padx=10, pady=10)
 
-        self.refresh_accounts()
-        self.start_timer()
+    #     self.refresh_accounts()
+    #     self.start_timer()
 
     def refresh_accounts(self):
         for widget in self.scrollable_frame.winfo_children():
@@ -87,7 +181,7 @@ class AppView:
 
     def update_timer(self):
         time_remaining = 30 - (int(time.time()) % 30)
-        self.timer_label.configure(text=f" {time_remaining} ")
+        #self.timer_label.configure(text=f" {time_remaining} ")
         if time_remaining == 30:
             self.refresh_accounts()
         self.root.after(1000, self.update_timer)  # Schedule the update_timer function to run after 1 second
