@@ -56,12 +56,22 @@ class AppView:
         # timer_label = tk.Label(menu_bar_frame, text=" 30 ", font=timer_font, bg="gray", fg="yellow")
         # timer_label.pack(side="right", padx=20)
         # timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
-        timer_label = ctk.CTkLabel(menu_bar_frame, text="30", font=timer_font, text_color="yellow", fg_color="gray",
-                                   corner_radius=15)
-        timer_label.pack(side='right', padx=20)
+        self.timer_label = ctk.CTkLabel(menu_bar_frame, text="30", font=timer_font, text_color="yellow", fg_color="gray",
+                       corner_radius=15, anchor='s')
+        self.timer_label.pack(side='right', padx=20, pady=1, ipady=3)
         # Tools menu
         menu_button = tk.Menubutton(menu_bar_frame, text="Tools")
         tools_menu = tk.Menu(menu_button, tearoff=0)
+
+        def toggle_menu(self):
+            if tools_menu.winfo_ismapped():
+                tools_menu.unpost()
+            else:
+                tools_menu.post(menu_button.winfo_rootx(), menu_button.winfo_rooty() + menu_button.winfo_height())
+
+        menu_button.config(menu=tools_menu)
+        menu_button.bind("<Button-1>", toggle_menu)  # Bind left mouse click to toggle_menu
+
         tools_menu.add_command(label="Backup/Restore", command=self.backup_restore)
         tools_menu.add_command(label="Import", command=self.import_accounts)
         tools_menu.add_command(label="Reorder Accounts", command=self.reorder_accounts)
@@ -181,7 +191,7 @@ class AppView:
 
     def update_timer(self):
         time_remaining = 30 - (int(time.time()) % 30)
-        #self.timer_label.configure(text=f" {time_remaining} ")
+        self.timer_label.configure(text=f"{time_remaining}")
         if time_remaining == 30:
             self.refresh_accounts()
         self.root.after(1000, self.update_timer)  # Schedule the update_timer function to run after 1 second

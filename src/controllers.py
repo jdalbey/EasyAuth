@@ -41,7 +41,7 @@ class AppController:
         self.view.edit_account_window.destroy()
 
     def delete_account(self,account):
-        # Placeholder for deleting an account
+        #TODO: Fix issues with confirmation dialog appearin beneath edit window
         self.account_manager.delete_account(account)
         self.view.refresh_accounts()
 
