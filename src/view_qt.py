@@ -13,7 +13,8 @@ import pyperclip
 from settings_dialog import SettingsDialog  
 from appconfig import AppConfig
 from models import Account
-
+from add_account_dialog import AddAccountDlg
+from confirm_account_dialog import ConfirmAccountDialog
 from controllers import AppController
 
 
@@ -260,22 +261,25 @@ class AppView(QMainWindow):
     def copy_to_clipboard(self, otp):
         pyperclip.copy(otp)
         print(f"Copied OTP: {otp}")
-        
-    # def show_add_account_form(self):
-    #     dialog_AddAcct = AddAccountDialog(self, self.controller)
-    #     dialog_AddAcct.exec_()
-    #     self.display_accounts()
-        
+
     def show_add_account_form(self):
-        dialog_AddAcct = AddAccountDialog(self, self.controller)
         if self.app_config.is_auto_find_qr_enabled():
-            # Call the find_qr_code method
+            # go find_qr_code
             qr_data = self.controller.find_qr_code()
+            # TODO: Check for multiple QR codes found
             if qr_data:
                 fields = Account(qr_data[0],qr_data[1],qr_data[2])
-                dialog_AddAcct.set_account(fields)
-
+                dialog_ConfirmAcct = ConfirmAccountDialog(self.controller)
+                dialog_ConfirmAcct.set_account(fields)
+                retcode = dialog_ConfirmAcct.exec_()
+                print (f"Confirm dialog closing code:  {retcode}")
+                self.display_accounts()
+                # if user confirmed the account data, return to main window
+                if retcode == 1:
+                    return
+        
         print ("Show_add_account_form is ready to exec() the dialog")
+        dialog_AddAcct = AddAccountDlg(self.controller)
         dialog_AddAcct.exec_()
         self.display_accounts()        
 
@@ -306,104 +310,6 @@ class AppView(QMainWindow):
 
     def show_about_dialog(self):
         pass
-
-
-
-class AddAccountDialog(QDialog):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-        self.setWindowTitle("New Account")
-        self.setMinimumWidth(400)
-
-        # Main layout
-        layout = QVBoxLayout(self)
-
-        # Header
-        header_label = QLabel("Choose how to create your new account:")
-        layout.addWidget(header_label)
-
-        # choices section
-        qr_screen_label = QLabel("• Fill the form automatically from a QR code on the screen")
-        qr_screen_label.setContentsMargins(20, 0, 0, 0)
-        layout.addWidget(qr_screen_label)
-
-        find_qr_btn = QPushButton("Find QR code")
-        #find_qr_btn.clicked.connect(self.controller.find_qr_code)
-        find_qr_btn.clicked.connect(lambda: self.get_qr_code())
-        find_qr_btn.setContentsMargins(40, 0, 0, 0)
-        layout.addWidget(find_qr_btn)
-
-        qr_file_label = QLabel("• Fill the form automatically from a QR image in a file")
-        qr_file_label.setContentsMargins(20, 0, 0, 0)
-        layout.addWidget(qr_file_label)
-
-        open_file_btn = QPushButton("Open file")
-        open_file_btn.clicked.connect(self.controller.open_qr_image)
-        open_file_btn.setContentsMargins(40, 0, 0, 0)
-        layout.addWidget(open_file_btn)
-
-        manual_label = QLabel("• Enter the data manually")
-        manual_label.setContentsMargins(20, 0, 0, 0)
-        layout.addWidget(manual_label)
-
-        # Form section
-        form_frame = QFrame()
-        form_frame.setFrameStyle(QFrame.StyledPanel)
-        form_layout = QGridLayout(form_frame)
-
-        # Provider
-        form_layout.addWidget(QLabel("Provider:"), 0, 0, Qt.AlignRight)
-        self.provider_entry = QLineEdit()
-        form_layout.addWidget(self.provider_entry, 0, 1)
-
-        # Label
-        form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
-        self.label_entry = QLineEdit()
-        form_layout.addWidget(self.label_entry, 1, 1)
-
-        # Secret Key
-        form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
-        self.secret_key_entry = QLineEdit()
-        form_layout.addWidget(self.secret_key_entry, 2, 1)
-
-        layout.addWidget(form_frame)
-
-        # Button section
-        button_frame = QWidget()
-        button_layout = QHBoxLayout(button_frame)
-
-        save_btn = QPushButton("Save")
-        save_btn.clicked.connect(lambda: self.handle_save_account())
-        #save_btn.clicked.connect(lambda: print ("save clicked"))  Works
-
-        cancel_btn = QPushButton("Cancel")
-        cancel_btn.clicked.connect(self.reject)
-
-        button_layout.addWidget(save_btn)
-        button_layout.addWidget(cancel_btn)
-        layout.addWidget(button_frame)
-
-    # Set values into fields (used by auto qr code scanning)
-    def set_account(self, account):
-        self.provider_entry.setText(account.provider)
-        self.label_entry.setText(account.label),
-        self.secret_key_entry.setText(account.secret)
-
-    def handle_save_account(self):
-        print ("AddAcctDialog is handling save account")
-        provider = self.provider_entry.text()
-        label = self.label_entry.text()
-        secret = self.secret_key_entry.text()
-        self.controller.save_account(provider, label, secret)
-        self.close()
-
-    def get_qr_code(self):
-        provider, label, secret = self.controller.find_qr_code()
-        self.provider_entry.setText(provider)
-        self.label_entry.setText(label)
-        self.secret_key_entry.setText(secret)
-
 
 class EditAccountDialog(QDialog):
     def __init__(self, parent, controller, index, account):

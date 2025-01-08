@@ -259,8 +259,8 @@ class Form_AddAccount:
             button_frame.pack(pady=10)
 
             self.save_button = ctk.CTkButton(button_frame, text="Save",
-                          command=lambda: self.controller.save_account(self.provider_entry.get(), self.label_entry.get(),
-                                                                       self.secret_key_entry.get()))
+                          command=lambda: self.controller.save_fields(self.provider_entry.get(), self.label_entry.get(),
+                                                                      self.secret_key_entry.get()))
             self.save_button.pack(side='left', padx=20)
             self.save_button["state"] = "disabled"
             ctk.CTkButton(button_frame, text="Cancel", command=self.add_account_window.destroy).pack(side='right', padx=20)

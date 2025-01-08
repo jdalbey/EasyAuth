@@ -30,9 +30,12 @@ class AppConfig:
                         'auto_find_qr': 'False' 
                     }
                     self._config.write(file)
+                    print ("saved config file")
             else:
                 raise FileNotFoundError(f"The configuration file '{config_file}' does not exist.")
         self._config.read(config_file)
+        print ("Read config file:")
+        print (self._config.sections())
 
     def get_vault_path(self):
         """
@@ -108,6 +111,7 @@ class AppConfig:
         self._config.read_string(config_string)
 
     def save_config(self):
+        print ("Start saving config file")
         if self._instance._config_file:
             with open(self._instance._config_file, 'w') as configfile:
                 self._config.write(configfile)
