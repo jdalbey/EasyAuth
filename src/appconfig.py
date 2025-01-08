@@ -1,6 +1,5 @@
 import configparser
 import os
-from PyQt5.QtWidgets import QMessageBox
 
 class AppConfig:
     """Application configuration settings"""
@@ -17,25 +16,21 @@ class AppConfig:
 
     def __read(self, config_file):
         if not os.path.exists(config_file):
-            reply = QMessageBox.question(None, "Create Config File",
-                                         f"The configuration file '{config_file}' does not exist. Do you want to create it?",
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                with open(config_file, 'w') as file:
-                    self._config['settings'] = {
-                        'vault_path': 'default.db',
-                        'smart_filtering': 'False',
-                        'theme_name': 'default',
-                        'alt_id': '',
-                        'auto_find_qr': 'False' 
-                    }
-                    self._config.write(file)
-                    print ("saved config file")
-            else:
-                raise FileNotFoundError(f"The configuration file '{config_file}' does not exist.")
-        self._config.read(config_file)
-        print ("Read config file:")
-        print (self._config.sections())
+            print (f"The configuration file '{config_file}' does not exist, creating it.")
+            with open(config_file, 'w') as file:
+                self._config['settings'] = {
+                    'vault_path': 'default.db',
+                    'smart_filtering': 'False',
+                    'theme_name': 'default',
+                    'alt_id': '',
+                    'auto_find_qr': 'False'
+                }
+                self._config.write(file)
+                print ("saved config file")
+        else:
+            self._config.read(config_file)
+            print ("Read config file:")
+            print (self._config.sections())
 
     def get_vault_path(self):
         """
