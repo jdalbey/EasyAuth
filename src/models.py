@@ -2,11 +2,13 @@
 import json
 import os
 from pathlib import Path # Python 3.5+
+from dataclasses import dataclass
+
+@dataclass
 class Account:
-    def __init__(self, provider, label, secret):
-        self.provider = provider
-        self.label = label
-        self.secret = secret
+    provider: str
+    label: str
+    secret: str
 
 class AccountManager:
     kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
