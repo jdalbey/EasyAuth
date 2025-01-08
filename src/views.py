@@ -76,12 +76,7 @@ class AppView:
         search_label = tk.Label(center_frame, text="Q")
         search_label.pack(side="right", padx=10)
         # Add a label for the "Timer" to the menu bar frame
-        import customtkinter as ctk
         timer_font = ctk.CTkFont(family='Courier', weight="bold", size=24)
-        # timer_label = tk.Label(menu_bar, text=" 30 ", font=timer_font, fg="yellow", bg="gray")
-        # timer_label = tk.Label(menu_bar_frame, text=" 30 ", font=timer_font, bg="gray", fg="yellow")
-        # timer_label.pack(side="right", padx=20)
-        # timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
         self.timer_label = ctk.CTkLabel(menu_bar_frame, text="30", font=timer_font, text_color="yellow", fg_color="gray",
                        corner_radius=15, anchor='s')
         self.timer_label.pack(side='right', padx=20, pady=1, ipady=3)
@@ -98,15 +93,6 @@ class AppView:
         filter_button.config(menu=fmenu)
         filter_button.pack(side="right", padx=10)
 
-        #add_account_button = tk.Button(menu_bar, text="Add Account", command=self.show_add_account_form, bg='#345', fg='black', font=('Arial', 14))
-        #menu_bar.add_command(label="Add Account", command=add_account_button)
-        #add_account_button.pack(side='left', padx=5)
-        # Timer label on the right-hand side of the menu bar
-        #timer_font = ctk.CTkFont(family='Courier', weight="bold", size=20)
-        #self.timer_label = tk.Label(menu_bar, text=" 30 ", font=timer_font, fg="yellow", bg="gray")
-        #self.timer_label.pack(side='right', padx=5)
-
-        #self.root.config(menu=menu_bar)
 
     def backup_restore(self):
         print("Backup/Restore selected")
@@ -123,39 +109,9 @@ class AppView:
     def settings(self):
         print("Settings selected")
     def show_about_dialog(self):
+        self.root.option_add('*Dialog.msg.font', 'Helvetica 10')
         tk.messagebox.showinfo("About", "Easy Auth\nVersion 0.0.1\nhttps://github.com/jdalbey/EasyAuth")
-
-    # def create_widgets(self):
-    #     self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
-    #     self.scrollable_frame.pack(fill='both', expand=True)
-
-    #     self.add_button = ctk.CTkButton(self.root, text="Add Account", command=self.show_add_account_form)
-    #     self.add_button.pack(side='left')
-
-    #     # self.refresh_button = ctk.CTkButton(self.root, text="Refresh", command=self.refresh_accounts)
-    #     # self.refresh_button.pack(side='left')
-
-    #     self.timer_label = ctk.CTkLabel(self.root, text="Time remaining: 30")
-    #     self.timer_label.pack(side='top')
-
-
-    #     self.refresh_accounts()
-    #     self.start_timer()
-    # def create_widgets(self):
-    #     top_frame = ctk.CTkFrame(self.root)
-    #     top_frame.pack(side='top', fill='x', padx=10, pady=10)
-
-    #     self.add_button = ctk.CTkButton(top_frame, text="Add Account", command=self.show_add_account_form)
-    #     self.add_button.pack(side='left', padx=5)
-    #     timer_font=ctk.CTkFont(family='Courier',weight="bold", size=20)
-    #     self.timer_label = ctk.CTkLabel(top_frame, text=" 30 ", font=timer_font, text_color="yellow", fg_color = "gray", corner_radius=5)
-    #     self.timer_label.pack(side='right', padx=5)
-
-    #     self.scrollable_frame = ctk.CTkScrollableFrame(self.root)
-    #     self.scrollable_frame.pack(fill='both', expand=True, padx=10, pady=10)
-
-    #     self.refresh_accounts()
-    #     self.start_timer()
+        self.root.option_clear()
 
     def refresh_accounts(self):
         for widget in self.scrollable_frame.winfo_children():
@@ -202,40 +158,9 @@ class AppView:
             self.refresh_accounts()
         self.root.after(1000, self.update_timer)  # Schedule the update_timer function to run after 1 second
 
+
     def show_add_account_form(self):
-        self.add_account_window = ctk.CTkToplevel(self.root)
-        self.add_account_window.title("New Account")
-
-        ctk.CTkLabel(self.add_account_window, text="Create a New Account from:").pack(pady=10)
-        message1 = "• Fill the form automatically from a QR code on the screen"
-        ctk.CTkLabel(self.add_account_window, text=message1).pack(anchor='w', padx=20)
-        ctk.CTkButton(self.add_account_window, text="Find QR code", command=self.controller.find_qr_code).pack(anchor='w', padx=40)
-        message2 = "• Fill the form automatically from a QR image in a file"
-        ctk.CTkLabel(self.add_account_window, text=message2).pack(anchor='w', padx=20)
-        ctk.CTkButton(self.add_account_window, text="Open file", command=self.controller.open_qr_image).pack(anchor='w', padx=40)
-
-        ctk.CTkLabel(self.add_account_window, text="• Enter the data manually").pack(anchor='w', padx=20)
-
-        form_frame = ctk.CTkFrame(self.add_account_window)
-        form_frame.pack(pady=10)
-
-        ctk.CTkLabel(form_frame, text="Provider").grid(row=0, column=0, padx=10, pady=5, sticky='e')
-        self.provider_entry = ctk.CTkEntry(form_frame)
-        self.provider_entry.grid(row=0, column=1, padx=10, pady=5)
-
-        ctk.CTkLabel(form_frame, text="Label").grid(row=1, column=0, padx=10, pady=5, sticky='e')
-        self.label_entry = ctk.CTkEntry(form_frame)
-        self.label_entry.grid(row=1, column=1, padx=10, pady=5)
-
-        ctk.CTkLabel(form_frame, text="Secret Key").grid(row=2, column=0, padx=10, pady=5, sticky='e')
-        self.secret_key_entry = ctk.CTkEntry(form_frame)
-        self.secret_key_entry.grid(row=2, column=1, padx=10, pady=5)
-
-        button_frame = ctk.CTkFrame(self.add_account_window)
-        button_frame.pack(pady=10)
-       
-        ctk.CTkButton(button_frame, text="Save", command=lambda: self.controller.save_account(self.provider_entry.get(), self.label_entry.get(), self.secret_key_entry.get())).pack(side='left', padx=20)
-        ctk.CTkButton(button_frame, text="Cancel", command=self.add_account_window.destroy).pack(side='right', padx=20)
+        Form_AddAccount(self.root,self.controller)
 
     def show_edit_account_form(self, index, account):
         self.edit_account_window = ctk.CTkToplevel(self.root)
@@ -283,3 +208,60 @@ class AppView:
     
     def run(self):
         self.root.mainloop()
+
+class Form_AddAccount:
+        def __init__ (self, root,controller):
+            self.add_account_window = ctk.CTkToplevel(root)
+            self.add_account_window.title("New Account")
+            self.controller = controller
+            self.create_add_account_form()
+
+        def is_form_filled(self,*args):
+            # Check if all fields have a value
+            all_filled = all(var.get().strip() for var in self.form_vars)
+            self.save_button["state"] = "normal" if all_filled else "disabled"
+
+        def create_add_account_form(self):
+            # List of StringVars, one for each field
+            self.form_vars = []
+
+            ctk.CTkLabel(self.add_account_window, text="There are 3 ways to create a new account:").pack(pady=10)
+            message1 = "1) Fill the form automatically from a QR code on the screen."
+            ctk.CTkLabel(self.add_account_window, text=message1).pack(anchor='w', padx=20)
+            ctk.CTkButton(self.add_account_window, text="Find QR code", command=self.controller.find_qr_code).pack(anchor='w',
+                                                                                                                   padx=40)
+            message2 = "2) Fill the form automatically from a QR image in a file."
+            ctk.CTkLabel(self.add_account_window, text=message2).pack(anchor='w', padx=20)
+            ctk.CTkButton(self.add_account_window, text="Open file", command=self.controller.open_qr_image).pack(anchor='w',
+                                                                                                                 padx=40)
+
+            ctk.CTkLabel(self.add_account_window, text="3) Enter the data manually.").pack(anchor='w', padx=20)
+
+            form_frame = ctk.CTkFrame(self.add_account_window)
+            form_frame.pack(pady=10)
+
+            ctk.CTkLabel(form_frame, text="Provider").grid(row=0, column=0, padx=10, pady=5, sticky='e')
+            var = tk.StringVar()
+            self.form_vars.append(var)
+            var.trace_add("write", self.is_form_filled)
+            self.provider_entry = ctk.CTkEntry(form_frame, textvariable=var)
+            self.provider_entry.grid(row=0, column=1, padx=10, pady=5)
+
+            ctk.CTkLabel(form_frame, text="Label").grid(row=1, column=0, padx=10, pady=5, sticky='e')
+            self.label_entry = ctk.CTkEntry(form_frame)
+            self.label_entry.grid(row=1, column=1, padx=10, pady=5)
+
+            ctk.CTkLabel(form_frame, text="Secret Key").grid(row=2, column=0, padx=10, pady=5, sticky='e')
+            self.secret_key_entry = ctk.CTkEntry(form_frame)
+            self.secret_key_entry.grid(row=2, column=1, padx=10, pady=5)
+
+            button_frame = ctk.CTkFrame(self.add_account_window)
+            button_frame.pack(pady=10)
+
+            self.save_button = ctk.CTkButton(button_frame, text="Save",
+                          command=lambda: self.controller.save_account(self.provider_entry.get(), self.label_entry.get(),
+                                                                       self.secret_key_entry.get()))
+            self.save_button.pack(side='left', padx=20)
+            self.save_button["state"] = "disabled"
+            ctk.CTkButton(button_frame, text="Cancel", command=self.add_account_window.destroy).pack(side='right', padx=20)
+            self.is_form_filled()

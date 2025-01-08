@@ -14,7 +14,7 @@ class AppController:
         self.logger = logging.getLogger(__name__)
         self.account_manager = AccountManager()
         self.secrets_manager = SecretsManager()
-        self.view = None  # This will be set by the view
+        self.view = None  # This will be set by the view using our set_view() method
 
     def set_view(self, view):
         self.view = view
@@ -22,28 +22,19 @@ class AppController:
     def get_accounts(self):
         return self.account_manager.accounts
 
-    def add_account(self):
-        """ Console stub for adding an account """
-        provider = input("Enter provider: ")
-        label = input("Enter label: ")
-        secret = find_qr_code()  # Replace with actual QR code scanning
-        encrypted_secret = self.secrets_manager.encrypt(secret)
-        account = Account(provider, label, encrypted_secret)
-        self.account_manager.add_account(account)
-        self.logger.info(f"Added account: {provider} ({label})")
+    def get_provider_icon_name(self, provider):
+        return self.account_manager.get_provider_icon_name(provider)
 
+    
     def update_account(self, index, provider, label, secret):
         encrypted_secret = self.secrets_manager.encrypt(secret)
         account = Account(provider, label, encrypted_secret)
         self.account_manager.update_account(index, account)
         self.logger.info(f"Updated account: {provider} ({label})")
-        self.view.refresh_accounts()
-        self.view.edit_account_window.destroy()
 
     def delete_account(self,account):
         #TODO: Fix issues with confirmation dialog appearin beneath edit window
         self.account_manager.delete_account(account)
-        self.view.refresh_accounts()
 
     def find_qr_code(self):
         url = scan_screen_for_qr_code()
@@ -63,9 +54,11 @@ class AppController:
             if not is_valid_secretkey(secret_key):
                 print("Secret key not valid")
                 exit()
-            self.view.populate_add_account_form(issuer, label, secret_key)
+            #self.view.populate_add_account_form(issuer, label, secret_key)
+            return issuer, label, secret_key
         else:
             self.logger.info("No QR code found")
+            return None
 
     def open_qr_image(self):
         # Placeholder for opening a QR image
@@ -76,5 +69,3 @@ class AppController:
         account = Account(provider, label, encrypted_secret)
         self.account_manager.add_account(account)
         self.logger.info(f"Saved account: {provider} ({label})")
-        self.view.refresh_accounts()
-        self.view.add_account_window.destroy()

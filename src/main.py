@@ -1,8 +1,11 @@
 import logging
+import sys
+
+from PyQt5.QtWidgets import QApplication
 
 from appconfig import AppConfig
 from controllers import AppController
-from views import AppView
+from view_qt import AppView
 from pathlib import Path # Python 3.5+
 def main():
     # Configure logging
@@ -18,13 +21,13 @@ def main():
     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
     config = AppConfig(filepath)
 
-
+    app = QApplication(sys.argv)
     # Initialize the controller and view
     controller = AppController()
     view = AppView(controller)
 
     # Start the application
-    view.run()
-
+    view.show()
+    sys.exit(app.exec_())
 if __name__ == '__main__':
     main()

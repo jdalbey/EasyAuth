@@ -25,7 +25,10 @@ class AccountManager:
             print (f"Missing vault file {self.vault_path}")
             return []
             #raise FileNotFoundError
-
+    def get_provider_icon_name(self, provider):
+        # TODO: Look up provider icon
+        return "images/favicon_32x32.png"
+    
     def set_accounts(self,account_string):
         """Set accounts from a string - dependency injection for testing
         @param account_string is JSON string of vault data"""
@@ -42,7 +45,8 @@ class AccountManager:
 
     def add_account(self, account):
         #TODO: Don't allow duplicate accounts (i.e., duplicate secret key)
-        self.accounts.append(account)
+        #self.accounts.append(account)
+        self.accounts.insert(0,account)
         self.save_accounts()
 
     def update_account(self, index, account):
