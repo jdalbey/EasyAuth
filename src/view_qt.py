@@ -122,8 +122,8 @@ class AppView(QMainWindow):
         self.timer_label = QLabel("  ")
         self.timer_label.setFont(timer_font)
         self.timer_label.setStyleSheet("""
-            background-color: gray;
-            color: yellow;
+            background-color: lightgray;
+            color: black;
             padding: 3px 15px;
             border-radius: 15px;
         """)
@@ -163,6 +163,8 @@ class AppView(QMainWindow):
             otp = pyotp.TOTP(secret_key).now()
             row_frame = QFrame()
             row_frame.setFrameShape(QFrame.StyledPanel)
+            # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
+            row_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             # Set internal padding for the frame
             #row_frame.setContentsMargins(0,0,0,0)
 
@@ -179,7 +181,7 @@ class AppView(QMainWindow):
             label = QLabel(f"{account.provider} ({account.label})")
             label.setFont(QFont("Arial", 12))
             otplabel = QLabel(f"{otp}")
-            otplabel.setFont(QFont("Courier", 14, QFont.Bold))
+            otplabel.setFont(QFont("DejaVu Sans Mono", 14, QFont.Bold))
             # Set the size policy for widget1
             label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
@@ -216,10 +218,15 @@ class AppView(QMainWindow):
 
             self.scroll_layout.addWidget(row_frame)
 
+        self.scroll_layout.addStretch() # this keeps the rows bunched up at the top
 
     def update_timer(self):
         time_remaining = 30 - (int(time.time()) % 30)
-        self.timer_label.setText(f"{time_remaining}")
+        display_time = str(time_remaining)
+        # pad the display time if necessary
+        if len(display_time) < 2:
+            display_time = ' ' + display_time
+        self.timer_label.setText(display_time)
         if time_remaining == 30:
             self.refresh_accounts()
 
