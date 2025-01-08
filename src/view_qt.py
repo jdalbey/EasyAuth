@@ -185,7 +185,10 @@ class AppView(QMainWindow):
             for index, account in enumerate(accounts):
                 if search_term in account.provider.lower():
                     secret_key = self.controller.secrets_manager.decrypt(account.secret)
-                    otp = pyotp.TOTP(secret_key).now()
+                    try:
+                        otp = pyotp.TOTP(secret_key).now()
+                    except:
+                        otp = "??????"
                     row_frame = QFrame()
                     row_frame.setFrameShape(QFrame.StyledPanel)
                     # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.

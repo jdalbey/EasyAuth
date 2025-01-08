@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
 from account_entry_fields import AccountEntryFields
 from models import Account
+from otp_manager import is_valid_secretkey
 
 class AddAccountDlg(QDialog):
     def __init__(self, controller, parent=None):
@@ -53,22 +54,19 @@ class AddAccountDlg(QDialog):
         self.layout.addLayout(self.button_layout)
         self.setLayout(self.layout)
 
-    # def set_provider(self, provider):
-    #     self.provider_entry.setText(provider)
-
-    # def set_label(self, label):
-    #     self.label_entry.setText(label)
-
-    # def set_secret(self, secret):
-    #     self.secret_entry.setText(secret)
-
     def save_fields(self):
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
-        self.controller.save_account(provider, label, secret)
-        self.accept()
-
+        # Validate secret key
+        if is_valid_secretkey(secret):
+            self.controller.save_account(provider, label, secret)
+            self.accept()
+        else:
+            reply = QMessageBox()
+            reply.setText(f'The secret key is invalid')
+            reply.setIcon(QMessageBox.Information)
+            reply.exec_()
     # Set values into fields (used by auto qr code scanning)
     def set_account(self, account):
         self.shared_fields.set_fields(account)
