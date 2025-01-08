@@ -27,10 +27,11 @@ class AppController:
 
     
     def update_account(self, index, provider, label, secret):
+        print (f"entering controller update account with {index} {provider}")
         encrypted_secret = self.secrets_manager.encrypt(secret)
         account = Account(provider, label, encrypted_secret)
         self.account_manager.update_account(index, account)
-        self.logger.info(f"Updated account: {provider} ({label})")
+        print(f"Updated account: {index} {provider} ({label})")
 
     def delete_account(self,account):
         #TODO: Fix issues with confirmation dialog appearin beneath edit window

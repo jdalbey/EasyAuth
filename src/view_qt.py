@@ -19,6 +19,7 @@ from controllers import AppController
 class AppView(QMainWindow):
     def __init__(self, controller):
         super().__init__()
+        self.logger = logging.getLogger(__name__)
         self.controller = controller
         self.controller.set_view(self)
         
@@ -30,9 +31,12 @@ class AppView(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
         
+        self.create_main_panel()
         self.create_menubar()
         self.create_toolbar()
-        self.create_main_panel()
+
+        self.refresh_accounts()
+        self.start_timer()
 
     def create_menubar(self):
         # Create menubar
@@ -91,10 +95,11 @@ class AppView(QMainWindow):
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         toolbar.addWidget(spacer)
         # Create search and filter group
-        search_box = QLineEdit()
-        search_box.setPlaceholderText("Search...")
-        search_box.setMaximumWidth(200)
-        toolbar.addWidget(search_box)
+        self.search_box = QLineEdit()
+        self.search_box.setPlaceholderText("Provider search...")
+        self.search_box.textChanged.connect(lambda: self.refresh_accounts())  # Dynamic search
+        self.search_box.setMaximumWidth(200)
+        toolbar.addWidget(self.search_box)
         
         # Add filter button with icon and dropdown menu
         filter_btn = QToolButton()
@@ -137,9 +142,6 @@ class AppView(QMainWindow):
         self.scroll_layout = QVBoxLayout(scroll_content)
         scroll_area.setWidget(scroll_content)
         self.main_layout.addWidget(scroll_area)
-        
-        self.refresh_accounts()
-        self.start_timer()
 
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
@@ -149,6 +151,7 @@ class AppView(QMainWindow):
 
 
     def refresh_accounts(self):
+        search_term = self.search_box.text().lower()
         # for widget in self.scroll_layout.children():
         #     widget.deleteLater()
         accounts = self.controller.get_accounts()
@@ -159,64 +162,66 @@ class AppView(QMainWindow):
         # Adjust the spacing of the scroll_layout
         self.scroll_layout.setSpacing(2)  # Set vertical spacing between rows
         for index, account in enumerate(accounts):
-            secret_key = self.controller.secrets_manager.decrypt(account.secret)
-            otp = pyotp.TOTP(secret_key).now()
-            row_frame = QFrame()
-            row_frame.setFrameShape(QFrame.StyledPanel)
-            # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
-            row_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            # Set internal padding for the frame
-            #row_frame.setContentsMargins(0,0,0,0)
+            if search_term in account.provider.lower():
+                secret_key = self.controller.secrets_manager.decrypt(account.secret)
+                otp = pyotp.TOTP(secret_key).now()
+                row_frame = QFrame()
+                row_frame.setFrameShape(QFrame.StyledPanel)
+                # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
+                row_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                # Set internal padding for the frame
+                #row_frame.setContentsMargins(0,0,0,0)
 
-            rowframe_layout = QHBoxLayout(row_frame)
-            rowframe_layout.setSpacing(5)  # Set horizontal spacing between widgets in the row
-            # Assuming your_frame is inside a parent widget with a layout
-            # Set external padding around the frame by adjusting the layout margins of the parent widget
-            #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
-            provider_icon_name = self.controller.get_provider_icon_name(account.provider)
-            provider_icon = QPixmap(provider_icon_name)
-            icon_label = QLabel()
-            icon_label.setPixmap(provider_icon)
-            rowframe_layout.addWidget(icon_label)
-            label = QLabel(f"{account.provider} ({account.label})")
-            label.setFont(QFont("Arial", 12))
-            otplabel = QLabel(f"{otp}")
-            otplabel.setFont(QFont("DejaVu Sans Mono", 14, QFont.Bold))
-            # Set the size policy for widget1
-            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                rowframe_layout = QHBoxLayout(row_frame)
+                rowframe_layout.setSpacing(5)  # Set horizontal spacing between widgets in the row
+                # Assuming your_frame is inside a parent widget with a layout
+                # Set external padding around the frame by adjusting the layout margins of the parent widget
+                #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
+                provider_icon_name = self.controller.get_provider_icon_name(account.provider)
+                provider_icon = QPixmap(provider_icon_name)
+                icon_label = QLabel()
+                icon_label.setPixmap(provider_icon)
+                rowframe_layout.addWidget(icon_label)
+                label = QLabel(f"{account.provider} ({account.label})")
+                label.setFont(QFont("Arial", 12))
+                otplabel = QLabel(f"{otp}")
+                otplabel.setFont(QFont("DejaVu Sans Mono", 14, QFont.Bold))
+                # Set the size policy for widget1
+                label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-            rowframe_layout.addWidget(label)
-            #rowframe_layout.addStretch()
-            rowframe_layout.addWidget(otplabel)
+                rowframe_layout.addWidget(label)
+                #rowframe_layout.addStretch()
+                rowframe_layout.addWidget(otplabel)
 
-            copy_btn = QToolButton()
-            if os.path.exists("images/copy_icon.png"):
-                copy_icon = QIcon("images/copy_icon.png")
-                copy_btn.setIcon(copy_icon)
-                copy_btn.setIconSize(QSize(16, 16))
-            else:
-                logging.warning("missing copy icon")
-            #copy_btn.setPopupMode(QToolButton.InstantPopup)
-            copy_btn.setToolTip("Copy code to clipboard")
-            copy_btn.clicked.connect(lambda: self.copy_to_clipboard(otp))
-            rowframe_layout.addWidget(copy_btn)
+                copy_btn = QToolButton()
+                if os.path.exists("images/copy_icon.png"):
+                    copy_icon = QIcon("images/copy_icon.png")
+                    copy_btn.setIcon(copy_icon)
+                    copy_btn.setIconSize(QSize(16, 16))
+                else:
+                    logging.warning("missing copy icon")
+                #copy_btn.setPopupMode(QToolButton.InstantPopup)
+                copy_btn.setToolTip("Copy code to clipboard")
+                copy_btn.clicked.connect(lambda: self.copy_to_clipboard(otp))
+                rowframe_layout.addWidget(copy_btn)
 
-            #rowframe_layout.addStretch()
+                #rowframe_layout.addStretch()
 
-            edit_btn = QToolButton()
-            if os.path.exists("images/pencil_icon.png"):
-                edit_icon = QIcon("images/pencil_icon.png")
-                edit_btn.setIcon(edit_icon)
-                edit_btn.setIconSize(QSize(16, 16))  # Adjust size as needed
-            else:
-                logging.warning("missing pencil icon")
-            #edit_btn.setPopupMode(QToolButton.InstantPopup)
-            edit_btn.setToolTip("Edit account")  # Add tooltip for accessibility
-            # pass the current values of index, account to show_edit_account_form
-            edit_btn.clicked.connect(lambda index=index, account=account: self.show_edit_account_form(index, account))
-            rowframe_layout.addWidget(edit_btn)
+                edit_btn = QToolButton()
+                if os.path.exists("images/pencil_icon.png"):
+                    edit_icon = QIcon("images/pencil_icon.png")
+                    edit_btn.setIcon(edit_icon)
+                    edit_btn.setIconSize(QSize(16, 16))  # Adjust size as needed
+                else:
+                    logging.warning("missing pencil icon")
+                #edit_btn.setPopupMode(QToolButton.InstantPopup)
+                edit_btn.setToolTip("Edit account")  # Add tooltip for accessibility
+                # pass the current values of index, account to show_edit_account_form
+                print (index)
+                edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
+                rowframe_layout.addWidget(edit_btn)
 
-            self.scroll_layout.addWidget(row_frame)
+                self.scroll_layout.addWidget(row_frame)
 
         self.scroll_layout.addStretch() # this keeps the rows bunched up at the top
 
@@ -240,6 +245,7 @@ class AppView(QMainWindow):
         self.refresh_accounts()
 
     def show_edit_account_form(self,index,account):
+        print (f"entering show_edit_account_form with {index} {account.provider}")
         dialog_EditAcct = EditAccountDialog(self, self.controller, index, account)
         dialog_EditAcct.exec_()
         self.refresh_accounts()
@@ -359,7 +365,7 @@ class EditAccountDialog(QDialog):
         self.controller = controller
         self.account = account
         self.index = index
-
+        print (f"EditAccountDialog init got {index} {account.provider}")
         self.setWindowTitle("Edit Account")
         self.setMinimumWidth(400)
 
@@ -393,7 +399,7 @@ class EditAccountDialog(QDialog):
         button_layout = QHBoxLayout(button_frame)
 
         save_btn = QPushButton("Save")
-        save_btn.clicked.connect(lambda: self.handle_update_request(
+        save_btn.clicked.connect(lambda index=index: self.handle_update_request(
             self.index,
             self.provider_entry.text(),
             self.label_entry.text(),
@@ -412,6 +418,7 @@ class EditAccountDialog(QDialog):
         layout.addWidget(button_frame)
 
     def handle_update_request(self,index, provider, label, secret):
+        print (f"EditAcctDialog is handling update request for: {index} {provider}")
         self.controller.update_account(index, provider, label, secret)
         self.close()
 
