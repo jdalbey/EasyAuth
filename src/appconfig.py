@@ -11,12 +11,14 @@ class AppConfig:
             cls._instance._config_file = config_file
             cls._instance._config = configparser.ConfigParser()
             if config_file:
-                cls._instance.__read(config_file)
+                cls._instance.read(config_file)
         return cls._instance
 
-    def __read(self, config_file):
+    def read(self, config_file):
         if not os.path.exists(config_file):
             print (f"The configuration file '{config_file}' does not exist, creating it.")
+            if not os.path.exists(os.path.dirname(config_file)):
+                os.makedirs(os.path.dirname(config_file))
             with open(config_file, 'w') as file:
                 self._config['settings'] = {
                     'vault_path': 'default.db',
@@ -94,9 +96,9 @@ class AppConfig:
 
     def reload(self, config_file):
         """
-        Reload the configuration from a file.
+        Reload the configuration from a file.  Used for testing.
         """
-        self.__read(config_file)
+        self.read(config_file)
 
     def set_config(self, config_string):
         """
