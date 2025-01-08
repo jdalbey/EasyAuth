@@ -21,7 +21,6 @@ class AccountManager:
                 content = json.load(f)
                 return [Account(**acc) for acc in content]
         else:
-            #TODO Report no entries in vault
             print (f"Missing vault file {self.vault_path}")
             return []
             #raise FileNotFoundError
@@ -36,7 +35,10 @@ class AccountManager:
 
     # TODO: Need a way to report errors in the model back to the view.
     def save_accounts(self):
-        # TODO: Handle missing vault (so create it).
+        # Handle missing vault (so create it).
+        if not os.path.exists(os.path.dirname(self.vault_path)):
+            os.makedirs(os.path.dirname(self.vault_path))
+
         try:
             with open(self.vault_path, 'w') as f:
                 json.dump([acc.__dict__ for acc in self.accounts], f)
