@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
 from account_entry_fields import AccountEntryFields
 from models import Account
 from otp_manager import is_valid_secretkey
@@ -23,7 +24,8 @@ class AddAccountDialog(QDialog):
         #find_qr_btn.clicked.connect(self.controller.find_qr_code)
         find_qr_btn.clicked.connect(lambda: self.get_qr_code())
         find_qr_btn.setContentsMargins(40, 0, 0, 0)
-        self.layout.addWidget(find_qr_btn)
+        find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.layout.addWidget(find_qr_btn, alignment=Qt.AlignCenter)
 
         qr_file_label = QLabel("• Fill the form automatically from a QR image in a file")
         qr_file_label.setContentsMargins(20, 0, 0, 0)
@@ -32,7 +34,8 @@ class AddAccountDialog(QDialog):
         open_file_btn = QPushButton("Open file")
         open_file_btn.clicked.connect(self.controller.open_qr_image)
         open_file_btn.setContentsMargins(40, 0, 0, 0)
-        self.layout.addWidget(open_file_btn)
+        open_file_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.layout.addWidget(open_file_btn, alignment=Qt.AlignCenter)
 
         manual_label = QLabel("• Enter the data manually")
         manual_label.setContentsMargins(20, 0, 0, 0)
