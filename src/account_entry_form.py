@@ -1,5 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout, QToolButton
 
 
 class AccountEntryForm(QFrame):
@@ -17,11 +18,31 @@ class AccountEntryForm(QFrame):
         form_layout.addWidget(self.provider_entry, 0, 1)
 
         # Label
-        form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
+        form_layout.addWidget(QLabel("User:"), 1, 0, Qt.AlignRight)
         self.label_entry = QLineEdit()
         self.label_entry.textChanged.connect(self.validate_form)
         form_layout.addWidget(self.label_entry, 1, 1)
-
+        help_button = QToolButton()
+        #help_button.setText("?")
+        help_button.setToolTip("Enter a label to identify this account\nsuch as your username or email address for the service.")
+        # Name identifying the website or online service this account authenticates with
+        # The alphanumeric code shared with you by the provider.
+        #help_button.setStyleSheet("font-weight: bold; color: blue;")  # Style for clarity
+        help_icon = QIcon("images/question_mark_icon_16.png")
+        help_button.setIcon(help_icon)
+        help_button.setIconSize(QSize(16, 16))
+        # Make square button invisible so only circular icon shows
+        help_button.setStyleSheet(
+            """
+            QToolButton {
+                border: none;       /* Remove border */
+                background: none;   /* Remove background */
+                padding: 0px;       /* Remove padding */
+            }
+            """
+        )
+        help_button.setPopupMode(QToolButton.InstantPopup)
+        form_layout.addWidget(help_button, 1, 2)
         # Secret Key
         form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
         self.secret_entry = QLineEdit()
@@ -37,4 +58,10 @@ class AccountEntryForm(QFrame):
         self.provider_entry.setText(account.provider)
         self.label_entry.setText(account.label)
         self.secret_entry.setText(account.secret)
-        
+
+    # disable the secret key so it can't be altered while QR code is revealed.
+    def disable_fields(self):
+        self.secret_entry.setDisabled(True)
+
+    def enable_fields(self):
+        self.secret_entry.setEnabled(True)

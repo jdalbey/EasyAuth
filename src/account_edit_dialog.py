@@ -102,6 +102,10 @@ class EditAccountDialog(QDialog):
             self.controller.delete_account(self.account)
             self.accept()
 
+    #TODO:  Figure out how to keep the revealed QR code in sync with the secret key field.
+    #       If user alters secret key field the visible code will be out of date, so maybe hide it
+    #       when user changes the field?  Or don't allow changes until the QR is hidden?
+    #       Disable the text fields when code is revealed and enable them when it's hidden.
     def handle_QR_reveal(self):
         # TODO: more robust flag
         if self.reveal_qr_button.text() == "Reveal QR code":
@@ -113,8 +117,11 @@ class EditAccountDialog(QDialog):
             self.qr_code_label.setPixmap(pixmap)
             self.layout().addWidget(self.qr_code_label)
             self.reveal_qr_button.setText("Hide QR code")
+            self.shared_fields.disable_fields()
         else:
             # Hide QR code
             self.qr_code_label.deleteLater()
-            self.qr_code_label = QLabel()
+            #self.qr_code_label = None  #QLabel()
             self.reveal_qr_button.setText("Reveal QR code")
+            self.shared_fields.enable_fields()
+        self.adjustSize()  # Doesn't work - Adjust the dialog size to fit its contents
