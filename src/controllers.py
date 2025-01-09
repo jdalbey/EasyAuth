@@ -6,6 +6,7 @@ import pyotp
 from otp_manager import is_valid_secretkey
 from models import AccountManager, Account
 from secrets_manager import SecretsManager
+from otp_manager import OTPManager
 from find_qr_codes import scan_screen_for_qr_code
 from find_qr_code import find_qr_code
 
@@ -14,6 +15,7 @@ class AppController:
         self.logger = logging.getLogger(__name__)
         self.account_manager = AccountManager()
         self.secrets_manager = SecretsManager()
+        self.otp_manager = OTPManager(self.secrets_manager)
         self.view = None  # This will be set by the view using our set_view() method
 
     def set_view(self, view):
@@ -36,7 +38,8 @@ class AppController:
     def delete_account(self,account):
         #TODO: Fix issues with confirmation dialog appearin beneath edit window
         self.account_manager.delete_account(account)
-
+    def generate_qr_code(self, account):
+        return self.otp_manager.generate_qr_code(account)
     def find_qr_code(self):
         url = scan_screen_for_qr_code()
         if len(url) == 1:

@@ -332,9 +332,11 @@ class EditAccountDialog(QDialog):
         self.secrets_manager = SecretsManager()
         self.account = account
         self.index = index
+        self.qr_code_label = None  # Initialize qr_code_label to None
+
         print (f"EditAccountDialog init got {index} {account.provider}")
         self.setWindowTitle("Edit Account")
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(475)
 
         # Main layout
         layout = QVBoxLayout(self)
@@ -360,6 +362,24 @@ class EditAccountDialog(QDialog):
         form_layout.addWidget(self.secret_key_entry, 2, 1)
 
         layout.addWidget(form_frame)
+
+        # Last Used section
+        last_used_frame = QFrame()
+        last_used_frame.setFrameStyle(QFrame.StyledPanel)
+        last_used_layout = QGridLayout(last_used_frame)
+
+        # Last Used Label
+        last_used_layout.addWidget(QLabel("Last Used:"), 0, 0, Qt.AlignRight)
+        self.last_used_label = QLabel(account.last_used)
+        last_used_layout.addWidget(self.last_used_label, 0, 1)
+
+        # Reveal QR Code Button
+        self.reveal_qr_button = QPushButton("Reveal QR code")
+        self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
+        last_used_layout.addWidget(self.reveal_qr_button, 1, 0, 1, 2, Qt.AlignCenter)
+
+        layout.addWidget(last_used_frame)
 
         # Button section
         button_frame = QWidget()
@@ -400,7 +420,22 @@ class EditAccountDialog(QDialog):
             self.controller.delete_account(self.account)
             self.accept()
 
-
+    def handle_QR_reveal(self):
+        if self.qr_code_label is None:
+            # Generate QR code
+            qr_code_image = self.controller.generate_qr_code(self.account)
+            pixmap = QPixmap()
+            pixmap.loadFromData(qr_code_image)
+            self.qr_code_label = QLabel()
+            self.qr_code_label.setPixmap(pixmap)
+            self.layout().addWidget(self.qr_code_label)
+            self.reveal_qr_button.setText("Hide QR code")
+        else:
+            # Hide QR code
+            self.qr_code_label.deleteLater()
+            self.qr_code_label = None
+            self.reveal_qr_button.setText("Reveal QR code")
+            
 if __name__ == '__main__':
     import sys
     # Configure logging
