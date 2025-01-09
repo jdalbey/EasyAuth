@@ -1,3 +1,5 @@
+import logging
+
 from cryptography.fernet import Fernet
 from appconfig import AppConfig
 import hashlib
@@ -5,6 +7,9 @@ import base64
 
 class SecretsManager:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        #logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+
         self.key = self.derive_key_from_uuid()
         self.cipher_suite = Fernet(self.key)
 
@@ -23,6 +28,7 @@ class SecretsManager:
         return encrypted_secret.decode()  # Return as string
 
     def decrypt(self, encrypted_secret):
+        logging.debug(f"Decrypting: {encrypted_secret[:5]}")
         decrypted_secret = self.cipher_suite.decrypt(encrypted_secret.encode())
         return decrypted_secret.decode()  # Return as string
     

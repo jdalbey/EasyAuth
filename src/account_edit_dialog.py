@@ -1,8 +1,11 @@
+import logging
+import copy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
     QVBoxLayout, QLineEdit, QHBoxLayout
 
+from account_entry_form import AccountEntryForm
 from models import Account
 from secrets_manager import SecretsManager
 
@@ -10,46 +13,56 @@ from secrets_manager import SecretsManager
 class EditAccountDialog(QDialog):
     def __init__(self, parent, controller, index, account):
         super().__init__(parent)
+        self.logger = logging.getLogger(__name__)
         self.controller = controller
         self.secrets_manager = SecretsManager()
         self.account = account
         self.index = index
 
-        print (f"EditAccountDialog init got {index} {account.provider}")
+        print (f"EditAccountDialog init got {index} {account.provider} {account.secret[:7]}")
         self.setWindowTitle("Edit Account")
         self.setMinimumWidth(475)
 
         # Main layout
         layout = QVBoxLayout(self)
 
-        # Form section
-        form_frame = QFrame()
-        form_frame.setFrameStyle(QFrame.StyledPanel)
-        form_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        form_layout = QGridLayout(form_frame)
+        # Add shared fields
+        self.shared_fields = AccountEntryForm()
+        layout.addWidget(self.shared_fields)
 
-        # Provider
-        form_layout.addWidget(QLabel("Provider:"), 0, 0, Qt.AlignRight)
-        self.provider_entry = QLineEdit(account.provider)
-        form_layout.addWidget(self.provider_entry, 0, 1)
+        # Place current account data into fields for updating
+        editable_account = copy.deepcopy(account)
+        editable_account.secret = controller.secrets_manager.decrypt(account.secret)
+        self.shared_fields.set_fields(editable_account)
 
-        # Label
-        form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
-        self.label_entry = QLineEdit(account.label)
-        form_layout.addWidget(self.label_entry, 1, 1)
-
-        # Secret Key
-        form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
-        self.secret_key_entry = QLineEdit(controller.secrets_manager.decrypt(account.secret))
-        form_layout.addWidget(self.secret_key_entry, 2, 1)
-
-        layout.addWidget(form_frame)
+        # # Form section
+        # form_frame = QFrame()
+        # form_frame.setFrameStyle(QFrame.StyledPanel)
+        # form_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # form_layout = QGridLayout(form_frame)
+        #
+        # # Provider
+        # form_layout.addWidget(QLabel("Provider:"), 0, 0, Qt.AlignRight)
+        # self.provider_entry = QLineEdit(account.provider)
+        # form_layout.addWidget(self.provider_entry, 0, 1)
+        #
+        # # Label
+        # form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
+        # self.label_entry = QLineEdit(account.label)
+        # form_layout.addWidget(self.label_entry, 1, 1)
+        #
+        # # Secret Key
+        # form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
+        # self.secret_key_entry = QLineEdit(controller.secrets_manager.decrypt(account.secret))
+        # form_layout.addWidget(self.secret_key_entry, 2, 1)
+        #
+        # layout.addWidget(form_frame)
 
         # Button section
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
 
-        save_btn = QPushButton("Save")
+        save_btn = QPushButton("Update")
         save_btn.clicked.connect(
             lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
 
@@ -92,8 +105,8 @@ class EditAccountDialog(QDialog):
 
     def handle_update_request(self,index, account):
         print (f"EditAcctDialog is handling update request for: {index} ")
-        encrypted_secret = self.secrets_manager.encrypt(self.secret_key_entry.text())
-        up_account = Account(self.provider_entry.text(), self.label_entry.text(), encrypted_secret, account.last_used)
+        encrypted_secret = self.secrets_manager.encrypt(self.shared_fields.secret_entry.text())
+        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), encrypted_secret, account.last_used)
         self.controller.update_account(index, up_account)
         self.close()
 

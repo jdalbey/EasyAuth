@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
 from account_entry_fields import AccountEntryFields
+from account_entry_form import AccountEntryForm
 from models import Account
 from otp_manager import is_valid_secretkey
 
@@ -42,8 +43,8 @@ class AddAccountDialog(QDialog):
         self.layout.addWidget(manual_label)
 
         # Add shared fields
-        self.shared_fields = AccountEntryFields()
-        self.shared_fields.add_to_layout(self.layout)
+        self.shared_fields = AccountEntryForm()
+        self.layout.addWidget(self.shared_fields)
 
         self.button_layout = QHBoxLayout()
         self.save_button = QPushButton("Save")

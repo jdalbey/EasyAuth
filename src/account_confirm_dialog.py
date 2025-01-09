@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 from account_entry_fields import AccountEntryFields
+from account_entry_form import AccountEntryForm
+
 
 class ConfirmAccountDialog(QDialog):
     def __init__(self, controller, parent=None):
@@ -14,8 +16,8 @@ class ConfirmAccountDialog(QDialog):
         self.layout.addWidget(header_label)
 
         # Add shared fields
-        self.shared_fields = AccountEntryFields()
-        self.shared_fields.add_to_layout(self.layout)
+        self.shared_fields = AccountEntryForm()
+        self.layout.addWidget(self.shared_fields)
 
         self.button_layout = QHBoxLayout()
         self.save_button = QPushButton("Accept")
