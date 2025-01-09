@@ -9,6 +9,8 @@ from PyQt5.QtGui import QFont, QIcon, QPixmap
 import pyotp
 import time, datetime
 import pyperclip
+
+from quick_start_dialog import QuickStartDialog
 from settings_dialog import SettingsDialog  
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
@@ -80,6 +82,9 @@ class AppView(QMainWindow):
 
         # Help menu
         help_menu = menubar.addMenu('Help')
+        quick_start_action = QAction("Quick Start",self)
+        quick_start_action.triggered.connect(self.show_quick_start_dialog)
+        help_menu.addAction(quick_start_action)
         about_action = QAction('About', self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
@@ -129,6 +134,7 @@ class AppView(QMainWindow):
         # Timer label
         timer_font = QFont("Courier", 24, QFont.Bold)
         self.timer_label = QLabel("  ")
+        self.timer_label.setToolTip("Time remaining until current TOTP expires.")
         self.timer_label.setFont(timer_font)
         self.timer_label.setStyleSheet("""
             background-color: lightgray;
@@ -171,13 +177,16 @@ class AppView(QMainWindow):
                 "Your vault is empty.",
                 "The vault stores two-factor authentication keys",
                 "provided by a website or other online service.",
-                "Store your secret key by clicking 'Add Account'",
-                "<Learn more>"
+                "Store your secret key by clicking 'Add Account'"
             ]
             for line in help_message:
                 help_label = QLabel(line)
                 help_label.setAlignment(Qt.AlignCenter)
                 self.scroll_layout.addWidget(help_label)
+            view_quick_btn = QPushButton("View Quick Start")
+            view_quick_btn.clicked.connect(self.show_quick_start_dialog)
+            view_quick_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
         else:
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
@@ -320,8 +329,19 @@ class AppView(QMainWindow):
     def settings(self):
         pass
 
+    def show_quick_start_dialog(self):
+        dlg = QuickStartDialog()
+
+
     def show_about_dialog(self):
-        pass
+        reply = QMessageBox.information(
+            self,
+            'About',
+            f'EasyAuth\n\n2FA authenticator\n\n' +
+            f"Version 0.0.1\n\n" +
+            "http://www.github.com/jdalbey/EasyAuth",
+            QMessageBox.Ok
+        )
 
 # local main for unit testing
 if __name__ == '__main__':
