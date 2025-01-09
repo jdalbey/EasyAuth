@@ -3,8 +3,9 @@ from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy,
 
 
 class AccountEntryForm(QFrame):
-    def __init__(self):
+    def __init__(self, save_button):
         super().__init__()
+        self.save_button = save_button
         self.setFrameStyle(QFrame.StyledPanel)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form_layout = QGridLayout(self)
@@ -12,18 +13,25 @@ class AccountEntryForm(QFrame):
         # Provider
         form_layout.addWidget(QLabel("Provider:"), 0, 0, Qt.AlignRight)
         self.provider_entry = QLineEdit()
+        self.provider_entry.textChanged.connect(self.validate_form)
         form_layout.addWidget(self.provider_entry, 0, 1)
 
         # Label
         form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
         self.label_entry = QLineEdit()
+        self.label_entry.textChanged.connect(self.validate_form)
         form_layout.addWidget(self.label_entry, 1, 1)
 
         # Secret Key
         form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
         self.secret_entry = QLineEdit()
+        self.secret_entry.textChanged.connect(self.validate_form)
         form_layout.addWidget(self.secret_entry, 2, 1)
 
+    def validate_form(self):
+        # Check if all fields are filled
+        all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
+        self.save_button.setEnabled(all_filled)
 
     def set_fields(self, account):
         self.provider_entry.setText(account.provider)

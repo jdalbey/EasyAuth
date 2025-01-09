@@ -14,13 +14,14 @@ class ConfirmAccountDialog(QDialog):
         header_label = QLabel("A QR code was found with these values:")
         self.layout.addWidget(header_label)
 
-        # Add shared fields
-        self.shared_fields = AccountEntryForm()
-        self.layout.addWidget(self.shared_fields)
-
         self.button_layout = QHBoxLayout()
         self.save_button = QPushButton("Accept")
         self.save_button.clicked.connect(self.save_fields)
+
+        # Add shared fields
+        self.shared_fields = AccountEntryForm(self.save_button)
+        self.layout.addWidget(self.shared_fields)
+
         self.button_layout.addWidget(self.save_button)
 
         self.cancel_button = QPushButton("Decline")

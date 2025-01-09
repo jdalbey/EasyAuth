@@ -10,7 +10,7 @@ class AddAccountDialog(QDialog):
         self.controller = controller
         self.setWindowTitle("Add Account")
         self.setGeometry(100, 100, 400, 300)
-
+        self.save_button = None
         self.layout = QVBoxLayout()
 
         header_label = QLabel("Choose how to create your new account:")
@@ -41,13 +41,17 @@ class AddAccountDialog(QDialog):
         manual_label.setContentsMargins(20, 0, 0, 0)
         self.layout.addWidget(manual_label)
 
-        # Add shared fields
-        self.shared_fields = AccountEntryForm()
-        self.layout.addWidget(self.shared_fields)
-
+        # Declare the save button here so we can pass it to the Form
         self.button_layout = QHBoxLayout()
         self.save_button = QPushButton("Save")
         self.save_button.clicked.connect(self.save_fields)
+        self.save_button.setEnabled(False)
+
+        # Add shared fields
+        self.shared_fields = AccountEntryForm(self.save_button)
+        self.layout.addWidget(self.shared_fields)
+
+        # Add the save button to the layout here
         self.button_layout.addWidget(self.save_button)
 
         self.cancel_button = QPushButton("Cancel")

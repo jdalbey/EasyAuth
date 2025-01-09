@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
     QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea, 
     QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout, 
     QHBoxLayout, QWidget, QMessageBox, QFrame)
-from PyQt5.QtCore import Qt, QTimer, QSize
-from PyQt5.QtGui import QFont, QIcon, QPixmap
+from PyQt5.QtCore import Qt, QTimer, QSize, QUrl
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QDesktopServices
 import pyotp
 import time, datetime
 import pyperclip
@@ -85,6 +85,9 @@ class AppView(QMainWindow):
         quick_start_action = QAction("Quick Start",self)
         quick_start_action.triggered.connect(self.show_quick_start_dialog)
         help_menu.addAction(quick_start_action)
+        userManualAction = QAction("User Manual", self)
+        userManualAction.triggered.connect(self.open_user_manual)
+        help_menu.addAction(userManualAction)
         about_action = QAction('About', self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
@@ -332,6 +335,10 @@ class AppView(QMainWindow):
     def show_quick_start_dialog(self):
         dlg = QuickStartDialog()
 
+    # TODO: Verify that app can be closed even if browser window remains open
+    def open_user_manual(self):
+        url = QUrl("https://example.com")
+        QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):
         reply = QMessageBox.information(

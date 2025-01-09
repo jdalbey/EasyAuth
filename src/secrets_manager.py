@@ -28,7 +28,6 @@ class SecretsManager:
         return encrypted_secret.decode()  # Return as string
 
     def decrypt(self, encrypted_secret):
-        logging.debug(f"Decrypting: {encrypted_secret[:5]}")
         decrypted_secret = self.cipher_suite.decrypt(encrypted_secret.encode())
         return decrypted_secret.decode()  # Return as string
     

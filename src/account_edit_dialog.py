@@ -26,8 +26,14 @@ class EditAccountDialog(QDialog):
         # Main layout
         layout = QVBoxLayout(self)
 
+        # Declare save button here so we can add it to Form
+        self.save_btn = QPushButton("Update")
+        self.save_btn.clicked.connect(
+            lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
+        self.save_btn.setEnabled(False)
+
         # Add shared fields
-        self.shared_fields = AccountEntryForm()
+        self.shared_fields = AccountEntryForm(self.save_btn)
         layout.addWidget(self.shared_fields)
 
         # Place current account data into fields for updating
@@ -39,17 +45,13 @@ class EditAccountDialog(QDialog):
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
 
-        save_btn = QPushButton("Update")
-        save_btn.clicked.connect(
-            lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
-
         delete_btn = QPushButton("Delete")
         delete_btn.clicked.connect(lambda: self.confirm_delete_account())
 
         cancel_btn = QPushButton("Cancel")
         cancel_btn.clicked.connect(self.reject)
 
-        button_layout.addWidget(save_btn)
+        button_layout.addWidget(self.save_btn)
         button_layout.addWidget(delete_btn)
         button_layout.addWidget(cancel_btn)
         layout.addWidget(button_frame)
