@@ -332,7 +332,6 @@ class EditAccountDialog(QDialog):
         self.secrets_manager = SecretsManager()
         self.account = account
         self.index = index
-        self.qr_code_label = None  # Initialize qr_code_label to None
 
         print (f"EditAccountDialog init got {index} {account.provider}")
         self.setWindowTitle("Edit Account")
@@ -344,6 +343,7 @@ class EditAccountDialog(QDialog):
         # Form section
         form_frame = QFrame()
         form_frame.setFrameStyle(QFrame.StyledPanel)
+        form_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form_layout = QGridLayout(form_frame)
 
         # Provider
@@ -363,24 +363,6 @@ class EditAccountDialog(QDialog):
 
         layout.addWidget(form_frame)
 
-        # Last Used section
-        last_used_frame = QFrame()
-        last_used_frame.setFrameStyle(QFrame.StyledPanel)
-        last_used_layout = QGridLayout(last_used_frame)
-
-        # Last Used Label
-        last_used_layout.addWidget(QLabel("Last Used:"), 0, 0, Qt.AlignRight)
-        self.last_used_label = QLabel(account.last_used)
-        last_used_layout.addWidget(self.last_used_label, 0, 1)
-
-        # Reveal QR Code Button
-        self.reveal_qr_button = QPushButton("Reveal QR code")
-        self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
-        last_used_layout.addWidget(self.reveal_qr_button, 1, 0, 1, 2, Qt.AlignCenter)
-
-        layout.addWidget(last_used_frame)
-
         # Button section
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
@@ -399,6 +381,32 @@ class EditAccountDialog(QDialog):
         button_layout.addWidget(delete_btn)
         button_layout.addWidget(cancel_btn)
         layout.addWidget(button_frame)
+
+        # Last Used section
+        last_used_frame = QFrame()
+        last_used_frame.setFrameStyle(QFrame.StyledPanel)
+        last_used_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        last_used_layout = QGridLayout(last_used_frame)
+
+        # Last Used Label
+        last_used_layout.addWidget(QLabel("Last Used:"), 0, 0, Qt.AlignRight)
+        self.last_used_label = QLabel(account.last_used)
+        last_used_layout.addWidget(self.last_used_label, 0, 1)
+
+        # Reveal QR Code Button
+        self.reveal_qr_button = QPushButton("Reveal QR code")
+        self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
+        last_used_layout.addWidget(self.reveal_qr_button, 1, 0, 1, 2, Qt.AlignCenter)
+
+        layout.addWidget(last_used_frame)
+
+        # Add spacer to push buttons toward top
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(spacer)
+
+
 
     def handle_update_request(self,index, account):
         print (f"EditAcctDialog is handling update request for: {index} ")
@@ -421,7 +429,8 @@ class EditAccountDialog(QDialog):
             self.accept()
 
     def handle_QR_reveal(self):
-        if self.qr_code_label is None:
+        # TODO: more robust flag
+        if self.reveal_qr_button.text() == "Reveal QR code":
             # Generate QR code
             qr_code_image = self.controller.generate_qr_code(self.account)
             pixmap = QPixmap()
@@ -433,7 +442,7 @@ class EditAccountDialog(QDialog):
         else:
             # Hide QR code
             self.qr_code_label.deleteLater()
-            self.qr_code_label = None
+            self.qr_code_label = QLabel()
             self.reveal_qr_button.setText("Reveal QR code")
             
 if __name__ == '__main__':
