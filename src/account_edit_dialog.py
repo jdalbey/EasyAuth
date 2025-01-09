@@ -35,29 +35,6 @@ class EditAccountDialog(QDialog):
         editable_account.secret = controller.secrets_manager.decrypt(account.secret)
         self.shared_fields.set_fields(editable_account)
 
-        # # Form section
-        # form_frame = QFrame()
-        # form_frame.setFrameStyle(QFrame.StyledPanel)
-        # form_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        # form_layout = QGridLayout(form_frame)
-        #
-        # # Provider
-        # form_layout.addWidget(QLabel("Provider:"), 0, 0, Qt.AlignRight)
-        # self.provider_entry = QLineEdit(account.provider)
-        # form_layout.addWidget(self.provider_entry, 0, 1)
-        #
-        # # Label
-        # form_layout.addWidget(QLabel("Label:"), 1, 0, Qt.AlignRight)
-        # self.label_entry = QLineEdit(account.label)
-        # form_layout.addWidget(self.label_entry, 1, 1)
-        #
-        # # Secret Key
-        # form_layout.addWidget(QLabel("Secret Key:"), 2, 0, Qt.AlignRight)
-        # self.secret_key_entry = QLineEdit(controller.secrets_manager.decrypt(account.secret))
-        # form_layout.addWidget(self.secret_key_entry, 2, 1)
-        #
-        # layout.addWidget(form_frame)
-
         # Button section
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)

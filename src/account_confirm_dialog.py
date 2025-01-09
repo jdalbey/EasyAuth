@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
-from account_entry_fields import AccountEntryFields
 from account_entry_form import AccountEntryForm
 
 

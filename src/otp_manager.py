@@ -28,6 +28,8 @@ class OTPManager:
         qr.add_data(uri)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
+        # Reduce the size of the image by setting box_size
+        img = img.resize((300, 300))  # Set the desired size
         buffer = BytesIO()
         img.save(buffer, format="PNG")
         return buffer.getvalue()

@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
-from account_entry_fields import AccountEntryFields
 from account_entry_form import AccountEntryForm
 from models import Account
 from otp_manager import is_valid_secretkey
