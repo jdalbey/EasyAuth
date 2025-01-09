@@ -28,23 +28,6 @@ def scan_screen_for_qr_code():
     #print (time.time() - starttime)
     return results
 
-# OBSOLETE: use potp.parse_uri
-def parse_qr_code(url):
-    parsed_url = urlparse(url)
-
-    scheme = parsed_url.scheme
-    path = parsed_url.path
-    label = path.split(":")[1]
-    query = parse_qs(parsed_url.query)
-
-    print(f"Scheme: {scheme}")
-    print(f"Path: {path}")
-    print(f"Label: {label}")
-    print(f"Query Parameters:")
-    print(f"secret: {query['secret'][0]}")
-    print(f"issuer: {query['issuer'][0]}")
-    return (query['issuer'][0], label, query['secret'][0])
-
 """ Reference: 2FA QR generator: https://stefansundin.github.io/2fa-qr/ """
 if __name__ == '__main__':
     url = scan_screen_for_qr_code()

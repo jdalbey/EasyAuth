@@ -196,7 +196,7 @@ class AppView(QMainWindow):
                     # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
                     row_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     # Set internal padding for the frame
-                    #row_frame.setContentsMargins(0,0,0,0)
+                    row_frame.setContentsMargins(0,0,0,0)
 
                     rowframe_layout = QHBoxLayout(row_frame)
                     rowframe_layout.setSpacing(5)  # Set horizontal spacing between widgets in the row
@@ -211,7 +211,7 @@ class AppView(QMainWindow):
                     label = QLabel(f"{account.provider} ({account.label})")
                     label.setFont(QFont("Arial", 12))
                     otplabel = QLabel(f"{otp}")
-                    otplabel.setFont(QFont("DejaVu Sans Mono", 14, QFont.Bold))
+                    otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
                     # Set the size policy for widget1
                     label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 

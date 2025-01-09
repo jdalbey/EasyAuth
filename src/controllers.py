@@ -1,14 +1,10 @@
-
 import logging
-import urllib
 import pyotp
-
 from otp_manager import is_valid_secretkey
 from models import AccountManager, Account
 from secrets_manager import SecretsManager
 from otp_manager import OTPManager
 from find_qr_codes import scan_screen_for_qr_code
-from find_qr_code import find_qr_code
 
 class AppController:
     def __init__(self):
@@ -29,7 +25,7 @@ class AppController:
 
     def update_account(self, index, account):
         """@pre account.secret is encrypted. """
-        print (f"entering controller update account with {index} {account.provider} {account.secret}")
+        print (f"entering controller update account with {index} {account.provider}")
         #encrypted_secret = self.secrets_manager.encrypt(account.secret)
         #account.secret = encrypted_secret
         self.account_manager.update_account(index, account)
