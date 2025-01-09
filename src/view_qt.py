@@ -8,14 +8,16 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
 from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QFont, QIcon, QPixmap
 import pyotp
-import time
+import time, datetime
 import pyperclip
 from settings_dialog import SettingsDialog  
+from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
 from models import Account
-from add_account_dialog import AddAccountDlg
+from add_account_dialog import AddAccountDialog
 from confirm_account_dialog import ConfirmAccountDialog
 from controllers import AppController
+from secrets_manager import SecretsManager
 
 
 class AppView(QMainWindow):
@@ -26,7 +28,7 @@ class AppView(QMainWindow):
         self.controller.set_view(self)
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
-     
+        self.current_dialog = None
         self.setWindowTitle("Easy Auth")
         self.setGeometry(100, 100, 500, 400)
         
@@ -60,7 +62,7 @@ class AppView(QMainWindow):
         file_menu.addAction(import_action)
         
         backup_action = QAction('Backup/Restore', self)
-        backup_action.triggered.connect(self.backup_restore)
+        backup_action.triggered.connect(self.show_backup_restore_dialog)
         file_menu.addAction(backup_action)
 
         settings_action = QAction('Settings', self)
@@ -226,7 +228,7 @@ class AppView(QMainWindow):
                         logging.warning("missing copy icon")
                     #copy_btn.setPopupMode(QToolButton.InstantPopup)
                     copy_btn.setToolTip("Copy code to clipboard")
-                    copy_btn.clicked.connect(lambda: self.copy_to_clipboard(otp))
+                    copy_btn.clicked.connect(lambda _, otp=otp, idx=index, acc=account: self.copy_to_clipboard(otp, idx, acc))
                     rowframe_layout.addWidget(copy_btn)
 
                     edit_btn = QToolButton()
@@ -261,20 +263,24 @@ class AppView(QMainWindow):
         if time_remaining == 30:
             self.display_accounts()
 
-    def copy_to_clipboard(self, otp):
+    def copy_to_clipboard(self, otp, idx, account):
         pyperclip.copy(otp)
         print(f"Copied OTP: {otp}")
+        now = datetime.datetime.now()
+        account.last_used = now.strftime("%Y-%m-%d %H:%M")
+        self.controller.update_account(idx,account)
 
     def show_add_account_form(self):
+        print("Starting Show_add_account_form")
         if self.app_config.is_auto_find_qr_enabled():
             # go find_qr_code
             qr_data = self.controller.find_qr_code()
             # TODO: Check for multiple QR codes found
             if qr_data:
                 fields = Account(qr_data[0],qr_data[1],qr_data[2])
-                dialog_ConfirmAcct = ConfirmAccountDialog(self.controller)
-                dialog_ConfirmAcct.set_account(fields)
-                retcode = dialog_ConfirmAcct.exec_()
+                self.current_dialog = ConfirmAccountDialog(self.controller)
+                self.current_dialog.set_account(fields)
+                retcode = self.current_dialog.exec_()
                 print (f"Confirm dialog closing code:  {retcode}")
                 self.display_accounts()
                 # if user confirmed the account data, return to main window
@@ -282,9 +288,10 @@ class AppView(QMainWindow):
                     return
         
         print ("Show_add_account_form is ready to exec() the dialog")
-        dialog_AddAcct = AddAccountDlg(self.controller)
-        dialog_AddAcct.exec_()
-        self.display_accounts()        
+        self.current_dialog = AddAccountDialog(self.controller)
+        self.current_dialog.exec_()
+        # Refresh the display
+        self.display_accounts()
 
     def show_edit_account_form(self,index,account):
         print (f"entering show_edit_account_form with {index} {account.provider}")
@@ -294,6 +301,10 @@ class AppView(QMainWindow):
 
     def show_settings_dialog(self):
         dialog = SettingsDialog(self)
+        dialog.exec_()
+
+    def show_backup_restore_dialog(self):
+        dialog = BackupRestoreDialog(self.controller.account_manager, self)
         dialog.exec_()
 
     def import_accounts(self):
@@ -318,6 +329,7 @@ class EditAccountDialog(QDialog):
     def __init__(self, parent, controller, index, account):
         super().__init__(parent)
         self.controller = controller
+        self.secrets_manager = SecretsManager()
         self.account = account
         self.index = index
         print (f"EditAccountDialog init got {index} {account.provider}")
@@ -354,12 +366,8 @@ class EditAccountDialog(QDialog):
         button_layout = QHBoxLayout(button_frame)
 
         save_btn = QPushButton("Save")
-        save_btn.clicked.connect(lambda index=index: self.handle_update_request(
-            self.index,
-            self.provider_entry.text(),
-            self.label_entry.text(),
-            self.secret_key_entry.text()
-        ))
+        save_btn.clicked.connect(
+            lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
 
         delete_btn = QPushButton("Delete")
         delete_btn.clicked.connect(lambda: self.confirm_delete_account())
@@ -372,9 +380,11 @@ class EditAccountDialog(QDialog):
         button_layout.addWidget(cancel_btn)
         layout.addWidget(button_frame)
 
-    def handle_update_request(self,index, provider, label, secret):
-        print (f"EditAcctDialog is handling update request for: {index} {provider}")
-        self.controller.update_account(index, provider, label, secret)
+    def handle_update_request(self,index, account):
+        print (f"EditAcctDialog is handling update request for: {index} ")
+        encrypted_secret = self.secrets_manager.encrypt(self.secret_key_entry.text())
+        up_account = Account(self.provider_entry.text(), self.label_entry.text(), encrypted_secret, account.last_used)
+        self.controller.update_account(index, up_account)
         self.close()
 
     def confirm_delete_account(self):

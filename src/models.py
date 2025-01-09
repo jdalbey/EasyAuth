@@ -3,12 +3,15 @@ import json
 import os
 from pathlib import Path # Python 3.5+
 from dataclasses import dataclass
+from secrets_manager import SecretsManager
+from datetime import datetime
 
 @dataclass
 class Account:
     provider: str
     label: str
     secret: str
+    last_used: str
 
 class AccountManager:
     kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
@@ -46,11 +49,12 @@ class AccountManager:
                 json.dump([acc.__dict__ for acc in self.accounts], f)
         except FileNotFoundError:
             print ("Missing Vault, can't save account.")
+            exit()
 
     def add_account(self, account):
+        """@param account with encrypted secret"""
         #TODO: Don't allow duplicate accounts (i.e., duplicate secret key)
-        #self.accounts.append(account)
-        self.accounts.insert(0,account)
+        self.accounts.insert(0,account)  # insert in first spot in list
         self.save_accounts()
 
     def update_account(self, index, account):
@@ -60,3 +64,19 @@ class AccountManager:
     def delete_account(self, account):
         self.accounts.remove(account)
         self.save_accounts()
+
+    def backup_accounts(self, file_path):
+        """ Store the accounts as json in the given file_path after decrypting the secret keys"""
+        secrets_manager = SecretsManager()
+        decrypted_accounts = []
+        for account in self.accounts:
+            decrypted_account = account.__dict__.copy()
+            decrypted_account['secret'] = secrets_manager.decrypt(account.secret)
+            decrypted_accounts.append(decrypted_account)
+
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(decrypted_accounts, f)
+            print(f"Accounts successfully backed up to {file_path}")
+        except Exception as e:
+            print(f"Failed to backup accounts: {e}")

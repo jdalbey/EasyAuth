@@ -37,5 +37,5 @@ class ConfirmAccountDialog(QDialog):
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
-        self.controller.save_account(provider, label, secret)
+        self.controller.save_new_account(provider, label, secret)
         self.accept()

@@ -3,9 +3,9 @@ from account_entry_fields import AccountEntryFields
 from models import Account
 from otp_manager import is_valid_secretkey
 
-class AddAccountDlg(QDialog):
+class AddAccountDialog(QDialog):
     def __init__(self, controller, parent=None):
-        super(AddAccountDlg, self).__init__(parent)
+        super(AddAccountDialog, self).__init__(parent)
         self.controller = controller
         self.setWindowTitle("Add Account")
         self.setGeometry(100, 100, 400, 300)
@@ -55,23 +55,25 @@ class AddAccountDlg(QDialog):
         self.setLayout(self.layout)
 
     def save_fields(self):
+        # TODO: Don't allow save until all fields have a value
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
         # Validate secret key
         if is_valid_secretkey(secret):
-            self.controller.save_account(provider, label, secret)
+            self.controller.save_new_account(provider, label, secret)
             self.accept()
         else:
             reply = QMessageBox()
             reply.setText(f'The secret key is invalid')
             reply.setIcon(QMessageBox.Information)
             reply.exec_()
+
     # Set values into fields (used by auto qr code scanning)
     def set_account(self, account):
         self.shared_fields.set_fields(account)
 
     def get_qr_code(self):
         provider, label, secret = self.controller.find_qr_code()
-        fields = Account(provider, label, secret)
+        fields = Account(provider, label, secret, "")
         self.shared_fields.set_fields(fields)

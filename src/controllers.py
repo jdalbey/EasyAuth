@@ -25,13 +25,13 @@ class AppController:
     def get_provider_icon_name(self, provider):
         return self.account_manager.get_provider_icon_name(provider)
 
-    
-    def update_account(self, index, provider, label, secret):
-        print (f"entering controller update account with {index} {provider}")
-        encrypted_secret = self.secrets_manager.encrypt(secret)
-        account = Account(provider, label, encrypted_secret)
+    def update_account(self, index, account):
+        """@pre account.secret is encrypted. """
+        print (f"entering controller update account with {index} {account.provider} {account.secret}")
+        #encrypted_secret = self.secrets_manager.encrypt(account.secret)
+        #account.secret = encrypted_secret
         self.account_manager.update_account(index, account)
-        print(f"Updated account: {index} {provider} ({label})")
+        print(f"Updated account: {index} {account.provider} ({account.label})")
 
     def delete_account(self,account):
         #TODO: Fix issues with confirmation dialog appearin beneath edit window
@@ -47,9 +47,6 @@ class AppController:
             label = totp_obj.name
             secret_key = totp_obj.secret
             # TODO: Extract the time period parameter if it exists
-            #parsed_uri = urllib.parse.urlparse(url[0])
-            #query_params = urllib.parse.parse_qs(parsed_uri.query)
-            #period = query_params.get('period', [None])[0]
             print(f"Scanned QR code: {issuer} {label} ")
             # check for url's not from a valid QR code.
             if not is_valid_secretkey(secret_key):
@@ -65,8 +62,9 @@ class AppController:
         # Placeholder for opening a QR image
         pass
 
-    def save_account(self, provider, label, secret):
+    def save_new_account(self, provider, label, secret):
+        """@param secret is plain-text shared secret"""
         encrypted_secret = self.secrets_manager.encrypt(secret)
-        account = Account(provider, label, encrypted_secret)
+        account = Account(provider, label, encrypted_secret, "")
         self.account_manager.add_account(account)
         self.logger.info(f"Saved account: {provider} ({label})")
