@@ -21,7 +21,6 @@ class AddAccountDialog(QDialog):
         self.layout.addWidget(qr_screen_label)
 
         find_qr_btn = QPushButton("Find QR code")
-        #find_qr_btn.clicked.connect(self.controller.find_qr_code)
         find_qr_btn.clicked.connect(lambda: self.get_qr_code())
         find_qr_btn.setContentsMargins(40, 0, 0, 0)
         find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -81,6 +80,6 @@ class AddAccountDialog(QDialog):
         self.shared_fields.set_fields(account)
 
     def get_qr_code(self):
-        provider, label, secret = self.controller.find_qr_code()
+        provider, label, secret = self.controller.find_qr_codes()
         fields = Account(provider, label, secret, "")
         self.shared_fields.set_fields(fields)

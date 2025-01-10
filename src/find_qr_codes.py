@@ -4,7 +4,7 @@ from pyzbar.pyzbar import decode
 from urllib.parse import urlparse, parse_qs
 import time
 
-def scan_screen_for_qr_code():
+def scan_screen_for_qr_codes():
     """
     Scans the display screen for QR codes and decodes them.
 
@@ -30,7 +30,7 @@ def scan_screen_for_qr_code():
 
 """ Reference: 2FA QR generator: https://stefansundin.github.io/2fa-qr/ """
 if __name__ == '__main__':
-    url = scan_screen_for_qr_code()
+    url = scan_screen_for_qr_codes()
     print (url)
     #url = 'otpauth://totp/PayPal:steve@dottotech.com?secret=DITATUPFVUIJK7X7&issuer=PayPal'
     #url = 'otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com'

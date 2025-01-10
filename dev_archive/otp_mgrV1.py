@@ -1,6 +1,6 @@
 import pyotp
 import json
-from src.find_qr_codes import scan_screen_for_qr_code
+from src.find_qr_codes import scan_screen_for_qr_codes
 from dev_archive import crypto_utils
 import urllib.parse
 
@@ -63,7 +63,7 @@ class OTPManager:
         return None
 # Remember that the issuer and account name cannot contain a colon (: or %3A)  or a parenthesis
     def add_account(self):
-        url = scan_screen_for_qr_code()
+        url = scan_screen_for_qr_codes()
         if len(url) == 1:
             # A valid QR code yields a URI of this form:
             #'otpauth://totp/{Issuer}:{name}?secret={shared key}&issuer={Issuer}'

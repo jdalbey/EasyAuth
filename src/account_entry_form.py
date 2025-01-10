@@ -27,12 +27,12 @@ class AccountEntryForm(QFrame):
 
         provider_info_btn = QToolButton()
         provider_info_btn.setToolTip("Name identifying the website or online service\nthis account authenticates with.")
-        provider_icon = QIcon("images/question_mark_icon_16.png")
-        provider_info_btn.setIcon(provider_icon)
+        info_icon = QIcon("images/question_mark_icon_16.png")
+        provider_info_btn.setIcon(info_icon)
         provider_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
         provider_info_btn.setStyleSheet(help_style)
-        provider_info_btn.setPopupMode(QToolButton.InstantPopup)
+        #provider_info_btn.setPopupMode(QToolButton.InstantPopup)
         form_layout.addWidget(provider_info_btn, 0, 2)
 
         # Label
@@ -42,12 +42,11 @@ class AccountEntryForm(QFrame):
         form_layout.addWidget(self.label_entry, 1, 1)
         user_info_btn = QToolButton()
         user_info_btn.setToolTip("A label to identify this account\nsuch as your username or email address for the service.")
-        help_icon = QIcon("images/question_mark_icon_16.png")
-        user_info_btn.setIcon(help_icon)
+        user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
         user_info_btn.setStyleSheet(help_style)
-        user_info_btn.setPopupMode(QToolButton.InstantPopup)
+        #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         form_layout.addWidget(user_info_btn, 1, 2)
 
         # Secret Key
@@ -58,12 +57,11 @@ class AccountEntryForm(QFrame):
 
         secret_info_btn = QToolButton()
         secret_info_btn.setToolTip("The alphanumeric code shared with you by the provider.")
-        secret_icon = QIcon("images/question_mark_icon_16.png")
-        secret_info_btn.setIcon(secret_icon)
+        secret_info_btn.setIcon(info_icon)
         secret_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
         secret_info_btn.setStyleSheet(help_style)
-        secret_info_btn.setPopupMode(QToolButton.InstantPopup)
+        #secret_info_btn.setPopupMode(QToolButton.InstantPopup)
         form_layout.addWidget(secret_info_btn, 2, 2)
 
     def validate_form(self):

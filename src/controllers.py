@@ -4,7 +4,7 @@ from otp_manager import is_valid_secretkey
 from models import AccountManager, Account
 from secrets_manager import SecretsManager
 from otp_manager import OTPManager
-from find_qr_codes import scan_screen_for_qr_code
+from find_qr_codes import scan_screen_for_qr_codes
 
 class AppController:
     def __init__(self):
@@ -36,8 +36,19 @@ class AppController:
         self.account_manager.delete_account(account)
     def generate_qr_code(self, account):
         return self.otp_manager.generate_qr_code(account)
-    def find_qr_code(self):
-        url = scan_screen_for_qr_code()
+
+    def find_qr_codes(self):
+        url = scan_screen_for_qr_codes()
+        # Examine each url to see if it is an otpauth protocol and reject others
+        # Try to parse each url.  Put the fields into an account and append to displaylist.
+        # Return validated url list to caller (View or Add Dialog)
+        # Pass displaylist to a dialog for multiple QR codes found
+        #  Return user's selected account or none
+        # If user made a selection,
+        #         check selection has valid secret key.
+        #         if not valid secret key show message box then return to blank account_add form.
+        #         if valid key place the fields from that account into the Cnfirm dialog form field.
+
         if len(url) == 1:
             # A valid QR code yields a URI of this form:
             # 'otpauth://totp/{Issuer}:{name}?secret={shared key}&issuer={Issuer}'

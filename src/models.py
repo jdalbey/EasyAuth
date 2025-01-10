@@ -31,8 +31,8 @@ class AccountManager:
             #raise FileNotFoundError
     def get_provider_icon_name(self, provider):
         # TODO: Look up provider icon
-        return "images/favicon_32x32.png"
-    
+        return None   # "images/favicon_32x32.png"
+
     def set_accounts(self,account_string):
         """Set accounts from a string - dependency injection for testing
         @param account_string is JSON string of vault data"""

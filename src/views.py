@@ -228,8 +228,8 @@ class Form_AddAccount:
             ctk.CTkLabel(self.add_account_window, text="There are 3 ways to create a new account:").pack(pady=10)
             message1 = "1) Fill the form automatically from a QR code on the screen."
             ctk.CTkLabel(self.add_account_window, text=message1).pack(anchor='w', padx=20)
-            ctk.CTkButton(self.add_account_window, text="Find QR code", command=self.controller.find_qr_code).pack(anchor='w',
-                                                                                                                   padx=40)
+            ctk.CTkButton(self.add_account_window, text="Find QR code", command=self.controller.find_qr_codes).pack(anchor='w',
+                                                                                                                    padx=40)
             message2 = "2) Fill the form automatically from a QR image in a file."
             ctk.CTkLabel(self.add_account_window, text=message2).pack(anchor='w', padx=20)
             ctk.CTkButton(self.add_account_window, text="Open file", command=self.controller.open_qr_image).pack(anchor='w',

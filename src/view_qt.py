@@ -197,6 +197,7 @@ class AppView(QMainWindow):
             for index, account in enumerate(accounts):
                 if search_term in account.provider.lower():
                     secret_key = self.controller.secrets_manager.decrypt(account.secret)
+                    # I think the preconditions make catching this exception superfluous.
                     try:
                         otp = pyotp.TOTP(secret_key).now()
                     except:
@@ -213,11 +214,16 @@ class AppView(QMainWindow):
                     # Assuming your_frame is inside a parent widget with a layout
                     # Set external padding around the frame by adjusting the layout margins of the parent widget
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
-                    provider_icon_name = self.controller.get_provider_icon_name(account.provider)
-                    provider_icon = QPixmap(provider_icon_name)
                     icon_label = QLabel()
-                    icon_label.setPixmap(provider_icon)
+                    provider_icon_img = self.controller.get_provider_icon_name(account.provider)
+                    if provider_icon_img:
+                        provider_icon = QPixmap(provider_icon_img)
+                        icon_label.setPixmap(provider_icon)
+                    else:
+                        provider_initial = account.provider[0]  # get first letter of provider name
+                        icon_label.setText('(' + provider_initial + ')')
                     rowframe_layout.addWidget(icon_label)
+
                     label = QLabel(f"{account.provider} ({account.label})")
                     label.setFont(QFont("Arial", 12))
                     otplabel = QLabel(f"{otp}")
@@ -283,8 +289,8 @@ class AppView(QMainWindow):
     def show_add_account_form(self):
         print("Starting Show_add_account_form")
         if self.app_config.is_auto_find_qr_enabled():
-            # go find_qr_code
-            qr_data = self.controller.find_qr_code()
+            # Before showing form go find_qr_code
+            qr_data = self.controller.find_qr_codes()
             # TODO: Check for multiple QR codes found
             if qr_data:
                 fields = Account(qr_data[0],qr_data[1],qr_data[2],"")
@@ -293,10 +299,10 @@ class AppView(QMainWindow):
                 retcode = self.current_dialog.exec_()
                 print (f"Confirm dialog closing code:  {retcode}")
                 self.display_accounts()
-                # if user confirmed the account data, return to main window
+                # if user confirmed the account data, return to main window, otherwise fall through to display Add dlg
                 if retcode == 1:
                     return
-        
+        # Either we didn't find any qr codes or auto hunt is turned off
         print ("Show_add_account_form is ready to exec() the dialog")
         self.current_dialog = AddAccountDialog(self.controller)
         self.current_dialog.exec_()
