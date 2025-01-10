@@ -8,3 +8,10 @@ Early stage development.
 ### Screenshot
 
 [![Main Window](https://i.postimg.cc/8zfHwgb5/Screenshot-from-2025-01-08-21-46-10.png)](https://postimg.cc/4YZVNMqk)
+
+### Limitations
+
+Currently target Linux OS.
+
+Uses only TOTP codes with SHA1, 6-digit, 30-second parameters.
+

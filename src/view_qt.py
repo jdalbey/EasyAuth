@@ -31,7 +31,7 @@ class AppView(QMainWindow):
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
         self.setWindowTitle("Easy Auth")
-        self.setGeometry(100, 100, 500, 400)
+        self.setGeometry(100, 100, 630, 400)
         
         # Create central widget
         self.central_widget = QWidget()
@@ -225,7 +225,10 @@ class AppView(QMainWindow):
                         icon_label.setText('(' + provider_initial + ')')
                     rowframe_layout.addWidget(icon_label)
 
-                    label = QLabel(f"{account.provider} ({account.label})")
+                    label_string = f"{account.provider} ({account.label})"
+                    if len(label_string) > 45:
+                        label_string = label_string[:45] + "..."
+                    label = QLabel(label_string)
                     label.setFont(QFont("Arial", 12))
                     otplabel = QLabel(f"{otp}")
                     otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
