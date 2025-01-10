@@ -27,7 +27,7 @@ class EditAccountDialog(QDialog):
         layout = QVBoxLayout(self)
 
         # Declare save button here so we can add it to Form
-        self.save_btn = QPushButton("Update")
+        self.save_btn = QPushButton("Save")
         self.save_btn.clicked.connect(
             lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
         self.save_btn.setEnabled(False)

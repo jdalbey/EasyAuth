@@ -5,6 +5,7 @@ from models import AccountManager, Account
 from secrets_manager import SecretsManager
 from otp_manager import OTPManager
 from find_qr_codes import scan_screen_for_qr_codes
+from PyQt5.QtWidgets import QMessageBox
 
 class AppController:
     def __init__(self):
@@ -38,35 +39,7 @@ class AppController:
         return self.otp_manager.generate_qr_code(account)
 
     def find_qr_codes(self):
-        url = scan_screen_for_qr_codes()
-        # Examine each url to see if it is an otpauth protocol and reject others
-        # Try to parse each url.  Put the fields into an account and append to displaylist.
-        # Return validated url list to caller (View or Add Dialog)
-        # Pass displaylist to a dialog for multiple QR codes found
-        #  Return user's selected account or none
-        # If user made a selection,
-        #         check selection has valid secret key.
-        #         if not valid secret key show message box then return to blank account_add form.
-        #         if valid key place the fields from that account into the Cnfirm dialog form field.
-
-        if len(url) == 1:
-            # A valid QR code yields a URI of this form:
-            # 'otpauth://totp/{Issuer}:{name}?secret={shared key}&issuer={Issuer}'
-            totp_obj = pyotp.parse_uri(url[0])
-            issuer = totp_obj.issuer
-            label = totp_obj.name
-            secret_key = totp_obj.secret
-            # TODO: Extract the time period parameter if it exists
-            print(f"Scanned QR code: {issuer} {label} ")
-            # check for url's not from a valid QR code.
-            if not is_valid_secretkey(secret_key):
-                print("Secret key not valid")
-                exit()
-            #self.view.populate_add_account_form(issuer, label, secret_key)
-            return issuer, label, secret_key
-        else:
-            self.logger.info("No QR code found")
-            return None
+        return scan_screen_for_qr_codes()
 
     def open_qr_image(self):
         # Placeholder for opening a QR image

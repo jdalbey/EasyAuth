@@ -10,12 +10,13 @@ import pyotp
 import time, datetime
 import pyperclip
 
+from add_dialog import AddDialog
 from quick_start_dialog import QuickStartDialog
 from settings_dialog import SettingsDialog  
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
 from models import Account
-from account_add_dialog import AddAccountDialog
+#from account_add_dialog import AddAccountDialog
 from account_confirm_dialog import ConfirmAccountDialog
 from controllers import AppController
 from account_edit_dialog import EditAccountDialog
@@ -288,24 +289,8 @@ class AppView(QMainWindow):
 
     def show_add_account_form(self):
         print("Starting Show_add_account_form")
-        if self.app_config.is_auto_find_qr_enabled():
-            # Before showing form go find_qr_code
-            qr_data = self.controller.find_qr_codes()
-            # TODO: Check for multiple QR codes found
-            if qr_data:
-                fields = Account(qr_data[0],qr_data[1],qr_data[2],"")
-                self.current_dialog = ConfirmAccountDialog(self.controller)
-                self.current_dialog.set_account(fields)
-                retcode = self.current_dialog.exec_()
-                print (f"Confirm dialog closing code:  {retcode}")
-                self.display_accounts()
-                # if user confirmed the account data, return to main window, otherwise fall through to display Add dlg
-                if retcode == 1:
-                    return
-        # Either we didn't find any qr codes or auto hunt is turned off
-        print ("Show_add_account_form is ready to exec() the dialog")
-        self.current_dialog = AddAccountDialog(self.controller)
-        self.current_dialog.exec_()
+        self.current_dialog = AddDialog(self.controller)
+        #self.current_dialog.exec_()
         # Refresh the display
         self.display_accounts()
 

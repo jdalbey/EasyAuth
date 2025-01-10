@@ -12,6 +12,7 @@ from pathlib import Path # Python 3.5+
 app_config = None
 
 def main():
+    app = QApplication(sys.argv)
     # Configure logging
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
@@ -25,7 +26,6 @@ def main():
     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
     app_config = AppConfig(filepath)
 
-    app = QApplication(sys.argv)
     # Initialize the controller and view
     controller = AppController()
     view = AppView(controller)
