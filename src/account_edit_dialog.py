@@ -1,9 +1,9 @@
 import logging
 import copy
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer, QSize
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
-    QVBoxLayout, QLineEdit, QHBoxLayout
+    QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton
 
 from account_entry_form import AccountEntryForm
 from models import Account
@@ -18,9 +18,13 @@ class EditAccountDialog(QDialog):
         self.secrets_manager = SecretsManager()
         self.account = account
         self.index = index
+        self.qr_code_label = None
+        self.is_qr_visible = False
 
-        print (f"EditAccountDialog init got {index} {account.provider} {account.secret[:7]}")
-        self.setWindowTitle("Edit Account")
+        # Store initial size
+        self.initial_size = None
+
+        self.setWindowTitle("DemoEdit Account")
         self.setMinimumWidth(475)
 
         # Main layout
@@ -67,12 +71,27 @@ class EditAccountDialog(QDialog):
         self.last_used_label = QLabel(account.last_used)
         last_used_layout.addWidget(self.last_used_label, 0, 1)
 
+        help_style = """
+            QToolButton {
+                border: none;       /* Remove border */
+                background: none;   /* Remove background */
+                padding: 0px;       /* Remove padding */
+            }
+            """
         # Reveal QR Code Button
         self.reveal_qr_button = QPushButton("Reveal QR code")
         self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
         last_used_layout.addWidget(self.reveal_qr_button, 1, 0, 1, 2, Qt.AlignCenter)
-
+        user_info_btn = QToolButton()
+        user_info_btn.setToolTip("This QR code can be used to import this account in another application.")
+        info_icon = QIcon("images/question_mark_icon_16.png")
+        user_info_btn.setIcon(info_icon)
+        user_info_btn.setIconSize(QSize(16, 16))
+        # Make square button invisible so only circular icon shows
+        user_info_btn.setStyleSheet(help_style)
+        #user_info_btn.setPopupMode(QToolButton.InstantPopup)
+        last_used_layout.addWidget(user_info_btn, 1, 1, Qt.AlignCenter)
         layout.addWidget(last_used_frame)
 
         # Add spacer to push buttons toward top
@@ -80,32 +99,19 @@ class EditAccountDialog(QDialog):
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(spacer)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        # Store the initial size when the dialog is first shown
+        if self.initial_size is None:
+            self.initial_size = self.size()
 
-
-    def handle_update_request(self,index, account):
-        print (f"EditAcctDialog is handling update request for: {index} ")
-        encrypted_secret = self.secrets_manager.encrypt(self.shared_fields.secret_entry.text())
-        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), encrypted_secret, account.last_used)
-        self.controller.update_account(index, up_account)
-        self.close()
-
-    def confirm_delete_account(self):
-        reply = QMessageBox.question(
-            self,
-            'Confirm Delete',
-            f'Are you sure you want to delete this account?\n\n{self.account.provider} ({self.account.label})\n\n'+
-            f"You will lose access to {self.account.provider} unless you have saved the restore codes. (Learn more)",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
-        if reply == QMessageBox.Yes:
-            self.controller.delete_account(self.account)
-            self.accept()
+    def update_qr_button_text(self):
+        """Update button text based on QR code visibility state"""
+        self.reveal_qr_button.setText("Hide QR code" if self.is_qr_visible else "Reveal QR code")
 
     def handle_QR_reveal(self):
-        # TODO: more robust flag
-        if self.reveal_qr_button.text() == "Reveal QR code":
-            # Generate QR code
+        if not self.is_qr_visible:
+            # Show QR code
             qr_code_image = self.controller.generate_qr_code(self.account)
             pixmap = QPixmap()
             pixmap.loadFromData(qr_code_image)
@@ -114,10 +120,18 @@ class EditAccountDialog(QDialog):
             self.layout().addWidget(self.qr_code_label)
             self.reveal_qr_button.setText("Hide QR code")
             self.shared_fields.disable_fields()
+            self.is_qr_visible = True
         else:
             # Hide QR code
-            self.qr_code_label.deleteLater()
-            #self.qr_code_label = None  #QLabel()
-            self.reveal_qr_button.setText("Reveal QR code")
-            self.shared_fields.enable_fields()
-        self.adjustSize()  # Doesn't work - Adjust the dialog size to fit its contents
+            if self.qr_code_label:
+                self.qr_code_label.hide()  # Hide immediately
+                self.qr_code_label.deleteLater()
+                self.qr_code_label = None
+                self.shared_fields.enable_fields()
+                self.is_qr_visible = False
+
+                # Use QTimer to resize after the event loop processes the deletion
+                QTimer.singleShot(0, lambda: self.resize(self.initial_size))
+
+        self.update_qr_button_text()
+
