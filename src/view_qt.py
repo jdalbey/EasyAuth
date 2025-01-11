@@ -110,23 +110,7 @@ class AppView(QMainWindow):
         self.search_box.textChanged.connect(lambda: self.display_accounts())  # Dynamic search
         self.search_box.setMaximumWidth(200)
         toolbar.addWidget(self.search_box)
-        
-        # Add filter button with icon and dropdown menu
-        filter_btn = QToolButton()
-        filter_icon = QIcon("images/filter_icon.png")
-        filter_btn.setIcon(filter_icon)
-        filter_btn.setIconSize(QSize(16, 16))  # Adjust size as needed
-        filter_btn.setPopupMode(QToolButton.InstantPopup)
-        filter_btn.setToolTip("Filter")  # Add tooltip for accessibility
-        
-        filter_menu = QMenu(filter_btn)
-        filter_menu.addAction("Provider A-Z")
-        filter_menu.addAction("User A-Z")
-        filter_menu.addAction("Last used: ↓")
-        filter_menu.addAction("Last used: ↑")
-        filter_btn.setMenu(filter_menu)
-        toolbar.addWidget(filter_btn)
-        
+
         # Add spacer to push timer to the right
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
