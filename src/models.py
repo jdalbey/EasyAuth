@@ -31,7 +31,6 @@ class AccountManager:
             return []
             #raise FileNotFoundError
 
-
     def get_provider_icon_name(self, provider):
         # TODO: Look up provider icon
         return None   # "images/favicon_32x32.png"
@@ -39,7 +38,8 @@ class AccountManager:
     def set_accounts(self,account_string):
         """Set accounts from a string - dependency injection for testing
         @param account_string is JSON string of vault data"""
-        self.accounts = json.loads(account_string)
+        content = json.loads(account_string)
+        self.accounts = [Account(**acc) for acc in content]
 
     # TODO: Need a way to report errors in the model back to the view.
     def save_accounts(self):

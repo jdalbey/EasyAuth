@@ -36,7 +36,9 @@ def main():
 if __name__ == '__main__':
     main()
 
-#TODO Unit test Backup
-#TODO Prevent file corruption
-# TODO Tooltip for timer styling
-# TODO Implement reorder
+# Development Tasks
+# [] Unit test Backup
+# [] Prevent file corruption
+# [x]Tooltip for timer styling
+# [x] Implement reorder
+# [x] Implement Open QR code from file

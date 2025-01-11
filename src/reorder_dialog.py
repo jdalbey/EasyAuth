@@ -2,10 +2,7 @@ import json
 
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
                              QListWidgetItem, QPushButton, QWidget, QLabel, QApplication)
-
-from controllers import AppController
-from models import Account, AccountManager
-
+from models import AccountManager
 class ReorderDialog(QDialog):
     def __init__(self, accounts, parent=None):
         super().__init__(parent)
@@ -113,16 +110,18 @@ class ReorderDialog(QDialog):
 if __name__ == '__main__':
     import sys
     from dataclasses import dataclass, asdict
-
+    from models import AccountManager
     app = QApplication(sys.argv)
-    controller = AppController()
-
-    dialog = ReorderDialog(controller.get_accounts(), None)
+    #controller = AppController()
+    mgr = AccountManager()
+    dialog = ReorderDialog(mgr.accounts, None)
     if dialog.exec() == QDialog.DialogCode.Accepted:
         accounts = dialog.get_ordered_accounts()
 
         account_dicts = [asdict(account) for account in accounts]
         json_str = json.dumps(account_dicts)
         print(json_str)
+        mgr.set_accounts(json_str)
+        mgr.save_accounts()
 
 

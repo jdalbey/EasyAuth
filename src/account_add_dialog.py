@@ -1,7 +1,7 @@
 import pyotp
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication
+    QApplication, QFileDialog
 
 from QRselectionDialog import QRselectionDialog
 from account_confirm_dialog import ConfirmAccountDialog
@@ -18,7 +18,6 @@ class AddAccountDialog(QDialog):
         self.setWindowTitle("Add Account")
         self.setGeometry(100, 100, 400, 300)
         self.create_form()
-        # DEFECT.  IF auto-find is on but no QR code is present the app hangs w/o showing Add Dialog
         if self.app_config.is_auto_find_qr_enabled():
             print ("starting with auto_hint")
             if self.process(False):
@@ -45,7 +44,6 @@ class AddAccountDialog(QDialog):
                 return True
         return False
 
-
     def process(self,called_from_Find_btn):
         # Before showing form go find_qr_code
         urls = self.controller.find_qr_codes()
@@ -62,14 +60,14 @@ class AddAccountDialog(QDialog):
             name = totp_obj.name
             secret_key = totp_obj.secret
             account = Account(issuer,name,secret_key,"")
-            # TODO: Extract the time period parameter if it exists
+            # TODO: Extract the advanced parameters if they exists
             print(f"In AddDialog: Scanned QR code: {issuer} {name} ")
             display_list.append(account)
         # How many valid URI's do we have?
         if len(display_list) == 0:
             # This should only be shown during a requested find, not an automatic one.
             if called_from_Find_btn:  # we might have got here from Find button even though auto_hunt was on and failed.
-                QMessageBox.information(None, 'Info', "No QR code found.  Be sure the QR code is visible on your screen.", QMessageBox.Ok)
+                QMessageBox.information(None, 'Alert', "No QR code found.  Be sure the QR code is visible on your screen and try again.", QMessageBox.Ok)
                 return False # no QR
         if len(display_list) == 1:
             return self.confirm_account(display_list[0])
@@ -97,7 +95,7 @@ class AddAccountDialog(QDialog):
         qr_screen_label.setContentsMargins(20, 0, 0, 0)
         self.layout.addWidget(qr_screen_label)
 
-        find_qr_btn = QPushButton("Find QR code")
+        find_qr_btn = QPushButton("Use QR code")
         find_qr_btn.clicked.connect(lambda: self.get_qr_code())
         find_qr_btn.setContentsMargins(40, 0, 0, 0)
         find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -108,7 +106,7 @@ class AddAccountDialog(QDialog):
         self.layout.addWidget(qr_file_label)
 
         open_file_btn = QPushButton("Open file")
-        #open_file_btn.clicked.connect(self.controller.open_qr_image)
+        open_file_btn.clicked.connect(self.open_qr_image)
         open_file_btn.setContentsMargins(40, 0, 0, 0)
         open_file_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.layout.addWidget(open_file_btn, alignment=Qt.AlignCenter)
@@ -139,7 +137,6 @@ class AddAccountDialog(QDialog):
 
 
     def save_fields(self):
-        # TODO: Don't allow save until all fields have a value
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
@@ -159,6 +156,40 @@ f'The secret key is invalid')
         self.process(True)
         print ("Finishing get_qr_code, back to Add Dialog")
 
+    def open_qr_image(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, f"Open QR image", "",
+                                                   "PNG Files (*.png);;All Files (*)", options=options)
+        if file_path:
+            try:
+                from pyzbar.pyzbar import decode
+                from PIL import Image
+                # Read image file
+                qr_image = Image.open(file_path)
+                # decode QR codes
+                qr_codes = decode(qr_image)
+                # Extract data from the detected QR codes
+                results = [qr_code.data.decode('utf-8') for qr_code in qr_codes if qr_code.data]
+                if len(results) == 0:
+                    QMessageBox.critical(self, "Error", f"QR image not recognized.")
+                    return
+                # results is a list
+                if len(results) > 1:
+                    QMessageBox.critical(self, "Operation failed", f"The image contained multiple QR codes.\n " +
+                                         "The program is currently unable to process more than one QR code per image.")
+                    return
+                # Parse the URI
+                try:
+                    totp_obj = pyotp.parse_uri(results[0])
+                except ValueError as e:
+                    QMessageBox.critical(self, "Error", f"QR code invalid {e}")
+                    return
+                # copy the retrieved attributes into the shared_fields
+                self.shared_fields.provider_entry.setText(totp_obj.issuer)
+                self.shared_fields.label_entry.setText(totp_obj.name)
+                self.shared_fields.secret_entry.setText(totp_obj.secret)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to read QR image: {e}")
 
 # local main for unit testing
 # if __name__ == '__main__':

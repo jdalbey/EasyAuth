@@ -1,5 +1,8 @@
+import json
 import logging
 import os
+from dataclasses import asdict
+
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
     QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea, 
     QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout, 
@@ -120,14 +123,25 @@ class AppView(QMainWindow):
         # Timer label
         timer_font = QFont("Courier", 24, QFont.Bold)
         self.timer_label = QLabel("  ")
-        self.timer_label.setToolTip("Time remaining until current TOTP expires.")
+        self.timer_label.setToolTip("Time remaining until current TOTP code expires.")
         self.timer_label.setFont(timer_font)
         self.timer_label.setStyleSheet("""
-            background-color: lightgray;
-            color: black;
-            padding: 3px 15px;
-            border-radius: 15px;
+            QLabel {
+                background-color: lightgray;
+                color: black;
+                padding: 3px 15px;
+                border-radius: 15px;
+            }
+            QToolTip {
+                color: black;
+                background-color: ivory;
+                border: 1px solid black;
+            }
         """)
+        # Set custom style for the tooltip
+        # self.timer_label.setStyleSheet(
+        #     "QToolTip { color: black; background-color: lightblue; border: 1px solid black; }")
+
         toolbar.addWidget(self.timer_label)
 
     def create_main_panel(self):
@@ -299,13 +313,15 @@ class AppView(QMainWindow):
     def backup_restore(self):
         pass
 
-    # Example usage in main window:
     def show_reorder_dialog(self):
         account_list = self.controller.get_accounts()
         dialog = ReorderDialog(account_list, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.accounts = dialog.get_ordered_accounts()
-            # TODO: save back to model!!!
+            # save back to model
+            account_dicts = [asdict(account) for account in self.accounts]
+            json_str = json.dumps(account_dicts)
+            self.controller.set_accounts(json_str)
             # Update main window display
             self.display_accounts()
 

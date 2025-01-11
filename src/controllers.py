@@ -1,3 +1,4 @@
+import datetime
 import logging
 import pyotp
 from otp_manager import is_valid_secretkey
@@ -20,6 +21,10 @@ class AppController:
         
     def get_accounts(self):
         return self.account_manager.accounts
+
+    def set_accounts(self,json_str):
+        self.account_manager.set_accounts(json_str)
+        self.account_manager.save_accounts()
 
     def get_provider_icon_name(self, provider):
         return self.account_manager.get_provider_icon_name(provider)
@@ -49,5 +54,8 @@ class AppController:
         """@param secret is plain-text shared secret"""
         encrypted_secret = self.secrets_manager.encrypt(secret)
         account = Account(provider, label, encrypted_secret, "")
+        now = datetime.datetime.now()
+        account.last_used = now.strftime("%Y-%m-%d %H:%M")
+
         self.account_manager.add_account(account)
         self.logger.info(f"Saved account: {provider} ({label})")
