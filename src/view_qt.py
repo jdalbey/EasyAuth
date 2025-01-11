@@ -10,14 +10,11 @@ import pyotp
 import time, datetime
 import pyperclip
 
-from add_dialog import AddDialog
+from account_add_dialog import AddAccountDialog
 from quick_start_dialog import QuickStartDialog
 from settings_dialog import SettingsDialog  
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
-from models import Account
-#from account_add_dialog import AddAccountDialog
-from account_confirm_dialog import ConfirmAccountDialog
 from controllers import AppController
 from account_edit_dialog import EditAccountDialog
 
@@ -31,7 +28,7 @@ class AppView(QMainWindow):
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
         self.setWindowTitle("Easy Auth")
-        self.setGeometry(100, 100, 630, 400)
+        self.setGeometry(100, 100, 650, 400)
         
         # Create central widget
         self.central_widget = QWidget()
@@ -292,7 +289,7 @@ class AppView(QMainWindow):
 
     def show_add_account_form(self):
         print("Starting Show_add_account_form")
-        self.current_dialog = AddDialog(self.controller)
+        self.current_dialog = AddAccountDialog(self.controller)
         #self.current_dialog.exec_()
         # Refresh the display
         self.display_accounts()
