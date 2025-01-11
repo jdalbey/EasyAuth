@@ -17,6 +17,7 @@ from backup_dialog import BackupRestoreDialog
 from appconfig import AppConfig
 from controllers import AppController
 from account_edit_dialog import EditAccountDialog
+from reorder_dialog import ReorderDialog
 
 class AppView(QMainWindow):
     def __init__(self, controller):
@@ -70,7 +71,7 @@ class AppView(QMainWindow):
         # Tools menu
         tools_menu = menubar.addMenu('Tools')
         reorder_action = QAction('Reorder Accounts', self)
-        reorder_action.triggered.connect(self.reorder_accounts)
+        reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
         
         providers_action = QAction('Providers', self)
@@ -298,8 +299,15 @@ class AppView(QMainWindow):
     def backup_restore(self):
         pass
 
-    def reorder_accounts(self):
-        pass
+    # Example usage in main window:
+    def show_reorder_dialog(self):
+        account_list = self.controller.get_accounts()
+        dialog = ReorderDialog(account_list, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.accounts = dialog.get_ordered_accounts()
+            # TODO: save back to model!!!
+            # Update main window display
+            self.display_accounts()
 
     def manage_providers(self):
         pass

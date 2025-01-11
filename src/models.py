@@ -13,6 +13,7 @@ class Account:
     secret: str
     last_used: str
 
+
 class AccountManager:
     kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
     def __init__(self, filename=kPathToVault):
@@ -29,6 +30,8 @@ class AccountManager:
             print (f"Missing vault file {self.vault_path}")
             return []
             #raise FileNotFoundError
+
+
     def get_provider_icon_name(self, provider):
         # TODO: Look up provider icon
         return None   # "images/favicon_32x32.png"
@@ -80,3 +83,16 @@ class AccountManager:
             print(f"Accounts successfully backed up to {file_path}")
         except Exception as e:
             print(f"Failed to backup accounts: {e}")
+
+    @staticmethod
+    def duplicate_accounts(accounts):
+        list_copy = []
+        for item in accounts:
+            newitem = Account(
+                provider=item.provider,
+                label=item.label,
+                secret=item.secret,
+                last_used=item.last_used
+            )
+            list_copy.append(newitem)
+        return list_copy
