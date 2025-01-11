@@ -24,7 +24,7 @@ class EditAccountDialog(QDialog):
         # Store initial size
         self.initial_size = None
 
-        self.setWindowTitle("DemoEdit Account")
+        self.setWindowTitle("Edit Account")
         self.setMinimumWidth(475)
 
         # Main layout
@@ -108,6 +108,26 @@ class EditAccountDialog(QDialog):
     def update_qr_button_text(self):
         """Update button text based on QR code visibility state"""
         self.reveal_qr_button.setText("Hide QR code" if self.is_qr_visible else "Reveal QR code")
+
+    def handle_update_request(self,index, account):
+        print (f"EditAcctDialog is handling update request for: {index} ")
+        encrypted_secret = self.secrets_manager.encrypt(self.shared_fields.secret_entry.text())
+        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), encrypted_secret, account.last_used)
+        self.controller.update_account(index, up_account)
+        self.close()
+
+    def confirm_delete_account(self):
+        reply = QMessageBox.question(
+            self,
+            'Confirm Delete',
+            f'Are you sure you want to delete this account?\n\n{self.account.provider} ({self.account.label})\n\n'+
+            f"You will lose access to {self.account.provider} unless you have saved the restore codes. (Learn more)",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            self.controller.delete_account(self.account)
+            self.accept()
 
     def handle_QR_reveal(self):
         if not self.is_qr_visible:
