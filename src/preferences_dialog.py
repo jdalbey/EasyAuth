@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, QFontDialog
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
+    QFontDialog, QSizePolicy
 from appconfig import AppConfig
 
 class PreferencesDialog(QDialog):
@@ -70,6 +72,9 @@ class PreferencesDialog(QDialog):
         self.restore_defaults_button = QPushButton("Restore Defaults")
         self.restore_defaults_button.clicked.connect(self.restore_defaults)
         layout.addWidget(self.restore_defaults_button)
+        self.restore_defaults_button.setContentsMargins(40, 0, 0, 0)
+        self.restore_defaults_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        layout.addWidget(self.restore_defaults_button, alignment=Qt.AlignCenter)
 
         # Load settings
         self.load_settings()
