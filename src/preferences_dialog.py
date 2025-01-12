@@ -50,6 +50,13 @@ class PreferencesDialog(QDialog):
         self.language_combo.addItems(["English", "Spanish"])
         layout.addWidget(self.language_combo)
 
+        # Theme drop down box
+        theme_label = QLabel("Theme:")
+        layout.addWidget(theme_label)
+        self.theme_combo = QComboBox()
+        self.theme_combo.addItems(["light", "dark"])
+        layout.addWidget(self.theme_combo)
+
         # Animate Copy to clipboard
         self.animate_copy = QCheckBox("Animate Copy to clipboard")
         layout.addWidget(self.animate_copy)
@@ -85,6 +92,7 @@ class PreferencesDialog(QDialog):
         self.language_combo.setCurrentText(self.app_config.get_language())
         self.animate_copy.setChecked(self.app_config.is_animate_copy())
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
+        self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
     def save_settings(self):
         self.app_config.set_search_by("Provider" if self.search_by_provider.isChecked() else "User")
@@ -96,6 +104,7 @@ class PreferencesDialog(QDialog):
         self.app_config.set_language(self.language_combo.currentText())
         self.app_config.set_animate_copy(self.animate_copy.isChecked())
         self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())
+        self.app_config.set_theme_name(self.theme_combo.currentText())
         self.accept()
 
     def select_font(self):

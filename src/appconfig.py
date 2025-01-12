@@ -133,7 +133,7 @@ class AppConfig:
         """
         Set the path to the application database.
         """
-        self.config.set('Settings', 'vault_path', path)
+        self.set('Settings', 'vault_path', path)
 
     def is_smart_filtering_enabled(self):
         """
@@ -145,7 +145,7 @@ class AppConfig:
         """
         Set the smart filtering enabled status.
         """
-        self.config.set('Settings', 'smart_filtering', str(enabled))
+        self.set('Settings', 'smart_filtering', str(enabled))
 
     def get_theme_name(self):
         """
@@ -157,7 +157,7 @@ class AppConfig:
         """
         Set the name of the theme.
         """
-        self.config.set('Settings', 'theme_name', theme_name)
+        self.set('Settings', 'theme_name', theme_name)
 
     def get_alt_id(self):
         """
@@ -169,7 +169,7 @@ class AppConfig:
         """
         Set the alternate id.
         """
-        self.config.set('Settings', 'alt_id', alt_id)
+        self.set('Settings', 'alt_id', alt_id)
 
     def restore_defaults(self):
         """ restore and write defaults """
