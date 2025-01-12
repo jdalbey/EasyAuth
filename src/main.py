@@ -26,9 +26,7 @@ def main():
     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
     app_config = AppConfig(filepath)
 
-    # Initialize the controller and view
-    controller = AppController()
-    view = AppView(controller)
+    view = AppView()
 
     # Start the application
     view.show()
@@ -42,3 +40,5 @@ if __name__ == '__main__':
 # [x]Tooltip for timer styling
 # [x] Implement reorder
 # [x] Implement Open QR code from file
+# [ ] Discover: Can label field in list be a link that opens the edit dialog.
+# [ ] Make a Woogle sample 2FA setup web page

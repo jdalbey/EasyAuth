@@ -13,21 +13,25 @@ import pyotp
 import time, datetime
 import pyperclip
 
+import cipher_funcs
 from account_add_dialog import AddAccountDialog
+from account_confirm_dialog import ConfirmAccountDialog
 from quick_start_dialog import QuickStartDialog
 from settings_dialog import SettingsDialog  
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
 from controllers import AppController
+from models_singleton import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 
 class AppView(QMainWindow):
-    def __init__(self, controller):
+    def __init__(self, ):
         super().__init__()
         self.logger = logging.getLogger(__name__)
-        self.controller = controller
-        self.controller.set_view(self)
+        #self.controller = controller
+        self.account_manager = AccountManager()
+        #self.controller.set_view(self)
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
@@ -162,7 +166,8 @@ class AppView(QMainWindow):
 
     def display_accounts(self):
         search_term = self.search_box.text().lower()
-        accounts = self.controller.get_accounts()
+        self.account_manager.load_accounts()
+
         # Clear the existing widgets in the scroll_layout
         while self.scroll_layout.count():
             child = self.scroll_layout.takeAt(0)
@@ -170,7 +175,7 @@ class AppView(QMainWindow):
                 child.widget().deleteLater()
 
         # Check if the accounts list is empty
-        if not accounts:
+        if not self.account_manager.accounts:
             self.vault_empty = True
             # Display a three-line help message
             help_message = [
@@ -191,9 +196,9 @@ class AppView(QMainWindow):
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
             self.scroll_layout.setSpacing(2)  # Set vertical spacing between rows
-            for index, account in enumerate(accounts):
+            for index, account in enumerate(self.account_manager.accounts):
                 if search_term in account.provider.lower():
-                    secret_key = self.controller.secrets_manager.decrypt(account.secret)
+                    secret_key = cipher_funcs.decrypt(account.secret)
                     # I think the preconditions make catching this exception superfluous.
                     try:
                         otp = pyotp.TOTP(secret_key).now()
@@ -212,7 +217,7 @@ class AppView(QMainWindow):
                     # Set external padding around the frame by adjusting the layout margins of the parent widget
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
                     icon_label = QLabel()
-                    provider_icon_img = self.controller.get_provider_icon_name(account.provider)
+                    provider_icon_img = self.account_manager.get_provider_icon_name(account.provider)
                     if provider_icon_img:
                         provider_icon = QPixmap(provider_icon_img)
                         icon_label.setPixmap(provider_icon)
@@ -284,18 +289,32 @@ class AppView(QMainWindow):
         print(f"Copied OTP: {otp}")
         now = datetime.datetime.now()
         account.last_used = now.strftime("%Y-%m-%d %H:%M")
-        self.controller.update_account(idx,account)
+        self.account_manager.update_account(idx,account)
+        print(f"Updated account: {idx} {account.provider} ({account.label})")
 
     def show_add_account_form(self):
+        """ User clicked Add Account button """
         print("Starting Show_add_account_form")
-        self.current_dialog = AddAccountDialog(self.controller)
-        #self.current_dialog.exec_()
+        # Are we in auto_find mode?
+        if self.app_config.is_auto_find_qr_enabled():
+            confirmDialog = ConfirmAccountDialog()
+            from qr_hunting import fetch_qr_code
+            result_code = fetch_qr_code(confirmDialog)
+            # if process returned True we should skip exec_
+            #result_code = QDialog.result(self.current_dialog)
+            print (f"AddAccountDialog closed with result code: {result_code}")
+            if not result_code:
+                self.current_dialog = AddAccountDialog()
+                self.current_dialog.exec_()
+        else:
+            self.current_dialog = AddAccountDialog()
+            self.current_dialog.exec_()
         # Refresh the display
         self.display_accounts()
 
     def show_edit_account_form(self,index,account):
         print (f"entering show_edit_account_form with {index} {account.provider}")
-        dialog_EditAcct = EditAccountDialog(self, self.controller, index, account)
+        dialog_EditAcct = EditAccountDialog(self, index, account)
         dialog_EditAcct.exec_()
         self.display_accounts()
 
@@ -304,32 +323,31 @@ class AppView(QMainWindow):
         dialog.exec_()
 
     def show_backup_restore_dialog(self):
-        dialog = BackupRestoreDialog(self.controller.account_manager, self)
+        dialog = BackupRestoreDialog(self.account_manager, self)
         dialog.exec_()
 
     def import_accounts(self):
-        pass
-
-    def backup_restore(self):
-        pass
+        reply = QMessageBox.information(
+            self,
+            'Information',
+            f'Importing accounts not yet implemented',
+            QMessageBox.Ok
+        )
 
     def show_reorder_dialog(self):
-        account_list = self.controller.get_accounts()
+        account_list = self.account_manager.accounts
         dialog = ReorderDialog(account_list, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.accounts = dialog.get_ordered_accounts()
             # save back to model
             account_dicts = [asdict(account) for account in self.accounts]
             json_str = json.dumps(account_dicts)
-            self.controller.set_accounts(json_str)
+            self.account_manager.set_accounts(json_str)
             # Update main window display
             self.display_accounts()
 
     def manage_providers(self):
-        pass
-
-    def settings(self):
-        pass
+        reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
 
     def show_quick_start_dialog(self):
         dlg = QuickStartDialog()
@@ -358,6 +376,6 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     controller = AppController()
-    window = AppView(controller)
+    window = AppView()
     window.show()
     sys.exit(app.exec_())

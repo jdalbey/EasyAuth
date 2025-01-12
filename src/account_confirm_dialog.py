@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 from account_entry_form import AccountEntryForm
-
+from models_singleton import AccountManager
 
 class ConfirmAccountDialog(QDialog):
-    def __init__(self, controller, parent=None):
+    def __init__(self, parent=None):
         super(ConfirmAccountDialog, self).__init__(parent)
-        self.controller = controller
+        self.account_manager = AccountManager()
         self.setWindowTitle("Confirm Account")
         self.setGeometry(100, 100, 400, 200)
 
@@ -16,6 +16,7 @@ class ConfirmAccountDialog(QDialog):
 
         self.button_layout = QHBoxLayout()
         self.save_button = QPushButton("Accept")
+        self.save_button.setShortcut('Ctrl+A')
         self.save_button.clicked.connect(self.save_fields)
 
         # Add shared fields
@@ -25,7 +26,7 @@ class ConfirmAccountDialog(QDialog):
         self.button_layout.addWidget(self.save_button)
 
         self.cancel_button = QPushButton("Decline")
-        self.cancel_button.clicked.connect(self.reject)
+        self.cancel_button.clicked.connect(self.reject) # returns False
         self.button_layout.addWidget(self.cancel_button)
 
         self.layout.addLayout(self.button_layout)
@@ -39,5 +40,5 @@ class ConfirmAccountDialog(QDialog):
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
-        self.controller.save_new_account(provider, label, secret)
-        self.accept()
+        self.account_manager.save_new_account(provider, label, secret)
+        self.accept()  # returns True

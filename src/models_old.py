@@ -1,11 +1,12 @@
-
+import logging
 import json
 import os
 from pathlib import Path # Python 3.5+
 from dataclasses import dataclass
-from secrets_manager import SecretsManager
+import cipher_funcs
 from datetime import datetime
 
+# TODO: Disambiguate - sometimes secret is used as the shared key and sometimes as the encrypted key.
 @dataclass
 class Account:
     provider: str
@@ -15,8 +16,10 @@ class Account:
 
 
 class AccountManager:
+    # TODO: Make cross-platform
     kPathToVault = ".var/app/org.redpoint.EasyAuth/data/vault.json"  # relative to user.home
     def __init__(self, filename=kPathToVault):
+        self.logger = logging.getLogger(__name__)
         home_dir_str = str(Path.home())
         self.vault_path = Path.home().joinpath(home_dir_str, filename)
         self.accounts = self.load_accounts()
@@ -54,7 +57,17 @@ class AccountManager:
             print ("Missing Vault, can't save account.")
             exit()
 
-    def add_account(self, account):
+    def save_new_account(self, provider, label, secret):
+        """@param secret is plain-text shared secret"""
+        encrypted_secret = cipher_funcs.encrypt(secret)
+        account = Account(provider, label, encrypted_secret, "")
+        now = datetime.now()
+        account.last_used = now.strftime("%Y-%m-%d %H:%M")
+
+        self.__add_account(account)
+        self.logger.info(f"Saved account: {provider} ({label})")
+
+    def __add_account(self, account):
         """@param account with encrypted secret"""
         #TODO: Don't allow duplicate accounts (i.e., duplicate secret key)
         self.accounts.insert(0,account)  # insert in first spot in list
@@ -70,11 +83,10 @@ class AccountManager:
 
     def backup_accounts(self, file_path):
         """ Store the accounts as json in the given file_path after decrypting the secret keys"""
-        secrets_manager = SecretsManager()
         decrypted_accounts = []
         for account in self.accounts:
             decrypted_account = account.__dict__.copy()
-            decrypted_account['secret'] = secrets_manager.decrypt(account.secret)
+            decrypted_account['secret'] = cipher_funcs.decrypt(account.secret)
             decrypted_accounts.append(decrypted_account)
 
         try:

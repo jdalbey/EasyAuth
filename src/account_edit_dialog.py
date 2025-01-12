@@ -5,17 +5,17 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
     QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton
 
+import otp_funcs
 from account_entry_form import AccountEntryForm
-from models import Account
-from secrets_manager import SecretsManager
+from models_singleton import Account, AccountManager
+import cipher_funcs
 
 
 class EditAccountDialog(QDialog):
-    def __init__(self, parent, controller, index, account):
+    def __init__(self, parent, index, account):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
-        self.controller = controller
-        self.secrets_manager = SecretsManager()
+        self.account_manager = AccountManager()
         self.account = account
         self.index = index
         self.qr_code_label = None
@@ -42,7 +42,7 @@ class EditAccountDialog(QDialog):
 
         # Place current account data into fields for updating
         editable_account = copy.deepcopy(account)
-        editable_account.secret = controller.secrets_manager.decrypt(account.secret)
+        editable_account.secret = cipher_funcs.decrypt(account.secret)
         self.shared_fields.set_fields(editable_account)
 
         # Button section
@@ -111,9 +111,9 @@ class EditAccountDialog(QDialog):
 
     def handle_update_request(self,index, account):
         print (f"EditAcctDialog is handling update request for: {index} ")
-        encrypted_secret = self.secrets_manager.encrypt(self.shared_fields.secret_entry.text())
+        encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
         up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), encrypted_secret, account.last_used)
-        self.controller.update_account(index, up_account)
+        self.account_manager.update_account(index, up_account)
         self.close()
 
     def confirm_delete_account(self):
@@ -126,13 +126,13 @@ class EditAccountDialog(QDialog):
             QMessageBox.No
         )
         if reply == QMessageBox.Yes:
-            self.controller.delete_account(self.account)
+            self.account_manager.delete_account(self.account)
             self.accept()
 
     def handle_QR_reveal(self):
         if not self.is_qr_visible:
             # Show QR code
-            qr_code_image = self.controller.generate_qr_code(self.account)
+            qr_code_image = otp_funcs.generate_qr_image(self.account)
             pixmap = QPixmap()
             pixmap.loadFromData(qr_code_image)
             self.qr_code_label = QLabel()

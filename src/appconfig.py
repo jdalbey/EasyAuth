@@ -12,23 +12,29 @@ class AppConfig:
             cls._instance._config = configparser.ConfigParser()
             if config_file:
                 cls._instance.read(config_file)
+            else:
+                cls._instance._config['settings'] = cls.get_default_settings()
         return cls._instance
+
+    @staticmethod
+    def get_default_settings():
+            return  {
+                'vault_path': 'default.db',
+                'smart_filtering': 'False',
+                'theme_name': 'default',
+                'alt_id': '',
+                'auto_find_qr': 'True'
+            }
 
     def read(self, config_file):
         if not os.path.exists(config_file):
             print (f"The configuration file '{config_file}' does not exist, creating it.")
             if not os.path.exists(os.path.dirname(config_file)):
                 os.makedirs(os.path.dirname(config_file))
-            with open(config_file, 'w') as file:
-                self._config['settings'] = {
-                    'vault_path': 'default.db',
-                    'smart_filtering': 'False',
-                    'theme_name': 'default',
-                    'alt_id': '',
-                    'auto_find_qr': 'False'
-                }
-                self._config.write(file)
-                print ("saved config file")
+                with open(config_file, 'w') as file:
+                    self._config['settings'] = self.get_default_settings()
+                    self._config.write(file)
+                    print("saved config file")
         else:
             self._config.read(config_file)
             print ("Read config file:")
