@@ -17,7 +17,7 @@ import cipher_funcs
 from account_add_dialog import AddAccountDialog
 from account_confirm_dialog import ConfirmAccountDialog
 from quick_start_dialog import QuickStartDialog
-from settings_dialog import SettingsDialog  
+from preferences_dialog import PreferencesDialog
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
 from controllers import AppController
@@ -71,9 +71,9 @@ class AppView(QMainWindow):
         backup_action.triggered.connect(self.show_backup_restore_dialog)
         file_menu.addAction(backup_action)
 
-        settings_action = QAction('Settings', self)
-        settings_action.triggered.connect(self.show_settings_dialog)
-        file_menu.addAction(settings_action)
+        preferences_action = QAction('Preferences', self)
+        preferences_action.triggered.connect(self.show_preferences_dialog)
+        file_menu.addAction(preferences_action)
 
         # Tools menu
         tools_menu = menubar.addMenu('Tools')
@@ -318,8 +318,8 @@ class AppView(QMainWindow):
         dialog_EditAcct.exec_()
         self.display_accounts()
 
-    def show_settings_dialog(self):
-        dialog = SettingsDialog(self)
+    def show_preferences_dialog(self):
+        dialog = PreferencesDialog(self)
         dialog.exec_()
 
     def show_backup_restore_dialog(self):

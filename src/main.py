@@ -25,7 +25,6 @@ def main():
     home_dir_str = str(Path.home())
     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
     app_config = AppConfig(filepath)
-
     view = AppView()
 
     # Start the application
@@ -35,10 +34,23 @@ if __name__ == '__main__':
     main()
 
 # Development Tasks
-# [] Unit test Backup
+# [ ] {NameError}name 'urls' is not defined
+# [ ] Finish removing Controller.
+# [ ] Develop GUI unit tests for each dialog
+# [ ] Implement drag-n-drop in reorder dialog.
+# [ ] Fix defect: Secretkey CD3334 passed validation but generated ??????
 # [] Prevent file corruption
+# [ ] Discover: Can label field in list be a link that opens the edit dialog.
+# [ ] Make a Woogle sample 2FA setup web page
+# [ ] Add more error handling to Backup
+# [ ] Implement Restore
+# [ ] Simply convoluted logic in qr_hunting.
+# [ ] In Entry Form fix tab order to skip (?) icons.
+# [ ] Animate TOTP code being copied to clipboard https://www.pythonguis.com/tutorials/qpropertyanimation/
+# [ ] Put images in resource bundles
+# [ ] Where is machine ID on Windows/Mac?
+# [ ] Internationalization
 # [x]Tooltip for timer styling
 # [x] Implement reorder
 # [x] Implement Open QR code from file
-# [ ] Discover: Can label field in list be a link that opens the edit dialog.
-# [ ] Make a Woogle sample 2FA setup web page
+# [x] Unit test Backup
