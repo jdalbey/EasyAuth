@@ -30,18 +30,7 @@ class TestAppConfig:
         assert smart_filter == False
         assert theme == "light"
         #assert alt_id.startswith("10b")
-        assert alt_id == ""
-
-        # Test the set config from string method
-        config_string = """
-        [settings]
-        database_path = /path/to/database.db
-        smart_filtering = true
-        theme_name = light
-        alt_id = A1B2
-        """
-        config.set_config(config_string)
-        assert config.get_theme_name() == "light"
+        assert alt_id == None
 
     def test_partial_config(self):
         # reset the singleton

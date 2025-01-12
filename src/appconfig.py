@@ -1,10 +1,13 @@
 from configparser import ConfigParser
 import os
+from pathlib import Path
+
 
 class AppConfig:
     """Application configuration settings (Preferences)"""
     _instance = None
     kDefaultPath = ".config/EasyAuth/config.ini"
+
     def __new__(cls, filepath=None):
         if cls._instance is None:
             cls._instance = super(AppConfig, cls).__new__(cls)
@@ -16,13 +19,15 @@ class AppConfig:
             return
         # This code executes just once for first/only instance
         self.config = ConfigParser()
-        self.filepath = filepath
         # If a filepath was provided load settings from there
         if filepath:
+            self.filepath = filepath  #must initialize before read uses it
             self.read(filepath)
         # otherwise fallback settings will be used by restore_defaults
         else:
-            self.filepath = self.kDefaultPath
+            home_dir_str = str(Path.home())
+            self.filepath = Path.home().joinpath(home_dir_str, AppConfig.kDefaultPath)
+            print (f"using default: {self.filepath}")
             self.restore_defaults()
         self._initialized = True
 
@@ -33,30 +38,17 @@ class AppConfig:
             print (f"The configuration file '{config_file}' does not exist, creating it.")
             # is the directory missing?
             if not os.path.exists(os.path.dirname(config_file)):
-                os.makedirs(os.path.dirname(config_file),True)
+                os.makedirs(os.path.dirname(config_file),mode=0o777,exist_ok=True)
             # write defaults to the file
             self.restore_defaults()
             print("restored defaults and saved to config file")
         else:
             self.config.read(config_file)
 
-    def saveconfig(self):
+    def save_config(self):
         if self.filepath:
             with open(self.filepath, 'w') as configfile:
                 self.config.write(configfile)
-
-    def reload(self, config_file):
-        """
-        Reload the configuration from a file.  Used for testing.
-        """
-        self.read(config_file)
-
-    def set_config(self, config_string):
-        """
-        Reload the configuration from a string (INI format).
-        Dependency injection for testing.
-        """
-        self.config.read_string(config_string)
 
     def get(self, section, option, fallback=None):
         return self.config.get(section, option, fallback=fallback)
@@ -66,7 +58,7 @@ class AppConfig:
         if not self.config.has_section(section):
             self.config.add_section(section)
         self.config.set(section, option, value)
-        self.saveconfig()
+        self.save_config()
 
     # Add methods to get and set the new settings
     def is_auto_find_qr_enabled(self):
@@ -163,7 +155,11 @@ class AppConfig:
         """
         Get the alternate id.
         """
-        return self.config.get('Settings', 'alt_id', fallback="")
+        alt_id_string = self.config.get('Settings', 'alt_id', fallback="")
+        if alt_id_string == "":
+            return None
+        else:
+            return alt_id_string
 
     def set_alt_id(self, alt_id):
         """
