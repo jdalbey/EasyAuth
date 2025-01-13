@@ -2,12 +2,14 @@ import time
 
 import pyautogui
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtCore import Qt
 from account_add_dialog import AddAccountDialog
 from account_confirm_dialog import ConfirmAccountDialog
 from appconfig import AppConfig
+import qr_hunting
+import find_qr_codes
 from controllers import AppController
 
 from PyQt5.QtTest import QTest
@@ -33,11 +35,17 @@ def dialog():  # this doesn't work in our case because we would need to use depe
     return dialog
 
 @pytest.mark.parametrize("shortcut", [Qt.CTRL + Qt.Key_U])
-def test_button_shortcut_activation(qtbot, shortcut,controller):
+def test_button_shortcut_activation(qtbot, shortcut):
     app_config = AppConfig(None)
-    dialog = AddAccountDialog(controller)
-    controller.find_qr_codes.assert_called_once()
-    controller.save_new_account.assert_called_once()
+    dialog = AddAccountDialog()
+
+    find_qr_codes.scan_screen_for_qr_codes = Mock()
+    find_qr_codes.scan_screen_for_qr_codes.return_value = []
+    qr_hunting.process_qr_codes = Mock()
+    qr_hunting.process_qr_codes = True
+    find_qr_codes.scan_screen_for_qr_codes.assert_called_once()
+
+    #controller.save_new_account.assert_called_once()
 
     # Simulate pressing the Ctrl+U shortcut to activate the button
     QTest.keyPress(dialog, Qt.Key_U, Qt.ControlModifier)

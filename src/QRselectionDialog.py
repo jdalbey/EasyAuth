@@ -52,9 +52,9 @@ class QRselectionDialog(QDialog):
 
         button_layout = QHBoxLayout()
         # OK button
-        ok_button = QPushButton("OK")
-        ok_button.clicked.connect(self.on_ok)
-        button_layout.addWidget(ok_button)
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.on_ok)
+        button_layout.addWidget(self.ok_button)
         # Cancel button
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(lambda: self.accept())
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     if dialog.exec_() == QDialog.Accepted:
         selected_account = dialog.get_selected_account()
         if selected_account:
-            print(f"Selected Account: {selected_account.provider} - {selected_account.name}")
+            print(f"Selected Account: {selected_account.provider} - {selected_account.label}")
         else:
             print("No account selected.")
 
