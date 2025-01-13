@@ -29,6 +29,7 @@ def confirm_account(account,confirm_dialog):
     # check selection has valid secret key.
     print(f"Checking validity of code for {account.provider}: {account.secret}")
     if not is_valid_secretkey(account.secret):
+        print ("QR code invalid key")
         # if not valid secret key show message box then return to blank account_add form.
         reply = QMessageBox.information (None, 'Info', "QR code has invalid secret key.",QMessageBox.Ok)
     else:
