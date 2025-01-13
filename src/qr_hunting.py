@@ -5,9 +5,6 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 import find_qr_codes
 from QRselectionDialog import QRselectionDialog
-from account_confirm_dialog import ConfirmAccountDialog
-from account_entry_form import AccountEntryForm
-from appconfig import AppConfig
 from models_singleton import Account, AccountManager
 from otp_funcs import is_valid_secretkey
 
@@ -17,7 +14,7 @@ def fetch_qr_code(confirm_dialog):
     @param automatic True if auto scan for QR code setting is true
     @param confirm_dialog the dialog to be used to ask the user to confirm the QR code that was found"""
     print ("starting qr hunt")
-    if process(False, confirm_dialog):
+    if process_qr_codes(False, confirm_dialog):
         # confirm returned True
         print("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
         return True
@@ -43,8 +40,8 @@ def confirm_account(account,confirm_dialog):
             return True
     return False
 
-def process(called_from_Find_btn,confirm_dialog):
-    # Before showing form go find_qr_code
+def process_qr_codes(called_from_Find_btn, confirm_dialog):
+    # first go find_qr_codes
     urls = find_qr_codes.scan_screen_for_qr_codes()
     print (f"Process got urls: {urls}")
     # Examine each url to see if it is an otpauth protocol and reject others

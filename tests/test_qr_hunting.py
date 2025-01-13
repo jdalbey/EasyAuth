@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import Mock, patch
 from PyQt5.QtWidgets import QMessageBox, QDialog
-from qr_hunting import confirm_account
+from qr_hunting import confirm_account, process_qr_codes
 
 # Assume the following imports are defined in your module
 # from qr_hunting import confirm_account, is_valid_secretkey, Account
 
-class TestConfirmAccount(unittest.TestCase):
+class TestQRHunting(unittest.TestCase):
     @patch("qr_hunting.is_valid_secretkey")
     @patch("qr_hunting.QMessageBox")
     @patch("qr_hunting.QDialog")
@@ -54,11 +54,11 @@ class TestConfirmAccount(unittest.TestCase):
         print(f"Test2 result: {result},  QDialog.Accepted: {QDialog.Accepted}")
         # Debugging output
         print("exec_() returned:", mock_confirm_dialog.exec_())
+        self.assertTrue(result)
 
         # Assertions for the valid key branch with accepted dialog
         mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
         mock_confirm_dialog.set_account.assert_called_once()
-        self.assertTrue(result)
 
     @patch("qr_hunting.is_valid_secretkey")
     @patch("qr_hunting.QDialog")
@@ -80,6 +80,56 @@ class TestConfirmAccount(unittest.TestCase):
         mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
         mock_confirm_dialog.set_account.assert_called_once()
         self.assertFalse(result)
+
+
+    @patch("find_qr_codes.scan_screen_for_qr_codes")
+    def test_process_qr_codes_valid_zero(self, mock_scan_screen_for_qr_codes):
+        # Mock dependencies
+        mock_scan_screen_for_qr_codes.return_value = []
+
+        # Call the function
+        result = process_qr_codes(False, None)
+
+        # Assertions when no urls found
+        mock_scan_screen_for_qr_codes.assert_called_once_with()
+        # if zero valid urls expect return False
+        self.assertFalse(result)
+
+    @patch("find_qr_codes.scan_screen_for_qr_codes")
+    @patch("qr_hunting.QMessageBox")
+    def test_process_qr_codes_valid_zero_from_find(self, MockQMessageBox, mock_scan_screen_for_qr_codes):
+        mock_message_box = Mock()
+        MockQMessageBox.information.return_value = mock_message_box
+
+        # Call the function
+        result = process_qr_codes(True, None)
+        # if zero valid urls expect return False
+        self.assertFalse(result)
+
+        # Assertions when no urls found
+        mock_scan_screen_for_qr_codes.assert_called_once_with()
+        # When True is passed should get an alert
+        MockQMessageBox.information.assert_called_once_with(
+            None, 'Alert', "No QR code found.  Be sure the QR code is visible on your screen and try again.",
+            unittest.mock.ANY
+        )
+
+    @patch("find_qr_codes.scan_screen_for_qr_codes")
+    @patch("qr_hunting.confirm_account")
+    def test_process_qr_codes_valid_one(self, mock_confirm_account, mock_scan_screen_for_qr_codes):
+        # Mock dependencies
+        mock_scan_screen_for_qr_codes.return_value = ['otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com']
+        mock_confirm_account.return_value = True
+        # Call the function
+        result = process_qr_codes(False, None)
+        self.assertTrue(result)
+        # Assertions when 1 url found and Accepted
+        mock_scan_screen_for_qr_codes.assert_called_once_with()
+
+        mock_confirm_account.return_value = False
+        result = process_qr_codes(False, None)
+        self.assertFalse(result)
+
 
 
 if __name__ == "__main__":
