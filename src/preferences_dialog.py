@@ -2,7 +2,16 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
     QFontDialog, QSizePolicy
 from appconfig import AppConfig
-
+"""GUI design ideas.
+buttons:   OK | CANCEL | APPLY
+Category tabs: vertical for many, horizontal for few
+   Appearance (theme, font), Keyboard (shortcuts), Behavior, Advanced (e.g. alt machine ID)
+Typora has a nice layout and monochrome (?)
+Use dimmed text for explanation:
+  [ ] Frazzle on exit
+      some dim text explanation here
+See Oracle Dialog style guide.      
+"""
 class PreferencesDialog(QDialog):
     def __init__(self, parent=None):
         super(PreferencesDialog, self).__init__(parent)
