@@ -40,9 +40,12 @@ class TestManualAddAccountDialog(unittest.TestCase):
         # Replace account manager in dialog with the mock
         dialog.account_manager = dialog_manager
 
+        # Verify save button is disabled until fields are populated
+        assert dialog.save_button.isEnabled() == False
         # populate fields
         account = Account("Woogle", "me@woogle.com", "AB34", "2000-01-01 01:01")
         dialog.set_account(account)
+        assert dialog.save_button.isEnabled() == True
 
         # Simulate pressing the Decline button
         dialog.cancel_button.click()
