@@ -8,7 +8,7 @@ from account_entry_form import AccountEntryForm
 from appconfig import AppConfig
 from models_singleton import Account, AccountManager
 from otp_funcs import is_valid_secretkey
-from qr_hunting import process
+from qr_hunting import process_qr_codes
 
 class AddAccountDialog(QDialog):
     def __init__(self, parent=None, ):
@@ -88,7 +88,7 @@ class AddAccountDialog(QDialog):
     def get_qr_code(self):
         """ User clicked User QR code """
         confirmDialog = ConfirmAccountDialog()
-        result_code = process(True,confirmDialog)  # True = called from Use QR code
+        result_code = process_qr_codes(True, confirmDialog)  # True = called from Use QR code
         print (f"Finishing get_qr_code with result {result_code}")
         if result_code:
             print ("calling accept")
