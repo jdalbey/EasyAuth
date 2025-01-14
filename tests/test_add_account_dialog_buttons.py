@@ -1,9 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication, QDialog
 from account_add_dialog import AddAccountDialog
 
@@ -40,7 +37,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.accept = Mock()  # Mock the accept method of the dialog
 
         # Act
-        dialog.get_qr_code()
+        dialog.find_qr_btn.click()
 
         # Assert
         mock_process.assert_called_once_with(True, mock_dialog_instance)
@@ -59,7 +56,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.accept = Mock()  # Mock the accept method of the dialog
 
         # Act
-        dialog.get_qr_code()
+        dialog.find_qr_btn.click()
 
         # Assert
         mock_process.assert_called_once_with(True, mock_dialog_instance)
