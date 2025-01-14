@@ -4,7 +4,6 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from appconfig import AppConfig
-from controllers import AppController
 from view_qt import AppView
 from pathlib import Path # Python 3.5+
 
@@ -34,7 +33,7 @@ if __name__ == '__main__':
     main()
 
 # Development Tasks
-# [ ] {NameError}name 'urls' is not defined
+# [ ] {NameError}name 'urls' is not defined when debugging a unittest
 # [ ] Explore Qt Creator for GUI builder tool for Preferences Dialog.
 # [ ] Preferences dialog - changes buttons to OK, Cancel, Apply.
 # [ ] Finish removing Controller.

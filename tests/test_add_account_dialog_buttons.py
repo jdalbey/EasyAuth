@@ -26,7 +26,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
     @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
     @patch("account_add_dialog.ConfirmAccountDialog")  # Correct module path for ConfirmAccountDialog
-    def test_get_qr_code_success(self, MockConfirmAccountDialog, mock_process):
+    def test_qr_code_btn_success(self, MockConfirmAccountDialog, mock_process):
         # Arrange
         mock_process.return_value = True  # Simulate a successful QR code processing
         mock_dialog_instance = Mock(spec=QDialog)
@@ -45,7 +45,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
     @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
     @patch("account_add_dialog.ConfirmAccountDialog")  # Correct module path for ConfirmAccountDialog
-    def test_get_qr_code_failure(self, MockConfirmAccountDialog, mock_process):
+    def test_qr_code_btn_reject(self, MockConfirmAccountDialog, mock_process):
         # Arrange
         mock_process.return_value = False  # Simulate a failed QR code processing
         mock_dialog_instance = Mock(spec=QDialog)

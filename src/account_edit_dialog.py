@@ -49,14 +49,14 @@ class EditAccountDialog(QDialog):
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
 
-        delete_btn = QPushButton("Delete")
-        delete_btn.clicked.connect(lambda: self.confirm_delete_account())
+        self.delete_btn = QPushButton("Delete")
+        self.delete_btn.clicked.connect(lambda: self.confirm_delete_account())
 
         cancel_btn = QPushButton("Cancel")
         cancel_btn.clicked.connect(self.reject)
 
         button_layout.addWidget(self.save_btn)
-        button_layout.addWidget(delete_btn)
+        button_layout.addWidget(self.delete_btn)
         button_layout.addWidget(cancel_btn)
         layout.addWidget(button_frame)
 
@@ -111,8 +111,8 @@ class EditAccountDialog(QDialog):
 
     def handle_update_request(self,index, account):
         print (f"EditAcctDialog is handling update request for: {index} ")
-        encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
-        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), encrypted_secret, account.last_used)
+        self.encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
+        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), self.encrypted_secret, account.last_used)
         self.account_manager.update_account(index, up_account)
         self.close()
 
