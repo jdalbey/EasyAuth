@@ -182,7 +182,8 @@ class AppView(QMainWindow):
                 "Your vault is empty.",
                 "The vault stores two-factor authentication keys",
                 "provided by a website or other online service.",
-                "Store your secret key by clicking 'Add Account'"
+                "Store your secret key by clicking 'Add Account'",
+                "or"
             ]
             for line in help_message:
                 help_label = QLabel(line)

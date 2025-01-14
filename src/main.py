@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from appconfig import AppConfig
-from view_qt import AppView
+from view import AppView
 from pathlib import Path # Python 3.5+
 
 # Global variable to store the application configuration
