@@ -4,7 +4,8 @@ from io import BytesIO
 import cipher_funcs
 
 def is_valid_secretkey(secret: str) -> bool:
-    """ Validate that the secret key can generate an OTP """
+    """ Validate that the secret key can generate an OTP
+        I.e., is secret a base32 string """
     try:
         totp = pyotp.TOTP(secret)
         otp = totp.now()  # Generate OTP, which validates the key internally

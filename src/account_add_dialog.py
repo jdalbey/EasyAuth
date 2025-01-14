@@ -28,12 +28,12 @@ class AddAccountDialog(QDialog):
         qr_screen_label.setContentsMargins(20, 0, 0, 0)
         self.layout.addWidget(qr_screen_label)
 
-        find_qr_btn = QPushButton("Use QR code")
-        find_qr_btn.setShortcut('Ctrl+U')
-        find_qr_btn.clicked.connect(lambda: self.get_qr_code())
-        find_qr_btn.setContentsMargins(40, 0, 0, 0)
-        find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.layout.addWidget(find_qr_btn, alignment=Qt.AlignCenter)
+        self.find_qr_btn = QPushButton("Use QR code")
+        self.find_qr_btn.setShortcut('Ctrl+U')
+        self.find_qr_btn.clicked.connect(lambda: self.get_qr_code())
+        self.find_qr_btn.setContentsMargins(40, 0, 0, 0)
+        self.find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.layout.addWidget(self.find_qr_btn, alignment=Qt.AlignCenter)
 
         qr_file_label = QLabel("• Fill the form automatically from a QR image in a file")
         qr_file_label.setContentsMargins(20, 0, 0, 0)
@@ -91,7 +91,6 @@ class AddAccountDialog(QDialog):
         result_code = process_qr_codes(True, confirmDialog)  # True = called from Use QR code
         print (f"Finishing get_qr_code with result {result_code}")
         if result_code:
-            print ("calling accept")
             self.accept()
 
     def open_qr_image(self):

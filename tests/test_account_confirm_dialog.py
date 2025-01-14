@@ -4,9 +4,25 @@ from PyQt5.QtWidgets import QApplication
 from account_confirm_dialog import ConfirmAccountDialog
 from unittest.mock import Mock
 class TestConfirmAccountDialog(unittest.TestCase):
+    # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.
+    @classmethod
+    def setUpClass(cls):
+        # QApplication is created once for the entire test suite
+        cls.app = QApplication([])
+
+    @classmethod
+    def tearDownClass(cls):
+        # Ensure QApplication is properly cleaned up after all tests
+        cls.app.quit()
+
     def setUp(self):
-        # Required for QApplication to initialize PyQt components
-        self.app = QApplication([])
+        # No need to create QApplication here; it's already done in setUpClass
+        pass
+
+    def tearDown(self):
+        # Clean up dialog and other resources
+        pass
+
 
     @patch('account_confirm_dialog.AccountManager')
     def test_Accept_button(self, MockAccountManager):
@@ -58,8 +74,6 @@ class TestConfirmAccountDialog(unittest.TestCase):
         # Verify save_new_account is called once with correct arguments
         mock_account_manager.save_new_account.assert_not_called()
 
-    def tearDown(self):
-        self.app.quit()
 
 
 if __name__ == "__main__":

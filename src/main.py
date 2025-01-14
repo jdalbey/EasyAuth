@@ -35,16 +35,18 @@ if __name__ == '__main__':
 
 # Development Tasks
 # [ ] {NameError}name 'urls' is not defined
+# [ ] Explore Qt Creator for GUI builder tool for Preferences Dialog.
+# [ ] Preferences dialog - changes buttons to OK, Cancel, Apply.
 # [ ] Finish removing Controller.
 # [ ] Develop GUI unit tests for each dialog
 # [ ] Implement drag-n-drop in reorder dialog.
-# [ ] Fix defect: Secretkey CD3334 passed validation but generated ??????
-# [] Prevent file corruption
+# [ ] Fix defect: Secretkey CD3334 bogus2 passed validation but generated ?????? Why is 'secret' invalid?
+# [ ] Prevent file corruption
 # [ ] Discover: Can label field in list be a link that opens the edit dialog.
 # [ ] Make a Woogle sample 2FA setup web page
-# [ ] Add more error handling to Backup
+# [ ] Add more error handling to Backup and vault read/write
 # [ ] Implement Restore
-# [ ] Simply convoluted logic in qr_hunting.
+# [ ] Simplify convoluted logic in qr_hunting.
 # [ ] In Entry Form fix tab order to skip (?) icons.
 # [ ] Animate TOTP code being copied to clipboard https://www.pythonguis.com/tutorials/qpropertyanimation/
 # [ ] Put images in resource bundles

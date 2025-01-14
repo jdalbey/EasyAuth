@@ -15,9 +15,6 @@ def test_single_instance(config_file):
     config2 = AppConfig(config_file)
     assert config1 is config2
 
-# TODO: test if .ini file exists but doesn't have all settings
-#       should use fallback.
-
 def test_save_config(app_config, config_file):
     app_config.set_vault_path('saved_path.db')
     app_config.save_config()
@@ -29,7 +26,11 @@ def test_set_get_vault_path(app_config):
     assert app_config.get_vault_path() == 'test_path.db'
 
 def test_missing_config_directory(app_config, config_file):
-    os.remove(config_file)
-    os.removedirs("/tmp/EasyAuth")
+    try:
+        os.remove(config_file)
+        os.removedirs("/tmp/EasyAuth")
+    except FileNotFoundError as e:
+        pass
+
     app_config.read(config_file)
     assert app_config.get_vault_path() == 'vault.json'

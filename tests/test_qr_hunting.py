@@ -118,7 +118,7 @@ class TestQRHunting(unittest.TestCase):
     @patch("qr_hunting.confirm_account")
     def test_process_qr_codes_valid_one(self, mock_confirm_account, mock_scan_screen_for_qr_codes):
         # Mock dependencies
-        mock_scan_screen_for_qr_codes.return_value = ['otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com']
+        mock_scan_screen_for_qr_codes.return_value = ['otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com','badurl']
         mock_confirm_account.return_value = True
         # Call the function
         result = process_qr_codes(False, None)
