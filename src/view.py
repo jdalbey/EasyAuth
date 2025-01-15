@@ -64,6 +64,7 @@ class AppView(QMainWindow):
         file_menu.addSeparator()
         
         import_action = QAction('Import', self)
+        import_action.setEnabled(False)
         import_action.triggered.connect(self.import_accounts)
         file_menu.addAction(import_action)
         
@@ -82,6 +83,7 @@ class AppView(QMainWindow):
         tools_menu.addAction(reorder_action)
         
         providers_action = QAction('Providers', self)
+        providers_action.setEnabled(False)
         providers_action.triggered.connect(self.manage_providers)
         tools_menu.addAction(providers_action)
         
@@ -303,7 +305,13 @@ class AppView(QMainWindow):
 
     def reset_label_color(self,label):
         # Reset the background color to the original (no background color)
-        label.setStyleSheet("background-color: none;")
+        try:
+            label.setStyleSheet("background-color: none;")
+        except RuntimeError as e:
+            """ if you hit copy with only 1 second left the label will get reset when the new code is'
+            generated and the attempt to reset the old label will fail.  But that's okay because
+            the new label will have reset the background color anyway."""
+            pass
 
     def show_add_account_form(self):
         """ User clicked Add Account button """
@@ -366,8 +374,9 @@ class AppView(QMainWindow):
         dlg = QuickStartDialog()
 
     # TODO: Verify that app can be closed even if browser window remains open
+
     def open_user_manual(self):
-        url = QUrl("https://example.com")
+        url = QUrl("https://github.com/jdalbey/EesyAuth/code/docs/user_manual.md")
         QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):

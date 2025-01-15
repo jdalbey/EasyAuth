@@ -1,3 +1,7 @@
+## EasyAuth User Manual
+
+Under construction.
+
 This is the user manual for the EasyAuth application. 
 EasyAuth is a desktop linux application for managing one time passwords. 
 The application has a graphical user interface. 
@@ -31,8 +35,7 @@ The second is "QR image" and a button labeled "open file".
 The third is "enter the data manually". 
 Beneath the three options is a hyperlink "help me choose". 
  The form then shows three fields. 
-The first is labeled "provider", the second is labeled "label", and the third is labeled "secret key". 
-Beneath these is a label "advanced settings" with a expand/collapse icon. 
+The first is labeled "provider", the second is labeled "user", and the third is labeled "secret key". 
 Beneath this is a save button. 
 The provider field is an auto complete field for the user to enter  the name of the service that issued the secret key. 
 As the user types a dropdown list presents options that match the users text entry. 
@@ -74,9 +77,7 @@ The second says "Import icon from file", and the third says "reset icon to defau
 The third button is only enabled when the value of the icon being displayed is not the default icon. 
 At the bottom of the form are buttons for Save and cancel. 
  When the save button is clicked on the new account form, the value in the secret key field will be checked to make sure it's valid. 
-If it's not valid, a confirmation prompt will be displayed that says, "invalid secret key, use anyway?" and then beneath it an explanatory message that says "invalid keys generate '??? ???' instead of a TOTP. 
-then the confirmation dialog has okay and Cancel buttons. 
-If okay is selected, the invalid key is saved with the account  And in the account list instead of displaying a one time password, it will display '??? ???'. 
+If it's not valid, an error message will be displayed that says, "invalid secret key".
 
 
 Advanced settings are not displayed on the new account form. 
@@ -135,14 +136,10 @@ First, the search looks for providers that match the query term, and if it doesn
 As long as the value in the search field matches one or more accounts, the matching account items are displayed in the account list. 
 
 
-The Filter button causes the account list to be filtered by the chosen criteria. 
-It can filter by provider in alphabetical order. 
-It can filter by label in alphabetical order. 
-It can filter by last use date chronologically earliest to latest or latest to earliest. 
-It can filter by usage count from high to low or low to high. 
+
 
 In the main window above the list of accounts, but below the menu bar is a circled whole number that represents the number of seconds remaining in the expiration period for the current one time passwords. 
-  
+
 Choosing reorder accounts from the file menu causes a form to appear that lists all the accounts in a scrollable list. 
 Additional buttons on each row allow items to be moved to a new position in the list. 
 To the right of each row are up and down buttons which allow moving an entry up or down one slot in the list. 
@@ -162,5 +159,4 @@ The new provider form has fields for provider name, website URL, and help URL, a
 The form also provides options for setting a value of the icon. 
 Clicking on a name in the provider list in the left panel causes an edit provider form to appear in the right hand panel in which the attributes of a provider can be modified. 
 There's also a delete button that would remove the provider from the list. 
-
 

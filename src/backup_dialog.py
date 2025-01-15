@@ -19,26 +19,32 @@ class BackupRestoreDialog(QDialog):
         layout.addWidget(backup_easy_auth_btn)
 
         backup_aegis_btn = QPushButton("Aegis")
+        backup_aegis_btn.setEnabled(False)
         backup_aegis_btn.clicked.connect(lambda: self.backup("Aegis"))
         layout.addWidget(backup_aegis_btn)
 
         backup_freeotp_btn = QPushButton("FreeOTP")
+        backup_freeotp_btn.setEnabled(False)
         backup_freeotp_btn.clicked.connect(lambda: self.backup("FreeOTP"))
         layout.addWidget(backup_freeotp_btn)
 
         # Restore panel
         restore_label = QLabel("Restore")
+        restore_label.setEnabled(False)
         layout.addWidget(restore_label)
 
         restore_easy_auth_btn = QPushButton("EasyAuth")
+        restore_easy_auth_btn.setEnabled(False)
         restore_easy_auth_btn.clicked.connect(lambda: self.restore("EasyAuth"))
         layout.addWidget(restore_easy_auth_btn)
 
         restore_aegis_btn = QPushButton("Aegis")
+        restore_aegis_btn.setEnabled(False)
         restore_aegis_btn.clicked.connect(lambda: self.restore("Aegis"))
         layout.addWidget(restore_aegis_btn)
 
         restore_freeotp_btn = QPushButton("FreeOTP")
+        restore_freeotp_btn.setEnabled(False)
         restore_freeotp_btn.clicked.connect(lambda: self.restore("FreeOTP"))
         layout.addWidget(restore_freeotp_btn)
 
