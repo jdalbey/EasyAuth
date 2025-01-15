@@ -21,36 +21,50 @@ class PreferencesDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
+        # Auto Find QR Code
+        self.auto_find_qr_checkbox = QCheckBox("Add Account finds QR code automatically:")
+        self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
+        layout.addWidget(self.auto_find_qr_checkbox)
+
         # Search by: Provider or User
         search_by_label = QLabel("Search by:")
+        search_by_label.setEnabled(False)
         layout.addWidget(search_by_label)
         self.search_by_provider = QRadioButton("Provider")
+        self.search_by_provider.setEnabled(False)
         self.search_by_user = QRadioButton("User")
+        self.search_by_user.setEnabled(False)
         layout.addWidget(self.search_by_provider)
         layout.addWidget(self.search_by_user)
 
         # Minimize application after TOTP copy to clipboard
         self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
+        self.minimize_after_copy.setEnabled(False)
         layout.addWidget(self.minimize_after_copy)
 
         # Minimize during QR code search
         self.minimize_during_qr_search = QCheckBox("Minimize during QR code search")
+        self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
 
         # Auto fetch website favicons
         self.auto_fetch_favicons = QCheckBox("Auto fetch website favicons")
+        self.auto_fetch_favicons.setEnabled(False)
         layout.addWidget(self.auto_fetch_favicons)
 
         # Display website favicons
         self.display_favicons = QCheckBox("Display website favicons")
+        self.display_favicons.setEnabled(False)
         layout.addWidget(self.display_favicons)
 
         # Secret key initially hidden with asterisks in Edit dialog
         self.secret_key_hidden = QCheckBox("Secret key initially hidden with asterisks in Edit dialog")
+        self.secret_key_hidden.setEnabled(False)
         layout.addWidget(self.secret_key_hidden)
 
         # Font button
         self.font_button = QPushButton("Font")
+        self.font_button.setEnabled(False)
         self.font_button.clicked.connect(self.select_font)
         layout.addWidget(self.font_button)
 
@@ -59,23 +73,22 @@ class PreferencesDialog(QDialog):
         layout.addWidget(language_label)
         self.language_combo = QComboBox()
         self.language_combo.addItems(["English", "Spanish"])
+        self.language_combo.setEnabled(False)
         layout.addWidget(self.language_combo)
 
         # Theme drop down box
         theme_label = QLabel("Theme:")
         layout.addWidget(theme_label)
         self.theme_combo = QComboBox()
+        self.theme_combo.setEnabled(False)
         self.theme_combo.addItems(["light", "dark"])
         layout.addWidget(self.theme_combo)
 
         # Animate Copy to clipboard
         self.animate_copy = QCheckBox("Animate Copy to clipboard")
+        self.animate_copy.setEnabled(False)
         layout.addWidget(self.animate_copy)
 
-        # Auto Find QR Code
-        self.auto_find_qr_checkbox = QCheckBox("Add Account finds QR code automatically:")
-        self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
-        layout.addWidget(self.auto_find_qr_checkbox)
 
         # Restore Defaults button
         self.restore_defaults_button = QPushButton("Restore Defaults")
