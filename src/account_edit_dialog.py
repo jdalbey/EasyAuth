@@ -111,10 +111,16 @@ class EditAccountDialog(QDialog):
 
     def handle_update_request(self,index, account):
         print (f"EditAcctDialog is handling update request for: {index} ")
-        self.encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
-        up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(), self.encrypted_secret, account.last_used)
-        self.account_manager.update_account(index, up_account)
-        self.close()
+        # Validate secret key
+        self.encrypted_secret = None
+        if otp_funcs.is_valid_secretkey(self.shared_fields.secret_entry.text()):
+            self.encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
+            up_account = Account(account.provider, account.label,
+                                 self.encrypted_secret, account.last_used)
+            self.account_manager.update_account(index, up_account)
+            self.close()
+        else:
+            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
     def confirm_delete_account(self):
         reply = QMessageBox.question(

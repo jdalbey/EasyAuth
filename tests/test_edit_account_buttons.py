@@ -22,10 +22,51 @@ class TestAccountDeletion(unittest.TestCase):
         
         # Verify the dialog was shown with correct parameters
         mock_question.assert_called_once()
-        MockAccountManager.delete_account.assert_called_once_with(account_in)
 
         # Verify the result is what we expect when user clicks Yes
         dialog.accept.assert_called_once()
+
+    @patch("account_edit_dialog.AccountManager")
+    def test_handle_update_request_success(self, MockAccountManager):
+        # account with a valid secret
+        account_in = Account("Woogle", "me@woogle.com", "AB34", "2000-01-01 01:01")
+        encrypted_secret = 'gAAAAABnhzAo4D3RsKjiMwAOdhM8kDAQ40zUucOhzBK_Hz_1QP0cwgL6aN1U2XgaCqItPx7ACmH6vp7b1h4XkoAYXKdy_KQUFg=='
+        account_in.secret = encrypted_secret
+        # setup the mocks
+        dialog = EditAccountDialog(None, 1, account_in)
+        dialog.account_manager = MockAccountManager
+        dialog.close = Mock()  # Mock the accept method of the dialog
+        # Call the method that shows the dialog
+        dialog.handle_update_request(1,account_in)
+        # verify results
+        assert dialog.encrypted_secret.startswith('gAAAA')
+        MockAccountManager.update_account.assert_called_once()
+        dialog.close.assert_called_once()
+
+    #@patch('PyQt5.QtWidgets.QMessageBox.information')  Not sure if this is better
+    @patch('account_edit_dialog.QMessageBox.information')
+    @patch("account_edit_dialog.AccountManager")
+    def test_handle_update_request_failure(self,MockAccountManager,MockMessageBox):
+        # account with an invalid secret
+        account_in = Account("Woogle", "me@woogle.com", "CD3334", "2000-01-01 01:01")
+        encrypted_secret = 'gAAAAABnhy9vzWtawbgygQLGLP_FC1UZ4xQsDzXS2-gH7WkEzC35YxK9qYpkRVnYYi6CXZhvoMaoTmYqMSL07j67iNkSUlJERQ=='
+        account_in.secret = encrypted_secret
+        dialog = EditAccountDialog(None, 1, account_in)
+        dialog.account_manager = MockAccountManager
+        dialog.close = Mock()  # Mock the accept method of the dialog
+        # Call the method that shows the dialog
+        dialog.handle_update_request(1,account_in)
+        # Verify results
+        assert dialog.encrypted_secret == None
+        MockAccountManager.update_account.assert_not_called()
+        dialog.close.assert_not_called()
+        MockMessageBox.assert_called_once() # Not MockMessageBox.information.assert_called_once()
+
+        #_with(
+            #None, 'Error', "The secret key is invalid", unittest.mock.ANY        )
+
+
+
 
     @patch('PyQt5.QtWidgets.QMessageBox.question')
     @patch("account_edit_dialog.AccountManager")

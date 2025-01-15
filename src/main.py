@@ -32,27 +32,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-# Development Tasks
-# [ ] {NameError}name 'urls' is not defined when debugging a unittest
-# [ ] Explore Qt Creator for GUI builder tool for Preferences Dialog.
-# [ ] Enhance logging to create a logfile from messages.
-# [ ] Preferences dialog - changes buttons to OK, Cancel, Apply.
-# [ ] Finish removing Controller.
-# [ ] Develop GUI unit tests for each dialog
-# [ ] Implement drag-n-drop in reorder dialog.
-# [ ] Fix defect: Secretkey CD3334 bogus2 passed validation but generated ?????? Why is 'secret' invalid?
-# [ ] Discover: Can label field in list be a link that opens the edit dialog.
-# [ ] Make a Woogle sample 2FA setup web page
-# [ ] Add more error handling to Backup and vault read/write
-# [ ] Implement Restore
-# [ ] Simplify convoluted logic in qr_hunting.
-# [ ] In Entry Form fix tab order to skip (?) icons.
-# [ ] Animate TOTP code being copied to clipboard https://www.pythonguis.com/tutorials/qpropertyanimation/
-# [ ] Put images in resource bundles
-# [ ] Where is machine ID on Windows/Mac?
-# [ ] Internationalization
-# [x]Tooltip for timer styling
-# [x] Implement reorder
-# [x] Implement Open QR code from file
-# [x] Unit test Backup
-# [x] Prevent file corruption

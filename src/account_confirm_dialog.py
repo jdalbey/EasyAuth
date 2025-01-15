@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox
+
+import otp_funcs
 from account_entry_form import AccountEntryForm
 from account_manager import AccountManager
 
@@ -37,11 +39,14 @@ class ConfirmAccountDialog(QDialog):
         self.shared_fields.set_fields(account)        
 
     def save_fields(self):
-        provider = self.shared_fields.provider_entry.text()
-        label = self.shared_fields.label_entry.text()
-        secret = self.shared_fields.secret_entry.text()
-        retcode = self.account_manager.save_new_account(provider, label, secret)
-        if retcode:
-            self.accept()  # returns True
+        if otp_funcs.is_valid_secretkey(self.shared_fields.secret_entry.text()):
+            provider = self.shared_fields.provider_entry.text()
+            label = self.shared_fields.label_entry.text()
+            secret = self.shared_fields.secret_entry.text()
+            retcode = self.account_manager.save_new_account(provider, label, secret)
+            if retcode:
+                self.accept()  # returns True
+            else:
+                QMessageBox.information(self,"Warning","Account with same provider and label already exists")
         else:
-            QMessageBox.information(self,"Warning","Account with same provider and label already exists")
+            QMessageBox.information(self,"Error",f'The secret key is invalid')

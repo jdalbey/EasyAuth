@@ -144,69 +144,6 @@ class AccountManager:
 
         return False
 
-    def get_provider_icon_name(self, provider):
-        # TODO: Look up provider icon
-        return None   # "images/favicon_32x32.png"
-
-    def _handle_external_modification(self):
-        """Handle detected external modifications to the vault file."""
-        self.logger.warning("Attempting to merge external changes")
-        try:
-            # Load both current memory state and disk state
-            with open(self.vault_path, 'r') as f:
-                disk_content = json.load(f)
-                disk_accounts = {
-                    self._account_key(acc): Account(**acc) 
-                    for acc in disk_content
-                }
-
-            memory_accounts = {
-                self._account_key(acc.__dict__): acc 
-                for acc in self.accounts
-            }
-
-            # Merge changes, preferring memory state for conflicts
-            merged = {**disk_accounts, **memory_accounts}
-            self.accounts = list(merged.values())
-            self.logger.info("Successfully merged external changes")
-
-        except Exception as e:
-            self.logger.error(f"Failed to handle external modifications: {str(e)}")
-            self._recover_from_backup()
-
-    def _recover_from_backup(self) -> List['Account']:
-        """Attempt to recover accounts from backup file."""
-        self.logger.info("Attempting recovery from backup")
-        try:
-            if self.backup_path.exists():
-                with open(self.backup_path, 'r') as f:
-                    content = json.load(f)
-                    if self._validate_account_data(content):
-                        self.logger.info("Successfully recovered from backup")
-                        return [Account(**acc) for acc in content]
-
-            self.logger.error("No valid backup found for recovery")
-            return []
-
-        except Exception as e:
-            self.logger.error(f"Failed to recover from backup: {str(e)}")
-            return []
-
-    @staticmethod
-    def _validate_account_data(content: list) -> bool:
-        """Validate account data structure."""
-        required_fields = {'provider', 'label', 'secret', 'last_used'}
-        return all(
-            isinstance(acc, dict) and 
-            all(field in acc for field in required_fields)
-            for acc in content
-        )
-
-    @staticmethod
-    def _account_key(account: dict) -> str:
-        """Generate unique key for account used to detect external modification """
-        return f"{account['provider']}:{account['label']}"
-
     def save_new_account(self, provider: str, label: str, secret: str) -> bool:
         """Save new account with duplicate checking."""
         try:
@@ -261,6 +198,69 @@ class AccountManager:
             self.logger.info(f"Accounts successfully backed up to {file_path}")
         except Exception as e:
             print(f"Failed to backup accounts: {e}")
+
+    def get_provider_icon_name(self, provider):
+        # TODO: Look up provider icon
+        return None   # "images/favicon_32x32.png"
+
+    def _handle_external_modification(self):
+        """Handle detected external modifications to the vault file."""
+        self.logger.warning("Attempting to merge external changes")
+        try:
+            # Load both current memory state and disk state
+            with open(self.vault_path, 'r') as f:
+                disk_content = json.load(f)
+                disk_accounts = {
+                    self._account_key(acc): Account(**acc)
+                    for acc in disk_content
+                }
+
+            memory_accounts = {
+                self._account_key(acc.__dict__): acc
+                for acc in self.accounts
+            }
+
+            # Merge changes, preferring memory state for conflicts
+            merged = {**disk_accounts, **memory_accounts}
+            self.accounts = list(merged.values())
+            self.logger.info("Successfully merged external changes")
+
+        except Exception as e:
+            self.logger.error(f"Failed to handle external modifications: {str(e)}")
+            self._recover_from_backup()
+
+    def _recover_from_backup(self) -> List['Account']:
+        """Attempt to recover accounts from backup file."""
+        self.logger.info("Attempting recovery from backup")
+        try:
+            if self.backup_path.exists():
+                with open(self.backup_path, 'r') as f:
+                    content = json.load(f)
+                    if self._validate_account_data(content):
+                        self.logger.info("Successfully recovered from backup")
+                        return [Account(**acc) for acc in content]
+
+            self.logger.error("No valid backup found for recovery")
+            return []
+
+        except Exception as e:
+            self.logger.error(f"Failed to recover from backup: {str(e)}")
+            return []
+
+    @staticmethod
+    def _validate_account_data(content: list) -> bool:
+        """Validate account data structure."""
+        required_fields = {'provider', 'label', 'secret', 'last_used'}
+        return all(
+            isinstance(acc, dict) and
+            all(field in acc for field in required_fields)
+            for acc in content
+        )
+
+    @staticmethod
+    def _account_key(account: dict) -> str:
+        """Generate unique key for account used to detect external modification """
+        return f"{account['provider']}:{account['label']}"
 
 
     @staticmethod
