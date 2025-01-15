@@ -1,6 +1,6 @@
 ## EasyAuth User Manual
 
-Under construction.
+### Under construction.  This is a very early draft and no longer accurate.
 
 This is the user manual for the EasyAuth application. 
 EasyAuth is a desktop linux application for managing one time passwords. 

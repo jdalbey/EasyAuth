@@ -376,7 +376,7 @@ class AppView(QMainWindow):
     # TODO: Verify that app can be closed even if browser window remains open
 
     def open_user_manual(self):
-        url = QUrl("https://github.com/jdalbey/EesyAuth/code/docs/user_manual.md")
+        url = QUrl("https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md")
         QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):
