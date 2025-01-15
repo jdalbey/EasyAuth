@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
 
 import otp_funcs
 from account_entry_form import AccountEntryForm
-from models_singleton import Account, AccountManager
+from account_manager import Account, AccountManager
 import cipher_funcs
 
 

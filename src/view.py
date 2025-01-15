@@ -21,7 +21,7 @@ from preferences_dialog import PreferencesDialog
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
 from controllers import AppController
-from models_singleton import AccountManager
+from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 

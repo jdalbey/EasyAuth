@@ -136,6 +136,10 @@ class AccountManager:
 
         return False
 
+    def get_provider_icon_name(self, provider):
+        # TODO: Look up provider icon
+        return None   # "images/favicon_32x32.png"
+
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""
         self.logger.warning("Attempting to merge external changes")
@@ -192,10 +196,10 @@ class AccountManager:
 
     @staticmethod
     def _account_key(account: dict) -> str:
-        """Generate unique key for account."""
+        """Generate unique key for account used to detect external modification """
         return f"{account['provider']}:{account['label']}"
 
-    def save_new_account(self, provider: str, label: str, secret: str):
+    def save_new_account(self, provider: str, label: str, secret: str) -> bool:
         """Save new account with duplicate checking."""
         try:
             # Check for duplicates
@@ -203,7 +207,8 @@ class AccountManager:
                 acc.provider == provider and acc.label == label 
                 for acc in self.accounts
             ):
-                raise ValueError("Account with same provider and label already exists")
+                #raise ValueError("Account with same provider and label already exists")
+                return False
 
             encrypted_secret = cipher_funcs.encrypt(secret)
             account = Account(
@@ -219,6 +224,46 @@ class AccountManager:
             else:
                 raise RuntimeError("Failed to save account to vault")
 
+            return True
         except Exception as e:
             self.logger.error(f"Error saving new account: {str(e)}")
             raise
+
+    def update_account(self, index, account):
+        self.accounts[index] = account
+        self.save_accounts()
+        self.logger.info(f"Updated account: {account.provider} ({account.label})")
+
+    def delete_account(self, account):
+        self.accounts.remove(account)
+        self.save_accounts()
+        self.logger.info(f"Deleted account: {account.provider} ({account.label})")
+
+    def backup_accounts(self, file_path):
+        """ Store the accounts as json in the given file_path after decrypting the secret keys"""
+        decrypted_accounts = []
+        for account in self.accounts:
+            decrypted_account = account.__dict__.copy()
+            decrypted_account['secret'] = cipher_funcs.decrypt(account.secret)
+            decrypted_accounts.append(decrypted_account)
+
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(decrypted_accounts, f)
+            self.logger.info(f"Accounts successfully backed up to {file_path}")
+        except Exception as e:
+            print(f"Failed to backup accounts: {e}")
+
+
+    @staticmethod
+    def duplicate_accounts(accounts):
+        list_copy = []
+        for item in accounts:
+            newitem = Account(
+                provider=item.provider,
+                label=item.label,
+                secret=item.secret,
+                last_used=item.last_used
+            )
+            list_copy.append(newitem)
+        return list_copy

@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox
 from account_entry_form import AccountEntryForm
-from models_singleton import AccountManager
+from account_manager import AccountManager
 
 class ConfirmAccountDialog(QDialog):
     def __init__(self, parent=None):
@@ -40,5 +40,8 @@ class ConfirmAccountDialog(QDialog):
         provider = self.shared_fields.provider_entry.text()
         label = self.shared_fields.label_entry.text()
         secret = self.shared_fields.secret_entry.text()
-        self.account_manager.save_new_account(provider, label, secret)
-        self.accept()  # returns True
+        retcode = self.account_manager.save_new_account(provider, label, secret)
+        if retcode:
+            self.accept()  # returns True
+        else:
+            QMessageBox.information(self,"Warning","Account with same provider and label already exists")

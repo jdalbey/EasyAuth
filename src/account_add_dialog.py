@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 from account_confirm_dialog import ConfirmAccountDialog
 from account_entry_form import AccountEntryForm
 from appconfig import AppConfig
-from models_singleton import Account, AccountManager
+from account_manager import Account, AccountManager
 from otp_funcs import is_valid_secretkey
 from qr_hunting import process_qr_codes
 
@@ -76,10 +76,12 @@ class AddAccountDialog(QDialog):
         secret = self.shared_fields.secret_entry.text()
         # Validate secret key
         if is_valid_secretkey(secret):
-            self.account_manager.save_new_account(provider, label, secret)
-            self.accept()
+            if self.account_manager.save_new_account(provider, label, secret):
+                self.accept()
+            else:
+                 QMessageBox.information(self,"Warning","Account with same provider and label already exists")
         else:
-            reply = QMessageBox.information(self,"Error",f'The secret key is invalid')
+            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
     # Set values into fields (used by auto qr code scanning)
     def set_account(self, account):

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from account_edit_dialog import EditAccountDialog
-from models_singleton import Account
+from account_manager import Account
 class TestAccountDeletion(unittest.TestCase):
 
     @patch('PyQt5.QtWidgets.QMessageBox.question')

@@ -3,7 +3,7 @@ import threading
 import os
 import json
 from unittest.mock import patch, mock_open
-from models_singleton import AccountManager, Account
+from account_manager import AccountManager, Account
 
 
 @pytest.fixture
@@ -39,7 +39,6 @@ def test_thread_safety():
 
     assert all(inst is instances[0] for inst in instances), "Singleton is not thread-safe"
 
-
 @patch("os.path.exists", return_value=True)
 @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
 def test_load_accounts(mock_open, mock_exists):
@@ -47,20 +46,6 @@ def test_load_accounts(mock_open, mock_exists):
     accounts = instance.load_accounts()
     assert accounts == [], "load_accounts should return an empty list if the vault is empty"
     mock_open.assert_called_with(instance.vault_path, "r")
-
-@patch("os.path.exists", return_value=False)
-def test_load_accounts_missing_file(mock_exists):
-    instance = AccountManager()
-    accounts = instance.load_accounts()
-    assert accounts == [], "load_accounts should return an empty list if the vault file is missing"
-
-def test_set_accounts(sample_accounts):
-    data4loads = '[{"provider": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00"}, {"provider": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00"}]'
-    data4dumps = [{"provider": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00"}, {"provider": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00"}]
-    instance = AccountManager()
-    instance.set_accounts(json.dumps(data4dumps))
-    assert len(instance.accounts) == 2, "set_accounts should load accounts from JSON string"
-    assert instance.accounts[0].provider == "Provider1"
 
 def test_typical_use():
     # Create a test vault

@@ -54,12 +54,6 @@ class AccountManager:
         # TODO: Look up provider icon
         return None   # "images/favicon_32x32.png"
 
-    def set_accounts(self,account_string):
-        """Set accounts from a string - dependency injection for testing
-        @param account_string is JSON string of vault data"""
-        content = json.loads(account_string) # parse string into data structure
-        self.accounts = [Account(**acc) for acc in content]
-
     # TODO: Need a way to report errors in the model back to the view.
     def save_accounts(self):
         # Handle missing vault (so create it).

@@ -119,7 +119,6 @@ class TestAccountManager:
             )
         except Exception as e:
             print(f"Exception during save: {e}")
-            print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
             raise
 
         assert len(account_manager.accounts) == 1
@@ -128,17 +127,84 @@ class TestAccountManager:
         assert new_account.label == "TestLabel"
         assert new_account.secret == "encrypted_test_secret"
 
-    def test_save_duplicate_account(self, account_manager, sample_accounts):
-        """Test that saving duplicate account raises error."""
-        account_manager.accounts = [Account(**sample_accounts[0])]
-        
-        with pytest.raises(ValueError) as exc_info:
+    @patch('cipher_funcs.encrypt')
+    def test_update_account(self, mock_encrypt, account_manager):
+
+        """Test updating an existing account."""
+        vault_dir = os.path.dirname(account_manager.vault_path)
+
+        mock_encrypt.return_value = "encrypted_test_secret"
+
+        # Clear any existing accounts
+        account_manager.accounts = []
+        # Save the new account
+        try:
             account_manager.save_new_account(
-                provider=sample_accounts[0]["provider"],
-                label=sample_accounts[0]["label"],
-                secret="new_secret"
+                provider="Test",
+                label="TestLabel",
+                secret="test_secret"
             )
-        assert "already exists" in str(exc_info.value)
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
+            raise
+        # Update the existing account
+        revised_data = Account("Foobar",'Barfoo',"encrypted_test_secret","2020-12-12 01:01")
+        try:
+            account_manager.update_account(0, revised_data)
+        except Exception as e:
+            print(f"Exception during update: {e}")
+            raise
+
+        assert len(account_manager.accounts) == 1
+        updated_account = account_manager.accounts[0]
+        assert updated_account.provider == "Foobar"
+        assert updated_account.label == "Barfoo"
+        assert updated_account.secret == "encrypted_test_secret"
+
+    @patch('cipher_funcs.encrypt')
+    def test_delete_account(self, mock_encrypt, account_manager):
+
+        """Test deleting an existing account."""
+        vault_dir = os.path.dirname(account_manager.vault_path)
+
+        mock_encrypt.return_value = "encrypted_test_secret"
+
+        # Clear any existing accounts
+        account_manager.accounts = []
+
+        # Save the new account
+        try:
+            retcode = account_manager.save_new_account("Foobar",'Barfoo',"encrypted_test_secret")
+            assert retcode
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            raise
+        # Retrieve the 1st account
+        current_account = account_manager.accounts[0]
+
+        # Delete the existing account
+        try:
+            account_manager.delete_account(current_account)
+        except Exception as e:
+            print(f"Exception during update: {e}")
+            raise
+
+        assert len(account_manager.accounts) == 0
+
+    def test_save_duplicate_account(self, account_manager, sample_accounts):
+        """Test that saving duplicate account returns False."""
+
+        # Put a sample account into the list
+        account_manager.accounts = [Account(**sample_accounts[0])]
+
+        # create a new account from the components of the existing one.
+        retcode = account_manager.save_new_account(
+            provider=sample_accounts[0]["provider"],
+            label=sample_accounts[0]["label"],
+            secret="new_secret"
+        )
+        assert not retcode
 
     def test_handle_external_modification(self, account_manager, sample_accounts):
         """Test handling of external modifications to vault file."""

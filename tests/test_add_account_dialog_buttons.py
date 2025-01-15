@@ -43,6 +43,8 @@ class TestAddAccountDialog(unittest.TestCase):
         mock_process.assert_called_once_with(True, mock_dialog_instance)
         dialog.accept.assert_called_once()  # Ensure accept() is called when process succeeds
 
+        # TODO: Assert that trying to add a duplicate shows a messagebox
+
     @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
     @patch("account_add_dialog.ConfirmAccountDialog")  # Correct module path for ConfirmAccountDialog
     def test_qr_code_btn_reject(self, MockConfirmAccountDialog, mock_process):

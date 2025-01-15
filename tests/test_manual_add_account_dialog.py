@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 from account_add_dialog import AddAccountDialog
 from unittest.mock import Mock
 
-from models_singleton import Account
+from account_manager import Account
 
 
 class TestManualAddAccountDialog(unittest.TestCase):

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 import find_qr_codes
 from QRselectionDialog import QRselectionDialog
-from models_singleton import Account, AccountManager
+from account_manager import Account, AccountManager
 from otp_funcs import is_valid_secretkey
 
 
