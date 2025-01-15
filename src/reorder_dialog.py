@@ -2,7 +2,7 @@ import json
 
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
                              QListWidgetItem, QPushButton, QWidget, QLabel, QApplication)
-from models_old import AccountManager
+from account_manager import AccountManager
 class ReorderDialog(QDialog):
     def __init__(self, accounts, parent=None):
         super().__init__(parent)
@@ -110,7 +110,7 @@ class ReorderDialog(QDialog):
 if __name__ == '__main__':
     import sys
     from dataclasses import dataclass, asdict
-    from models_old import AccountManager
+    from account_manager import AccountManager
     app = QApplication(sys.argv)
     #controller = AppController()
     mgr = AccountManager()

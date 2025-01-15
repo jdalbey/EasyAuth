@@ -62,6 +62,14 @@ class AccountManager:
             self.accounts = self.load_accounts()
             self.initialized = True
 
+    def set_accounts(self,account_string):
+        """Set accounts from a string - dependency injection for testing
+        @param account_string is JSON string of vault data"""
+        content = json.loads(account_string)
+        self.accounts = [Account(**acc) for acc in content]
+        self.save_accounts()
+        self.logger.info(f"Saved accounts : {account_string} ")
+
     def load_accounts(self) -> List['Account']:
         """Load accounts from vault with validation and backup recovery."""
         try:

@@ -35,12 +35,12 @@ if __name__ == '__main__':
 # Development Tasks
 # [ ] {NameError}name 'urls' is not defined when debugging a unittest
 # [ ] Explore Qt Creator for GUI builder tool for Preferences Dialog.
+# [ ] Enhance logging to create a logfile from messages.
 # [ ] Preferences dialog - changes buttons to OK, Cancel, Apply.
 # [ ] Finish removing Controller.
 # [ ] Develop GUI unit tests for each dialog
 # [ ] Implement drag-n-drop in reorder dialog.
 # [ ] Fix defect: Secretkey CD3334 bogus2 passed validation but generated ?????? Why is 'secret' invalid?
-# [ ] Prevent file corruption
 # [ ] Discover: Can label field in list be a link that opens the edit dialog.
 # [ ] Make a Woogle sample 2FA setup web page
 # [ ] Add more error handling to Backup and vault read/write
@@ -55,3 +55,4 @@ if __name__ == '__main__':
 # [x] Implement reorder
 # [x] Implement Open QR code from file
 # [x] Unit test Backup
+# [x] Prevent file corruption

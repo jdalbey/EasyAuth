@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QRadioButton, QPushButton, \
     QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup
-from models_old import Account
+from account_manager import Account
 
 class QRselectionDialog(QDialog):
     def __init__(self, accounts, parent=None ):

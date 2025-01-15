@@ -1,6 +1,6 @@
 import datetime
 import logging
-from models_old import AccountManager, Account
+from account_manager import AccountManager, Account
 import otp_funcs
 import cipher_funcs
 from find_qr_codes import scan_screen_for_qr_codes

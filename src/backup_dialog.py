@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox
-from models_old import AccountManager
+from account_manager import AccountManager
 
 class BackupRestoreDialog(QDialog):
     def __init__(self, account_manager: AccountManager, parent=None):
