@@ -64,6 +64,10 @@ class AccountEntryForm(QFrame):
         #secret_info_btn.setPopupMode(QToolButton.InstantPopup)
         form_layout.addWidget(secret_info_btn, 2, 2)
 
+         # Fix tabbing order to skip the info buttons and just go to entry fields
+        self.setTabOrder(self.provider_entry, self.label_entry)
+        self.setTabOrder(self.label_entry, self.secret_entry)
+
     def validate_form(self):
         # Check if all fields are filled
         all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0

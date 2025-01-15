@@ -232,6 +232,7 @@ class AppView(QMainWindow):
                         label_string = label_string[:45] + "..."
                     label = QLabel(label_string)
                     label.setFont(QFont("Arial", 12))
+
                     otplabel = QLabel(f"{otp}")
                     otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
                     # Set the size policy for widget1
@@ -250,7 +251,7 @@ class AppView(QMainWindow):
                         logging.warning("missing copy icon")
                     #copy_btn.setPopupMode(QToolButton.InstantPopup)
                     copy_btn.setToolTip("Copy code to clipboard")
-                    copy_btn.clicked.connect(lambda _, otp=otp, idx=index, acc=account: self.copy_to_clipboard(otp, idx, acc))
+                    copy_btn.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
                     rowframe_layout.addWidget(copy_btn)
 
                     edit_btn = QToolButton()
@@ -286,12 +287,23 @@ class AppView(QMainWindow):
             self.display_accounts()
 
     def copy_to_clipboard(self, otp, idx, account):
-        pyperclip.copy(otp)
-        print(f"Copied OTP: {otp}")
+        """ @param otp is the label of the one-time password """
+        pyperclip.copy(otp.text())
+        print(f"Copied OTP: {otp.text()}")
         now = datetime.datetime.now()
+        # update last used time
         account.last_used = now.strftime("%Y-%m-%d %H:%M")
         self.account_manager.update_account(idx,account)
-        print(f"Updated account: {idx} {account.provider} ({account.label})")
+        print(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
+
+        # Provide visual feedback on copy: change the background color of the label to yellow
+        otp.setStyleSheet("background-color: yellow;")
+        # Use QTimer to reset the background color back to the original color
+        QTimer.singleShot(1000, lambda otp=otp: self.reset_label_color(label=otp))
+
+    def reset_label_color(self,label):
+        # Reset the background color to the original (no background color)
+        label.setStyleSheet("background-color: none;")
 
     def show_add_account_form(self):
         """ User clicked Add Account button """
