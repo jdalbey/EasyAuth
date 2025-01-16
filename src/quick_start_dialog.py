@@ -5,7 +5,7 @@ class QuickStartDialog(QDialog):
     def __init__(self,parent):
         super().__init__(parent)
         self.setWindowTitle("Quick Start Guide")
-        self.resize(600,500)
+        self.resize(700,550)
         layout = QVBoxLayout()
 
         logOutput = QTextEdit(self)
