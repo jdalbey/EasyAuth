@@ -35,3 +35,13 @@ Uses only TOTP codes with SHA1, 6-digit, 30-second parameters.
 As with any form of two-factor authentication, if the second-factor is compromised (e.g., your phone is lost or stolen) 
 you may lose access to your online accounts unless you have saved the recover codes you were issued initially. 
 This software is issued with no guarantee.  There is a risk of data loss, including loss of your secret keys.
+
+### Dependencies
+pip install PyQt5
+pip install pyotp
+pip install pyperclip
+pip install pyautogui
+pip install pyzbar
+pip install cryptography
+pip install qrcode
+
