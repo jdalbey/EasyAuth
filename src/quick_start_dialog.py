@@ -2,19 +2,24 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
 
 
 class QuickStartDialog(QDialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,parent):
+        super().__init__(parent)
         self.setWindowTitle("Quick Start Guide")
-
+        self.resize(600,500)
         layout = QVBoxLayout()
 
         logOutput = QTextEdit(self)
         logOutput.setReadOnly(True)
-        logOutput.setLineWrapMode(QTextEdit.NoWrap)
-        logOutput.setHtml("<h2>Quick Start guide</h2> Appearing here soon.")
-        font = logOutput.font()
-        font.setFamily("Courier")
-        font.setPointSize(10)
+        logOutput.setLineWrapMode(QTextEdit.WidgetWidth)
+        content = self.load_quickstart_text()
+        if len(content) > 0:
+            logOutput.setHtml(content)
+        else:
+            logOutput.setHtml("<h2>Quick Start guide</h2> Appearing here soon.")
+
+        # font = logOutput.font()
+        # font.setFamily("Courier")
+        # font.setPointSize(10)
 
         layout.addWidget(logOutput)
 
@@ -27,6 +32,14 @@ class QuickStartDialog(QDialog):
 
         response = self.exec()
 
+    def load_quickstart_text(self):
+        try:
+            f = open("docs/quick_start_guide.html")
+            text = f.read()
+            f.close()
+        except FileNotFoundError as e:
+            return ""
+        return text
 
 """from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton
 # Example of creating and showing the centered dialog

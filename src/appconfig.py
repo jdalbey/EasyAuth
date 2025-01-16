@@ -169,7 +169,7 @@ class AppConfig:
 
     def restore_defaults(self):
         """ restore and write defaults """
-        self.set_auto_find_qr_enabled(False)
+        self.set_auto_find_qr_enabled(True)
         self.set_search_by('Provider')
         self.set_minimize_after_copy(False)
         self.set_minimize_during_qr_search(False)

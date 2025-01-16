@@ -1,86 +1,77 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 from PyQt5.QtWidgets import QMessageBox, QDialog
+
+from account_manager import Account
 from qr_hunting import confirm_account, process_qr_codes
 
-# Assume the following imports are defined in your module
-# from qr_hunting import confirm_account, is_valid_secretkey, Account
-
 class TestQRHunting(unittest.TestCase):
-    @patch("qr_hunting.is_valid_secretkey")
-    @patch("qr_hunting.QMessageBox")
-    @patch("qr_hunting.QDialog")
-    def test_confirm_account_invalid_secretkey(self, MockQDialog, MockQMessageBox, mock_is_valid_secretkey):
-        # Mock dependencies
-        mock_is_valid_secretkey.return_value = False  # Simulate invalid secret key
-        mock_message_box = Mock()
-        MockQMessageBox.information.return_value = mock_message_box
 
-        # Create mock account and dialog
-        mock_account = Mock(provider="TestProvider", label="TestLabel", secret="InvalidSecret")
-        mock_confirm_dialog = Mock()
+    @patch("qr_hunting.QMessageBox.information")
+    @patch("qr_hunting.ConfirmAccountDialog")
+    @patch("qr_hunting.is_valid_secretkey")
+    def test_confirm_account_ok(self, mock_is_valid_secretkey, mock_ConfirmAccountDialog, mock_information):
+        # Mock a valid secret key
+        mock_is_valid_secretkey.return_value = True
+
+        # Mock the ConfirmAccountDialog
+        mock_dialog_instance = MagicMock()
+        mock_dialog_instance.exec_.return_value = QDialog.Accepted
+        mock_ConfirmAccountDialog.return_value = mock_dialog_instance
+
+        # Create a sample account
+        account = Account(provider="TestProvider", label="TestLabel", secret="ValidSecret", last_used="")
 
         # Call the function
-        result = confirm_account(mock_account, mock_confirm_dialog)
-        print (f"Test1 result: {result}")
+        result = confirm_account(account)
 
-        # Debugging: Check if QMessageBox.information was called
-        print(MockQMessageBox.information.call_args_list)
-        # Assertions for the invalid key branch
-        mock_is_valid_secretkey.assert_called_once_with("InvalidSecret")
-        print ("passed first assert")
-        MockQMessageBox.information.assert_called_once_with(
-            None, 'Info', "QR code has invalid secret key.", unittest.mock.ANY
-        )
-        self.assertFalse(result)
-
-    # Don't mock entire QDialog, just the methods we need
-    @patch("qr_hunting.is_valid_secretkey")
-    def test_valid_secretkey_confirm_account_accepted(self, mock_is_valid_secretkey):
-        # Mock dependencies
-        from PyQt5.QtWidgets import QDialog
-
-        mock_is_valid_secretkey.return_value = True  # Simulate valid secret key
-        # Create a mock dialog and configure exec_() to return QDialog.Accepted
-        mock_confirm_dialog = Mock()
-        mock_confirm_dialog.exec_.return_value = QDialog.Accepted  # Use the original constant
-
-        # Create mock account and dialog
-        mock_account = Mock(provider="TestProvider", label="TestLabel", secret="ValidSecret")
-
-
-        # Call the function - expect True
-        result = confirm_account(mock_account, mock_confirm_dialog)
-        print(f"Test2 result: {result},  QDialog.Accepted: {QDialog.Accepted}")
-        # Debugging output
-        print("exec_() returned:", mock_confirm_dialog.exec_())
+        # Assert that the dialog was displayed and accepted
+        mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
+        mock_ConfirmAccountDialog.assert_called_once()  # Confirm dialog was created
+        mock_dialog_instance.set_account.assert_called_once()
+        mock_dialog_instance.exec_.assert_called_once()  # Dialog exec_ was called
         self.assertTrue(result)
 
-        # Assertions for the valid key branch with accepted dialog
-        mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
-        mock_confirm_dialog.set_account.assert_called_once()
-
+    @patch("qr_hunting.QMessageBox.information")
+    @patch("qr_hunting.ConfirmAccountDialog")
     @patch("qr_hunting.is_valid_secretkey")
-    @patch("qr_hunting.QDialog")
-    def test_valid_secretkey_confirm_account_rejected(self, MockQDialog, mock_is_valid_secretkey):
-        # Mock dependencies
-        mock_is_valid_secretkey.return_value = True  # Simulate valid secret key
-        mock_dialog_instance = Mock()
-        mock_dialog_instance.exec_.return_value = QDialog.Rejected
-        MockQDialog.return_value = mock_dialog_instance
+    def test_confirm_account_cancel(self, mock_is_valid_secretkey, mock_ConfirmAccountDialog, mock_information):
+        # Mock a valid secret key
+        mock_is_valid_secretkey.return_value = True
 
-        # Create mock account and dialog
-        mock_account = Mock(provider="TestProvider", label="TestLabel", secret="ValidSecret")
-        mock_confirm_dialog = Mock()
+        # Mock the ConfirmAccountDialog
+        mock_dialog_instance = MagicMock()
+        mock_dialog_instance.exec_.return_value = QDialog.Rejected
+        mock_ConfirmAccountDialog.return_value = mock_dialog_instance
+
+        # Create a sample account
+        account = Account(provider="TestProvider", label="TestLabel", secret="ValidSecret", last_used="")
 
         # Call the function
-        result = confirm_account(mock_account, mock_confirm_dialog)
+        result = confirm_account(account)
 
-        # Assertions for the valid key branch with rejected dialog
+        # Assert that the dialog was displayed and canceled
         mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
-        mock_confirm_dialog.set_account.assert_called_once()
+        mock_dialog_instance.set_account.assert_called_once()
         self.assertFalse(result)
 
+    @patch("qr_hunting.QMessageBox.information")
+    @patch("qr_hunting.is_valid_secretkey")
+    def test_confirm_account_invalid_secret(self, mock_is_valid_secretkey, mock_information):
+        # Mock an invalid secret key
+        mock_is_valid_secretkey.return_value = False
+
+        # Create a sample account
+        account = Account(provider="TestProvider", label="TestLabel", secret="InvalidSecret", last_used="")
+
+        # Call the function
+        result = confirm_account(account)
+
+        mock_is_valid_secretkey.assert_called_once_with('InvalidSecret')
+
+        # Assert that QMessageBox was shown
+        mock_information.assert_called_once_with(None, 'Info', "QR code has invalid secret key.", QMessageBox.Ok)
+        self.assertFalse(result)
 
     @patch("find_qr_codes.scan_screen_for_qr_codes")
     def test_process_qr_codes_valid_zero(self, mock_scan_screen_for_qr_codes):
@@ -88,7 +79,7 @@ class TestQRHunting(unittest.TestCase):
         mock_scan_screen_for_qr_codes.return_value = []
 
         # Call the function
-        result = process_qr_codes(False, None)
+        result = process_qr_codes(False)
 
         # Assertions when no urls found
         mock_scan_screen_for_qr_codes.assert_called_once_with()
@@ -102,7 +93,7 @@ class TestQRHunting(unittest.TestCase):
         MockQMessageBox.information.return_value = mock_message_box
 
         # Call the function
-        result = process_qr_codes(True, None)
+        result = process_qr_codes(True)
         # if zero valid urls expect return False
         self.assertFalse(result)
 
@@ -121,16 +112,12 @@ class TestQRHunting(unittest.TestCase):
         mock_scan_screen_for_qr_codes.return_value = ['otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com','badurl']
         mock_confirm_account.return_value = True
         # Call the function
-        result = process_qr_codes(False, None)
+        result = process_qr_codes(False)
         self.assertTrue(result)
         # Assertions when 1 url found and Accepted
         mock_scan_screen_for_qr_codes.assert_called_once_with()
 
         mock_confirm_account.return_value = False
-        result = process_qr_codes(False, None)
+        result = process_qr_codes(False)
         self.assertFalse(result)
 
-
-
-if __name__ == "__main__":
-    unittest.main()

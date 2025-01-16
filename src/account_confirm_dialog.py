@@ -8,7 +8,7 @@ class ConfirmAccountDialog(QDialog):
     def __init__(self, parent=None):
         super(ConfirmAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
-        self.setWindowTitle("Confirm Account")
+        self.setWindowTitle("Confirm New Account")
         self.setGeometry(100, 100, 400, 200)
 
         self.layout = QVBoxLayout()

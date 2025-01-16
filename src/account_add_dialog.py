@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
     QApplication, QFileDialog
 
-from account_confirm_dialog import ConfirmAccountDialog
 from account_entry_form import AccountEntryForm
 from appconfig import AppConfig
 from account_manager import Account, AccountManager
@@ -89,8 +88,7 @@ class AddAccountDialog(QDialog):
 
     def get_qr_code(self):
         """ User clicked User QR code """
-        confirmDialog = ConfirmAccountDialog()
-        result_code = process_qr_codes(True, confirmDialog)  # True = called from Use QR code
+        result_code = process_qr_codes(True)  # True = called from Use QR code
         print (f"Finishing get_qr_code with result {result_code}")
         if result_code:
             self.accept()

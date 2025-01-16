@@ -13,9 +13,10 @@ import pyotp
 import time, datetime
 import pyperclip
 
+import qr_hunting
+from qr_hunting import fetch_qr_code
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
-from account_confirm_dialog import ConfirmAccountDialog
 from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
 from backup_dialog import BackupRestoreDialog   
@@ -178,34 +179,38 @@ class AppView(QMainWindow):
 
         # Check if the accounts list is empty
         if not self.account_manager.accounts:
-            self.vault_empty = True
-            # Display a three-line help message
-            help_message = [
-                "Your vault is empty.",
-                "The vault stores two-factor authentication keys",
-                "provided by a website or other online service.",
-                "Store your secret key by clicking 'Add Account'",
-                "or"
-            ]
-            for line in help_message:
-                help_label = QLabel(line)
-                help_label.setAlignment(Qt.AlignCenter)
-                self.scroll_layout.addWidget(help_label)
-            view_quick_btn = QPushButton("View Quick Start")
-            view_quick_btn.clicked.connect(self.show_quick_start_dialog)
-            view_quick_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
-        else:
+            # See if a QR code is visible.  Would be nice on an initally empty vault.
+            # if not qr_hunting.process_qr_codes(called_from_Find_btn=False):
+                # If not show empty_vault message
+                self.vault_empty = True
+                # Display a three-line help message
+                help_message = [
+                    "Your vault is empty.",
+                    "The vault stores two-factor authentication keys",
+                    "provided by a website or other online service.",
+                    "Store your secret key by clicking 'Add Account'",
+                    "or"
+                ]
+                for line in help_message:
+                    help_label = QLabel(line)
+                    help_label.setAlignment(Qt.AlignCenter)
+                    self.scroll_layout.addWidget(help_label)
+                view_quick_btn = QPushButton("View Quick Start")
+                view_quick_btn.clicked.connect(self.show_quick_start_dialog)
+                view_quick_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
+
+        # If account list is not empty show it
+        if self.account_manager.accounts:
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
             self.scroll_layout.setSpacing(2)  # Set vertical spacing between rows
             for index, account in enumerate(self.account_manager.accounts):
                 if search_term in account.provider.lower():
                     secret_key = cipher_funcs.decrypt(account.secret)
-                    # I think the preconditions make catching this exception superfluous.
                     try:
                         otp = pyotp.TOTP(secret_key).now()
-                    except:
+                    except:  # This would only happen from internal error
                         otp = "??????"
                     row_frame = QFrame()
                     row_frame.setFrameShape(QFrame.StyledPanel)
@@ -299,7 +304,7 @@ class AppView(QMainWindow):
         print(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
 
         # Provide visual feedback on copy: change the background color of the label to yellow
-        otp.setStyleSheet("background-color: yellow;")
+        otp.setStyleSheet("background-color: #82e0aa;")
         # Use QTimer to reset the background color back to the original color
         QTimer.singleShot(1000, lambda otp=otp: self.reset_label_color(label=otp))
 
@@ -318,9 +323,7 @@ class AppView(QMainWindow):
         print("Starting Show_add_account_form")
         # Are we in auto_find mode?
         if self.app_config.is_auto_find_qr_enabled():
-            confirmDialog = ConfirmAccountDialog()
-            from qr_hunting import fetch_qr_code
-            result_code = fetch_qr_code(confirmDialog)
+            result_code = fetch_qr_code()
             # if process returned True we should skip exec_
             #result_code = QDialog.result(self.current_dialog)
             print (f"AddAccountDialog closed with result code: {result_code}")
@@ -371,7 +374,7 @@ class AppView(QMainWindow):
         reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
 
     def show_quick_start_dialog(self):
-        dlg = QuickStartDialog()
+        dlg = QuickStartDialog(self)
 
     # TODO: Verify that app can be closed even if browser window remains open
 

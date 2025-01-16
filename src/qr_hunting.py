@@ -1,20 +1,19 @@
 import pyotp
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication, QFileDialog
+from PyQt5.QtWidgets import QDialog, QMessageBox
 
 import find_qr_codes
 from QRselectionDialog import QRselectionDialog
-from account_manager import Account, AccountManager
+from account_manager import Account
+from account_confirm_dialog import ConfirmAccountDialog
 from otp_funcs import is_valid_secretkey
 
 
-def fetch_qr_code(confirm_dialog):
+def fetch_qr_code():
     """ Look for a QR code.
     @param automatic True if auto scan for QR code setting is true
     @param confirm_dialog the dialog to be used to ask the user to confirm the QR code that was found"""
     print ("starting qr hunt")
-    if process_qr_codes(False, confirm_dialog):
+    if process_qr_codes(False):
         # confirm returned True
         print("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
         return True
@@ -22,7 +21,7 @@ def fetch_qr_code(confirm_dialog):
     # Either we didn't find any qr codes or auto_find is turned off
     return False
 
-def confirm_account(account,confirm_dialog):
+def confirm_account(account): #, confirm_dialog):
     # check selection has valid secret key.
     print(f"Checking validity of code for {account.provider}: {account.secret}")
     if not is_valid_secretkey(account.secret):
@@ -32,7 +31,7 @@ def confirm_account(account,confirm_dialog):
     else:
         # if valid key place the fields from that account into the Confirm dialog form field.
         fields = Account(account.provider, account.label, account.secret, "")
-        current_dialog = confirm_dialog
+        current_dialog = ConfirmAccountDialog()
         current_dialog.set_account(fields)
         if current_dialog.exec_() == QDialog.Accepted:
             print (f"Confirm dialog was accepted.")
@@ -40,7 +39,7 @@ def confirm_account(account,confirm_dialog):
             return True
     return False
 
-def process_qr_codes(called_from_Find_btn, confirm_dialog):
+def process_qr_codes(called_from_Find_btn):
     # first go find_qr_codes
     urls = find_qr_codes.scan_screen_for_qr_codes()
     print (f"Process got urls: {urls}")
@@ -67,7 +66,7 @@ def process_qr_codes(called_from_Find_btn, confirm_dialog):
             QMessageBox.information(None, 'Alert', "No QR code found.  Be sure the QR code is visible on your screen and try again.", QMessageBox.Ok)
             return False # no QR
     if len(display_list) == 1:
-        confirm_code = confirm_account(display_list[0],confirm_dialog)
+        confirm_code = confirm_account(display_list[0])
         print (f"Found 1 QR code and confirm dialog returned {confirm_code}")
         return confirm_code # True if accepted, False if declined
     # Wow, we got more than one QR code
@@ -80,7 +79,7 @@ def process_qr_codes(called_from_Find_btn, confirm_dialog):
             # If user made a selection,
             if selected_account:
                 print(f"Selected Account: {selected_account.provider} - {selected_account.label}")
-                return confirm_account(selected_account, confirm_dialog)
+                return confirm_account(selected_account)
 
     return False
 

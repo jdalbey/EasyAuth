@@ -25,12 +25,9 @@ class TestAddAccountDialog(unittest.TestCase):
         pass
 
     @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
-    @patch("account_add_dialog.ConfirmAccountDialog")  # Correct module path for ConfirmAccountDialog
-    def test_qr_code_btn_success(self, MockConfirmAccountDialog, mock_process):
+    def test_qr_code_btn_success(self, mock_process):
         # Arrange
         mock_process.return_value = True  # Simulate a successful QR code processing
-        mock_dialog_instance = Mock(spec=QDialog)
-        MockConfirmAccountDialog.return_value = mock_dialog_instance
 
         # Create the dialog instance
         dialog = AddAccountDialog()
@@ -40,18 +37,15 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.find_qr_btn.click()
 
         # Assert
-        mock_process.assert_called_once_with(True, mock_dialog_instance)
+        mock_process.assert_called_once_with(True)
         dialog.accept.assert_called_once()  # Ensure accept() is called when process succeeds
 
         # TODO: Assert that trying to add a duplicate shows a messagebox
 
-    @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
-    @patch("account_add_dialog.ConfirmAccountDialog")  # Correct module path for ConfirmAccountDialog
-    def test_qr_code_btn_reject(self, MockConfirmAccountDialog, mock_process):
+    @patch("account_add_dialog.process_qr_codes")  # Correct module path for processbv
+    def test_qr_code_btn_reject(self, mock_process):
         # Arrange
         mock_process.return_value = False  # Simulate a failed QR code processing
-        mock_dialog_instance = Mock(spec=QDialog)
-        MockConfirmAccountDialog.return_value = mock_dialog_instance
 
         # Create the dialog instance
         dialog = AddAccountDialog()
@@ -61,7 +55,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.find_qr_btn.click()
 
         # Assert
-        mock_process.assert_called_once_with(True, mock_dialog_instance)
+        mock_process.assert_called_once_with(True)
         dialog.accept.assert_not_called()  # Ensure accept() is NOT called when process fails
 
 if __name__ == "__main__":
