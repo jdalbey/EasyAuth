@@ -1,6 +1,7 @@
  # Detects one or more QR codes on the screen.
-import pyautogui
 from pyzbar.pyzbar import decode
+from PIL import ImageGrab
+import logging
 
 def scan_screen_for_qr_codes():
     """
@@ -10,9 +11,11 @@ def scan_screen_for_qr_codes():
         list: A list of decoded data from QR codes found on the screen.
 
     """
-    print  ("\nTaking screen shot")
+    logger = logging.getLogger(__name__)
+    logger.info("Taking screen shot")
     # Take a screenshot of the current screen
-    screenshot = pyautogui.screenshot()
+    bbox = None  # take fullscreen
+    screenshot = ImageGrab.grab(bbox)
 
     # Convert screenshot to a format usable by pyzbar
     screenshot = screenshot.convert('RGB')
@@ -22,6 +25,7 @@ def scan_screen_for_qr_codes():
 
     # Extract data from the detected QR codes
     results = [qr_code.data.decode('utf-8') for qr_code in qr_codes if qr_code.data]
+    # Return a list, one item for each code.
     return results
 
 """ Reference: 2FA QR generator: https://stefansundin.github.io/2fa-qr/ """

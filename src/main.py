@@ -17,13 +17,13 @@ def main():
     logger = logging.getLogger(__name__)
 
     # Suppress log messages from the tkinter module
-    logging.getLogger('PIL').setLevel(logging.WARNING)
+    #logging.getLogger('PIL').setLevel(logging.WARNING)
 
     # Initialize the application settings with a config file
     kConfigPath = ".config/EasyAuth/config.ini"
     home_dir_str = str(Path.home())
     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
-    app_config = AppConfig(filepath)
+    AppConfig(filepath)
     view = AppView()
 
     # Start the application

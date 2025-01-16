@@ -37,11 +37,11 @@ you may lose access to your online accounts unless you have saved the recover co
 This software is issued with no guarantee.  There is a risk of data loss, including loss of your secret keys.
 
 ### Dependencies
-pip install PyQt5
-pip install pyotp
-pip install pyperclip
-pip install pyautogui
-pip install pyzbar
-pip install cryptography
-pip install qrcode
+PyQt5  
+pyotp  
+pyperclip  
+pyautogui  
+pyzbar  
+cryptography  
+qrcode  
 

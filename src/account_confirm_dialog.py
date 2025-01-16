@@ -47,6 +47,6 @@ class ConfirmAccountDialog(QDialog):
             if retcode:
                 self.accept()  # returns True
             else:
-                QMessageBox.information(self,"Warning","Account with same provider and label already exists")
+                QMessageBox.information(self,"Warning","Account with same provider and user already exists")
         else:
             QMessageBox.information(self,"Error",f'The secret key is invalid')

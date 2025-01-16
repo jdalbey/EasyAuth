@@ -13,7 +13,6 @@ import pyotp
 import time, datetime
 import pyperclip
 
-import qr_hunting
 from qr_hunting import fetch_qr_code
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
@@ -21,7 +20,6 @@ from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
 from backup_dialog import BackupRestoreDialog   
 from appconfig import AppConfig
-from controllers import AppController
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
@@ -400,7 +398,6 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     app = QApplication(sys.argv)
-    controller = AppController()
     window = AppView()
     window.show()
     sys.exit(app.exec_())
