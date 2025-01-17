@@ -48,13 +48,13 @@ class PreferencesDialog(QDialog):
         layout.addWidget(self.minimize_during_qr_search)
 
         # Auto fetch website favicons
-        self.auto_fetch_favicons = QCheckBox("Auto fetch website favicons")
+        self.auto_fetch_favicons = QCheckBox("Auto fetch provider favicons")
         self.auto_fetch_favicons.setEnabled(False)
         layout.addWidget(self.auto_fetch_favicons)
 
         # Display website favicons
-        self.display_favicons = QCheckBox("Display website favicons")
-        self.display_favicons.setEnabled(False)
+        self.display_favicons = QCheckBox("Display provider favicons")
+        self.display_favicons.setEnabled(True)
         layout.addWidget(self.display_favicons)
 
         # Secret key initially hidden with asterisks in Edit dialog

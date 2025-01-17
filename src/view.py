@@ -242,26 +242,27 @@ class AppView(QMainWindow):
                     # Assuming your_frame is inside a parent widget with a layout
                     # Set external padding around the frame by adjusting the layout margins of the parent widget
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
-                    icon_label = QLabel()
-                    provider_icon_img = self.account_manager.get_provider_icon_name(account.provider)
-                    if provider_icon_img:
-                        provider_icon = QPixmap(provider_icon_img)
-                        icon_label.setPixmap(provider_icon)
-                    else:
-                        provider_initial = account.provider[0]  # get first letter of provider name
-                        icon_label.setText(' ' + provider_initial + ' ')
-                        icon_label.setStyleSheet("""
-                        QLabel {
-                            border: 1px solid #488AC7;
-                            border-radius: 12px;
-                            color: white;
-                            background-color: #488AC7;
-                            font-size: 16px;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-                    """)
-                    rowframe_layout.addWidget(icon_label)
+                    if self.app_config.is_display_favicons():
+                        icon_label = QLabel()
+                        provider_icon_img = self.account_manager.get_provider_icon_name(account.provider)
+                        if provider_icon_img:
+                            provider_icon = QPixmap(provider_icon_img)
+                            icon_label.setPixmap(provider_icon)
+                        else:
+                            provider_initial = account.provider[0]  # get first letter of provider name
+                            icon_label.setText(' ' + provider_initial + ' ')
+                            icon_label.setStyleSheet("""
+                            QLabel {
+                                border: 1px solid #488AC7;
+                                border-radius: 12px;
+                                color: white;
+                                background-color: #488AC7;
+                                font-size: 16px;
+                                font-weight: bold;
+                                text-align: center;
+                            }
+                        """)
+                        rowframe_layout.addWidget(icon_label)
 
                     label_string = f"{account.provider} ({account.label})"
                     if len(label_string) > 45:
@@ -400,10 +401,12 @@ class AppView(QMainWindow):
     def show_preferences_dialog(self):
         dialog = PreferencesDialog(self)
         dialog.exec_()
+        self.display_accounts()
 
     def show_backup_restore_dialog(self):
         dialog = BackupRestoreDialog(self.account_manager, self)
         dialog.exec_()
+        self.display_accounts()
 
     def import_accounts(self):
         reply = QMessageBox.information(
@@ -412,6 +415,8 @@ class AppView(QMainWindow):
             f'Importing accounts not yet implemented',
             QMessageBox.Ok
         )
+        self.display_accounts()
+
 
     def show_reorder_dialog(self):
         account_list = self.account_manager.accounts
