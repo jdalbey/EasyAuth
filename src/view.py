@@ -252,14 +252,13 @@ class AppView(QMainWindow):
                         icon_label.setText(' ' + provider_initial + ' ')
                         icon_label.setStyleSheet("""
                         QLabel {
-                            border: 1px;
+                            border: 1px solid #488AC7;
                             border-radius: 12px;
-                            background: transparent;
                             color: white;
-                            background-color: blue;
+                            background-color: #488AC7;
                             font-size: 16px;
                             font-weight: bold;
-                            text-align: left;
+                            text-align: center;
                         }
                     """)
                     rowframe_layout.addWidget(icon_label)
