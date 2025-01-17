@@ -34,13 +34,19 @@ class TestAccountDeletion(unittest.TestCase):
         account_in.secret = encrypted_secret
         # setup the mocks
         dialog = EditAccountDialog(None, 1, account_in)
+        # mock updated fields the user has modified
+        dialog.shared_fields.provider_entry.setText("ModifiedWoogle")
+        dialog.shared_fields.label_entry.setText("x@w.com")
         dialog.account_manager = MockAccountManager
         dialog.close = Mock()  # Mock the accept method of the dialog
         # Call the method that shows the dialog
         dialog.handle_update_request(1,account_in)
         # verify results
         assert dialog.encrypted_secret.startswith('gAAAA')
-        MockAccountManager.update_account.assert_called_once()
+        # We expect the account sent to update has the modified fields
+        expected_account = Account("ModifiedWoogle","x@w.com","","2000-01-01 01:01")
+        expected_account.secret = dialog.encrypted_secret
+        MockAccountManager.update_account.assert_called_once_with(1, expected_account)
         dialog.close.assert_called_once()
 
     #@patch('PyQt5.QtWidgets.QMessageBox.information')  Not sure if this is better

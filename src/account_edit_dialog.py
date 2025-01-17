@@ -110,12 +110,15 @@ class EditAccountDialog(QDialog):
         self.reveal_qr_button.setText("Hide QR code" if self.is_qr_visible else "Reveal QR code")
 
     def handle_update_request(self,index, account):
+        """Update the account with the fields in the account dialog
+           @param index is position in account list
+           @param account is info given to edit dialog when launched"""
         print (f"EditAcctDialog is handling update request for: {index} ")
-        # Validate secret key
         self.encrypted_secret = None
+        # Validate secret key
         if otp_funcs.is_valid_secretkey(self.shared_fields.secret_entry.text()):
             self.encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
-            up_account = Account(account.provider, account.label,
+            up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(),
                                  self.encrypted_secret, account.last_used)
             self.account_manager.update_account(index, up_account)
             self.close()

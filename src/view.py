@@ -25,6 +25,32 @@ from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 
 class AppView(QMainWindow):
+    otplabel_style_normal = """
+        QPushButton {
+            border: None;
+            background: transparent;
+            color: black;
+            font-size: 16px;
+            text-align: left;
+        }
+        QPushButton:hover {
+            text-decoration: underline;
+            color: blue;
+            }
+        """
+    otplabel_style_clicked = """
+        QPushButton {
+            border: None;
+            background: transparent;
+            background-color: #82e0aa;
+            color: black;
+            font-size: 16px;
+            text-align: left;
+        }
+        QPushButton:hover {
+            text-decoration: underline;
+        }
+        """
     def __init__(self, ):
         super().__init__()
         self.logger = logger.configure_logging()
@@ -141,10 +167,6 @@ class AppView(QMainWindow):
                 border: 1px solid black;
             }
         """)
-        # Set custom style for the tooltip
-        # self.timer_label.setStyleSheet(
-        #     "QToolTip { color: black; background-color: lightblue; border: 1px solid black; }")
-
         toolbar.addWidget(self.timer_label)
 
     def create_main_panel(self):
@@ -227,48 +249,85 @@ class AppView(QMainWindow):
                         icon_label.setPixmap(provider_icon)
                     else:
                         provider_initial = account.provider[0]  # get first letter of provider name
-                        icon_label.setText('(' + provider_initial + ')')
+                        icon_label.setText(' ' + provider_initial + ' ')
+                        icon_label.setStyleSheet("""
+                        QLabel {
+                            border: 1px;
+                            border-radius: 12px;
+                            background: transparent;
+                            color: white;
+                            background-color: blue;
+                            font-size: 16px;
+                            font-weight: bold;
+                            text-align: left;
+                        }
+                    """)
                     rowframe_layout.addWidget(icon_label)
 
                     label_string = f"{account.provider} ({account.label})"
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
-                    label = QLabel(label_string)
-                    label.setFont(QFont("Arial", 12))
+                    provider_label = QLabel(label_string)
+                    provider_label.setFont(QFont("Arial", 12))
+                    provider_label.setStyleSheet("""
+                        QLabel {
+                            border: 1px;
+                            background: transparent;
+                            color: black;
+                            font-size: 16px;
+                            text-align: left;
+                        }
+                    """)
+                    #provider_label.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
+                    # Set the size policy for widget
+                    #provider_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                    otplabel = QLabel(f"{otp}")
+                    edit_btn = QPushButton()
+                    if os.path.exists("images/edit_icon.png"):
+                        edit_icon = QIcon("images/edit_icon.png")
+                        edit_btn.setIcon(edit_icon)
+                        edit_btn.setIconSize(QSize(16,16))
+                        # Apply a stylesheet to change the icon on hover
+                        edit_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
+                        # edit_btn.setStyleSheet("""
+                        #     QPushButton:hover {
+                        #         qproperty-icon: url(images/edit_icon_hover.png);
+                        #     }
+                        # """)
+                    else:
+                        self.logger.warning("missing edit icon")
+                    edit_btn.setToolTip("Edit account")
+                    # pass the current values of index, account to show_edit_account_form
+                    edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
+                    rowframe_layout.addWidget(edit_btn)
+
+                    otplabel = QPushButton(f"{otp}")
                     otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
-                    # Set the size policy for widget1
-                    label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    otplabel.setStyleSheet(self.otplabel_style_normal)
+                    otplabel.setToolTip("Copy code to clipboard")
+                    otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
-                    rowframe_layout.addWidget(label)
-                    #rowframe_layout.addStretch()
+                    rowframe_layout.addWidget(provider_label)
+                    rowframe_layout.addWidget(edit_btn)
+                    rowframe_layout.addStretch()
                     rowframe_layout.addWidget(otplabel)
 
-                    copy_btn = QToolButton()
+                    copy_btn = QPushButton()
+                    """# Apply a stylesheet to change the icon on hover
+                        my_button.setStyleSheet("QPushButton:hover {"
+                            "icon: url(path/to/hovered_icon.png);"
+                            "}")"""
                     if os.path.exists("images/copy_icon.png"):
                         copy_icon = QIcon("images/copy_icon.png")
                         copy_btn.setIcon(copy_icon)
-                        copy_btn.setIconSize(QSize(16, 16))
+                        copy_btn.setIconSize(QSize(18, 18))
+                        copy_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
                     else:
                         self.logger.warning("missing copy icon")
-                    #copy_btn.setPopupMode(QToolButton.InstantPopup)
                     copy_btn.setToolTip("Copy code to clipboard")
                     copy_btn.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
                     rowframe_layout.addWidget(copy_btn)
 
-                    edit_btn = QToolButton()
-                    if os.path.exists("images/pencil_icon.png"):
-                        edit_icon = QIcon("images/pencil_icon.png")
-                        edit_btn.setIcon(edit_icon)
-                        edit_btn.setIconSize(QSize(16, 16))  # Adjust size as needed
-                    else:
-                        self.logger.warning("missing pencil icon")
-                    #edit_btn.setPopupMode(QToolButton.InstantPopup)
-                    edit_btn.setToolTip("Edit account")  # Add tooltip for accessibility
-                    # pass the current values of index, account to show_edit_account_form
-                    edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
-                    rowframe_layout.addWidget(edit_btn)
 
                     self.scroll_layout.addWidget(row_frame)
 
@@ -300,14 +359,15 @@ class AppView(QMainWindow):
         print(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
 
         # Provide visual feedback on copy: change the background color of the label to yellow
-        otp.setStyleSheet("background-color: #82e0aa;")
+        otp.setStyleSheet(self.otplabel_style_clicked)
         # Use QTimer to reset the background color back to the original color
         QTimer.singleShot(1000, lambda otp=otp: self.reset_label_color(label=otp))
 
     def reset_label_color(self,label):
         # Reset the background color to the original (no background color)
         try:
-            label.setStyleSheet("background-color: none;")
+            label.setStyleSheet(self.otplabel_style_normal)
+            pass
         except RuntimeError as e:
             """ if you hit copy with only 1 second left the label will get reset when the new code is'
             generated and the attempt to reset the old label will fail.  But that's okay because
