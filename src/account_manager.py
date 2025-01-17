@@ -10,6 +10,9 @@ import cipher_funcs
 from dataclasses import dataclass
 
 # TODO: Disambiguate - sometimes secret is used as the shared key and sometimes as the encrypted key.
+import logger
+
+
 @dataclass
 class Account:
     provider: str
@@ -37,8 +40,7 @@ class AccountManager:
 
         if not hasattr(self, 'initialized'):
             # Configure logging with more detail
-            self.logger = logging.getLogger(__name__)
-            self.logger.setLevel(logging.INFO)
+            self.logger = logger.configure_logging()
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )

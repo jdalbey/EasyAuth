@@ -1,4 +1,4 @@
-import logging
+import logger
 import copy
 from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
@@ -14,7 +14,7 @@ import cipher_funcs
 class EditAccountDialog(QDialog):
     def __init__(self, parent, index, account):
         super().__init__(parent)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.configure_logging()
         self.account_manager = AccountManager()
         self.account = account
         self.index = index

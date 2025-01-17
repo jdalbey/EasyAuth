@@ -1,6 +1,6 @@
 import json
-import logging
 import os
+import sys, logger
 from dataclasses import asdict
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
@@ -27,10 +27,8 @@ from reorder_dialog import ReorderDialog
 class AppView(QMainWindow):
     def __init__(self, ):
         super().__init__()
-        self.logger = logging.getLogger(__name__)
-        #self.controller = controller
+        self.logger = logger.configure_logging()
         self.account_manager = AccountManager()
-        #self.controller.set_view(self)
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
@@ -253,7 +251,7 @@ class AppView(QMainWindow):
                         copy_btn.setIcon(copy_icon)
                         copy_btn.setIconSize(QSize(16, 16))
                     else:
-                        logging.warning("missing copy icon")
+                        self.logger.warning("missing copy icon")
                     #copy_btn.setPopupMode(QToolButton.InstantPopup)
                     copy_btn.setToolTip("Copy code to clipboard")
                     copy_btn.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
@@ -265,7 +263,7 @@ class AppView(QMainWindow):
                         edit_btn.setIcon(edit_icon)
                         edit_btn.setIconSize(QSize(16, 16))  # Adjust size as needed
                     else:
-                        logging.warning("missing pencil icon")
+                        self.logger.warning("missing pencil icon")
                     #edit_btn.setPopupMode(QToolButton.InstantPopup)
                     edit_btn.setToolTip("Edit account")  # Add tooltip for accessibility
                     # pass the current values of index, account to show_edit_account_form
@@ -392,11 +390,6 @@ class AppView(QMainWindow):
 
 # local main for unit testing
 if __name__ == '__main__':
-    import sys
-    # Configure logging
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-
     app = QApplication(sys.argv)
     window = AppView()
     window.show()

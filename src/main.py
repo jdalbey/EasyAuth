@@ -1,8 +1,5 @@
-import logging
-import sys
-
+import sys, logging
 from PyQt5.QtWidgets import QApplication
-
 from appconfig import AppConfig
 from view import AppView
 from pathlib import Path # Python 3.5+

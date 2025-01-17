@@ -57,7 +57,7 @@ class TestConfirmAccountDialog(unittest.TestCase):
         MockAccountManager.save_new_account.return_value = False
         dialog.accept = Mock()  # Reset the mock
         dialog.save_button.click()
-        mockmsgbox.assert_called_once_with(dialog,"Warning","Account with same provider and label already exists")
+        mockmsgbox.assert_called_once_with(dialog,"Warning","Account with same provider and user already exists")
         dialog.accept.assert_not_called()
 
     @patch('account_confirm_dialog.QMessageBox.information')

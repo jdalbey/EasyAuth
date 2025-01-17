@@ -1,7 +1,6 @@
  # Detects one or more QR codes on the screen.
 from pyzbar.pyzbar import decode
 from PIL import ImageGrab
-import logging
 
 def scan_screen_for_qr_codes():
     """
@@ -11,8 +10,6 @@ def scan_screen_for_qr_codes():
         list: A list of decoded data from QR codes found on the screen.
 
     """
-    logger = logging.getLogger(__name__)
-    logger.info("Taking screen shot")
     # Take a screenshot of the current screen
     bbox = None  # take fullscreen
     screenshot = ImageGrab.grab(bbox)
