@@ -23,6 +23,7 @@ from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
+from favicon_provider_lookup import get_color_for_letter
 
 class AppView(QMainWindow):
     otplabel_style_normal = """
@@ -246,22 +247,34 @@ class AppView(QMainWindow):
                         icon_label = QLabel()
                         provider_icon_img = self.account_manager.get_provider_icon_name(account.provider)
                         if provider_icon_img:
-                            provider_icon = QPixmap(provider_icon_img)
-                            icon_label.setPixmap(provider_icon)
+                            # Load the PNG image from a file
+                            pixmap = QPixmap(provider_icon_img)
+                            # Scale the pixmap to the desired fixed size (32x32)
+                            pixmap = pixmap.scaled(16, 16)
+                            # Set the QPixmap to the QLabel
+                            icon_label.setPixmap(pixmap)
                         else:
+                            # IF icon not available show the first letter of provider's name
+                            # on a 'silk blue' colored background
                             provider_initial = account.provider[0]  # get first letter of provider name
-                            icon_label.setText(' ' + provider_initial + ' ')
-                            icon_label.setStyleSheet("""
-                            QLabel {
-                                border: 1px solid #488AC7;
-                                border-radius: 12px;
+                            icon_label.setText(provider_initial + '')
+                            color_name = get_color_for_letter(provider_initial)
+                            css_string = "QLabel { border: 1px solid " + color_name + "; "
+                            css_string += "border-radius: 8px; color: white; background-color: "
+                            css_string += color_name + "; "
+                            css_string += "font-size: 12px;font-weight: bold;text-align: center;}"
+                            icon_label.setStyleSheet(css_string)
+                            """
+                                QLabel {
+                                border: 1px solid #488AC7;  /* 'silk blue' */
+                                border-radius: 8px;
                                 color: white;
                                 background-color: #488AC7;
-                                font-size: 16px;
+                                font-size: 12px;
                                 font-weight: bold;
                                 text-align: center;
-                            }
-                        """)
+                                }
+                            """
                         rowframe_layout.addWidget(icon_label)
 
                     label_string = f"{account.provider} ({account.label})"
