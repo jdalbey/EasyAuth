@@ -13,6 +13,7 @@ import pyotp
 import time, datetime
 import pyperclip
 
+from provider_map import Providers
 from qr_hunting import fetch_qr_code
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
@@ -56,6 +57,7 @@ class AppView(QMainWindow):
         super().__init__()
         self.logger = logger.configure_logging()
         self.account_manager = AccountManager()
+        self.providers = Providers()
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
@@ -245,14 +247,11 @@ class AppView(QMainWindow):
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
                     if self.app_config.is_display_favicons():
                         icon_label = QLabel()
-                        provider_icon_img = self.account_manager.get_provider_icon_name(account.provider)
-                        if provider_icon_img:
-                            # Load the PNG image from a file
-                            pixmap = QPixmap(provider_icon_img)
-                            # Scale the pixmap to the desired fixed size (32x32)
-                            pixmap = pixmap.scaled(16, 16)
+                        #provider_icon_name = self.account_manager.get_provider_icon_name(account.provider)
+                        provider_icon_pixmap = self.providers.get_provider_icon_pixmap(account.provider)
+                        if provider_icon_pixmap:
                             # Set the QPixmap to the QLabel
-                            icon_label.setPixmap(pixmap)
+                            icon_label.setPixmap(provider_icon_pixmap)
                         else:
                             # IF icon not available show the first letter of provider's name
                             # on a 'silk blue' colored background

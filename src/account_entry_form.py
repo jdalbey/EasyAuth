@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout, QToolButton
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout, QToolButton, QPushButton, \
+    QDialog
 
 
 class AccountEntryForm(QFrame):
@@ -25,6 +26,9 @@ class AccountEntryForm(QFrame):
         self.provider_entry.textChanged.connect(self.validate_form)
         form_layout.addWidget(self.provider_entry, 0, 1)
 
+        provider_lookup_btn = QPushButton("Lookup")
+        provider_lookup_btn.clicked.connect(self.provider_lookup)
+        form_layout.addWidget(provider_lookup_btn, 0,2)
         provider_info_btn = QToolButton()
         provider_info_btn.setToolTip("Name identifying the website or online service\nthis account authenticates with.")
         info_icon = QIcon("images/question_mark_icon_16.png")
@@ -33,7 +37,7 @@ class AccountEntryForm(QFrame):
         # Make square button invisible so only circular icon shows
         provider_info_btn.setStyleSheet(help_style)
         #provider_info_btn.setPopupMode(QToolButton.InstantPopup)
-        form_layout.addWidget(provider_info_btn, 0, 2)
+        form_layout.addWidget(provider_info_btn, 0, 3)
 
         # Label
         form_layout.addWidget(QLabel("User:"), 1, 0, Qt.AlignRight)
@@ -84,3 +88,16 @@ class AccountEntryForm(QFrame):
 
     def enable_fields(self):
         self.secret_entry.setEnabled(True)
+
+    def provider_lookup(self):
+        from provider_search_dialog import ProviderSearchDialog
+        # Create and show the search page
+        search_page = ProviderSearchDialog()
+        # Show the dialog and get the result
+        if search_page.exec_() == QDialog.Accepted:
+            selected = search_page.get_selected_provider()
+            self.provider_entry.setText(selected)
+        else:
+            print("No selection made")
+
+
