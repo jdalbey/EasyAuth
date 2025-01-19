@@ -158,7 +158,7 @@ def get_color_for_letter(letter):
     }
 
     if not letter or len(letter) != 1 or not letter.isalpha():
-        return None
+        return 'white'
     return letter_to_color.get(letter.upper())
 
 # Example Usage
