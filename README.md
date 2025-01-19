@@ -10,6 +10,7 @@ Focus on ease of use for beginners using TOTP authentication.
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
  - QR codes can be read from an image file
  - Familiar easy-to-navigate desktop GUI
+ - Automatically finds favicons for many popular sites
  - Verifying with OTP in three easy steps: 
    1. Open the application  
    2. Click Copy button next to the account you are logging in to. 
@@ -19,12 +20,13 @@ Focus on ease of use for beginners using TOTP authentication.
 
 
 ### Status
-Early stage development.  Core features and GUI are implemented.  Minimal error handling.  Some unit tests for core modules are passing.
+Development underway.  Core features and GUI are implemented.
+Error handling implemented for core data model classes.
+52 unit tests for are passing.  Approximately 2000 lines of code.
 
 ### Screenshot
-
-[![Main Window](https://i.postimg.cc/8zfHwgb5/Screenshot-from-2025-01-08-21-46-10.png)](https://postimg.cc/4YZVNMqk)
-
+ 
+[![Main Window](https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png)
 ### Limitations
 
 Currently targets Linux OS.
