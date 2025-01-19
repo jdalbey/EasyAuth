@@ -7,8 +7,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
-import requests
-
 import cipher_funcs
 from dataclasses import dataclass
 
@@ -203,23 +201,6 @@ class AccountManager:
             self.logger.info(f"Accounts successfully backed up to {file_path}")
         except Exception as e:
             print(f"Failed to backup accounts: {e}")
-
-    def get_provider_icon_name(self, provider):
-        # REFS: https://favicon.im/  https://opendata.stackexchange.com/questions/14007/list-of-top-10k-websites-and-their-favicons
-        # https://github.com/opendns/public-domain-lists/blob/master/opendns-top-domains.txt
-        # https://pypi.org/project/favicon/
-        # Look up provider icon
-        from favicon_provider_lookup import provider_favicon_lookup
-        img_path = provider_favicon_lookup(provider)
-        #url = 'https://www.google.com/s2/favicons?domain=' + provider
-        # fav = requests.get(url).content
-        # if len(fav) > 0:
-        #     img_path = os.sep + 'tmp' + os.sep + 'images' + os.sep + provider + '.png'
-        #     with open(img_path, 'wb') as handler:
-        #         handler.write(fav)
-        return img_path   # "images/favicon_32x32.png"
-        # else:
-        #     return None
 
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""

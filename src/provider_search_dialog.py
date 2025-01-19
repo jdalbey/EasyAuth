@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QTableWidget,
-                             QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog)
-from PyQt5.QtCore import Qt, QItemSelectionModel
+                             QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog, QMessageBox)
+from PyQt5.QtCore import Qt, QItemSelectionModel, QEvent
 from PyQt5.QtGui import QIcon
 import json
 import sys
@@ -37,6 +37,7 @@ class ProviderSearchDialog(QDialog):
         self.setup_ui()
         self.load_data()
         self.resize(600, 400)
+        self.setWindowTitle("Provider Search")
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
@@ -65,25 +66,34 @@ class ProviderSearchDialog(QDialog):
         # Connect signals
         self.search_box.textChanged.connect(self.filter_items)
         self.table.itemSelectionChanged.connect(self.handle_selection)
-
-        # Install event filter on table for handling Backtab and Enteer
+        # Install event filter on table for handling Backtab and Enter
         self.table.installEventFilter(self)
+        self.table.viewport().installEventFilter(self)
 
+    # Handle table events
     def eventFilter(self, obj, event):
         if obj == self.table:
-            if event.type() == event.KeyPress:
+            if event.type() == QEvent.KeyPress:
+                # Backtab returns to search box
                 if event.key() == Qt.Key_Backtab:
                     self.search_box.setFocus()
                     self.clear_table_selection()
                     return True
-            if event.type() == event.KeyPress:
                 if event.key() == Qt.Key_Return:
                     selected_row = self.table.currentRow()
                     item = self.table.item(selected_row, 1)
                     self.selected_provider = item.text()
-                    self.accept()
+                    self.accept()   # close the dialog
+                    return True
+        if obj == self.table.viewport():
+            if event.type() == QEvent.MouseButtonDblClick:
+                print("mouse double click")
+                selected_row = self.table.currentRow()
+                item = self.table.item(selected_row, 1)
+                self.selected_provider = item.text()
+                self.accept()  # close the dialog
+                return True
         return super().eventFilter(obj, event)
-
 
     def select_first_row(self):
         if self.table.rowCount() > 0:
@@ -106,20 +116,16 @@ class ProviderSearchDialog(QDialog):
         self.selected_provider = None
 
     def load_data(self):
+        """ Load the list model used by the table from the provider map """
         try:
             for provider_name, data in self.providers.provider_map.items():
+                # assemble a list item from the components of a provider entry
                 domain = data['domain']
                 raw_image = data['raw_image']
                 list_item = {"icon": raw_image, "provider": provider_name, "domain": domain}
                 self.all_items.append(list_item)
-        except FileNotFoundError:
-            # Sample data with new provider names
-            self.all_items = [
-                {"icon": "icon1.png", "provider": "Figma", "domain": "domain1.com"},
-                {"icon": "icon2.png", "provider": "Garden", "domain": "domain2.com"},
-                {"icon": "icon3.png", "provider": "Gargle", "domain": "domain3.com"},
-                {"icon": "icon4.png", "provider": "Google", "domain": "domain4.com"}
-            ]
+        except Exception as ex:
+            QMessageBox.Warning(self,"Warning",f"Table initialization failed. {e}")
         self.populate_table(self.all_items)
 
     def populate_table(self, items):
@@ -144,7 +150,8 @@ class ProviderSearchDialog(QDialog):
         search_text = self.search_box.text().lower()
         filtered_items = [
             item for item in self.all_items
-            if search_text in item['provider'].lower()
+            #if search_text in item['provider'].lower()
+            if item['provider'].lower().startswith(search_text.lower())
         ]
         self.populate_table(filtered_items)
         

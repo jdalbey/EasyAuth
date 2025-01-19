@@ -88,6 +88,79 @@ class Providers:
         pixmap = self.make_pixmap(img_raw)
         return pixmap
 
+    def get_provider_icon(self,provider):
+        my_icon_label = QLabel()
+        provider_icon_pixmap = self.get_provider_icon_pixmap(provider)
+        if provider_icon_pixmap:
+            # Set the QPixmap to the QLabel
+            my_icon_label.setPixmap(provider_icon_pixmap)
+        else:
+            # IF icon not available show the first letter of provider's name
+            provider_initial = provider[0]  # get first letter of provider name
+            my_icon_label.setText(provider_initial + '')
+            color_name = get_color_for_letter(provider_initial)
+            css_string = "QLabel { border: 1px solid " + color_name + "; "
+            css_string += "border-radius: 8px; color: white; background-color: "
+            css_string += color_name + "; "
+            css_string += "font-size: 12px;font-weight: bold;text-align: center;}"
+            my_icon_label.setStyleSheet(css_string)
+            """
+                QLabel {
+                border: 1px solid #488AC7;  /* 'silk blue' */
+                border-radius: 8px;
+                color: white;
+                background-color: #488AC7;
+                font-size: 12px;
+                font-weight: bold;
+                text-align: center;
+                }
+            """
+        return my_icon_label
+
+def get_color_for_letter(letter):
+    """
+    Returns the color associated with the given letter.
+
+    Args:
+        letter (str): A single letter (case-insensitive).
+
+    Returns:
+        str: The color associated with the letter, or None if the input is invalid.
+    """
+    # Mapping of letters to colors
+    letter_to_color = {
+        'A': 'lightpink',
+        'B': 'lightcoral',
+        'C': 'lightsalmon',
+        'D': 'lightgoldenrodyellow',
+        'E': 'palegreen',
+        'F': 'lightseagreen',
+        'G': 'mediumturquoise',
+        'H': 'paleturquoise',
+        'I': 'lightblue',
+        'J': 'deepskyblue',
+        'K': 'lightskyblue',
+        'L': 'lightgray',
+        'M': 'lavender',
+        'N': 'lightpink',
+        'O': 'lightcoral',
+        'P': 'lightsalmon',
+        'Q': 'lightgoldenrodyellow',
+        'R': 'palegreen',
+        'S': 'lightseagreen',
+        'T': 'mediumturquoise',
+        'U': 'paleturquoise',
+        'V': 'lightblue',
+        'W': 'deepskyblue',
+        'X': 'lightskyblue',
+        'Y': 'lightgray',
+        'Z': 'lavender',
+    }
+
+    if not letter or len(letter) != 1 or not letter.isalpha():
+        return None
+    return letter_to_color.get(letter.upper())
+
 # Example Usage
 if __name__ == "__main__":
     app = QApplication([])

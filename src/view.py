@@ -13,6 +13,7 @@ import pyotp
 import time, datetime
 import pyperclip
 
+import provider_map
 from provider_map import Providers
 from qr_hunting import fetch_qr_code
 import cipher_funcs
@@ -24,7 +25,6 @@ from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
-from favicon_provider_lookup import get_color_for_letter
 
 class AppView(QMainWindow):
     otplabel_style_normal = """
@@ -246,34 +246,7 @@ class AppView(QMainWindow):
                     # Set external padding around the frame by adjusting the layout margins of the parent widget
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
                     if self.app_config.is_display_favicons():
-                        icon_label = QLabel()
-                        #provider_icon_name = self.account_manager.get_provider_icon_name(account.provider)
-                        provider_icon_pixmap = self.providers.get_provider_icon_pixmap(account.provider)
-                        if provider_icon_pixmap:
-                            # Set the QPixmap to the QLabel
-                            icon_label.setPixmap(provider_icon_pixmap)
-                        else:
-                            # IF icon not available show the first letter of provider's name
-                            # on a 'silk blue' colored background
-                            provider_initial = account.provider[0]  # get first letter of provider name
-                            icon_label.setText(provider_initial + '')
-                            color_name = get_color_for_letter(provider_initial)
-                            css_string = "QLabel { border: 1px solid " + color_name + "; "
-                            css_string += "border-radius: 8px; color: white; background-color: "
-                            css_string += color_name + "; "
-                            css_string += "font-size: 12px;font-weight: bold;text-align: center;}"
-                            icon_label.setStyleSheet(css_string)
-                            """
-                                QLabel {
-                                border: 1px solid #488AC7;  /* 'silk blue' */
-                                border-radius: 8px;
-                                color: white;
-                                background-color: #488AC7;
-                                font-size: 12px;
-                                font-weight: bold;
-                                text-align: center;
-                                }
-                            """
+                        icon_label = self.providers.get_provider_icon(account.provider)
                         rowframe_layout.addWidget(icon_label)
 
                     label_string = f"{account.provider} ({account.label})"
