@@ -185,6 +185,16 @@ class AccountManager:
         self.save_accounts()
         self.logger.info(f"Deleted account: {account.provider} ({account.label})")
 
+    def sort_alphabetically(self):
+        self.accounts = sorted(self.accounts, key=lambda x: x.provider)
+        self.save_accounts()
+        self.logger.info(f"Accounts sorted alphabetically.")
+
+    def sort_recency(self):
+        self.accounts = sorted(self.accounts, key=lambda x: x.last_used, reverse=True)
+        self.save_accounts()
+        self.logger.info(f"Accounts sorted by recently used.")
+
     def backup_accounts(self, file_path):
         """ Store the accounts as json in the given file_path after decrypting the secret keys"""
         decrypted_accounts = []

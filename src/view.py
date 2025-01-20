@@ -4,8 +4,8 @@ import sys, logging
 from dataclasses import asdict
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
-    QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea, 
-    QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout, 
+    QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea,
+    QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout,
     QHBoxLayout, QWidget, QMessageBox, QFrame)
 from PyQt5.QtCore import Qt, QTimer, QSize, QUrl
 from PyQt5.QtGui import QFont, QIcon, QPixmap, QDesktopServices
@@ -20,7 +20,7 @@ import cipher_funcs
 from account_add_dialog import AddAccountDialog
 from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
-from backup_dialog import BackupRestoreDialog   
+from backup_dialog import BackupRestoreDialog
 from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
@@ -64,7 +64,7 @@ class AppView(QMainWindow):
         self.current_dialog = None
         self.setWindowTitle("Easy Auth")
         self.setGeometry(100, 100, 650, 400)
-        
+
         # Create central widget
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -81,21 +81,21 @@ class AppView(QMainWindow):
     def create_menubar(self):
         # Create menubar
         menubar = self.menuBar()
-        
+
         # File menu
         file_menu = menubar.addMenu('File')
         add_account_action = QAction('Add Account', self)
         add_account_action.setShortcut('Ctrl+N')
         add_account_action.triggered.connect(self.show_add_account_form)
         file_menu.addAction(add_account_action)
-        
+
         file_menu.addSeparator()
-        
+
         import_action = QAction('Import', self)
         import_action.setEnabled(False)
         import_action.triggered.connect(self.import_accounts)
         file_menu.addAction(import_action)
-        
+
         backup_action = QAction('Backup/Restore', self)
         backup_action.triggered.connect(self.show_backup_restore_dialog)
         file_menu.addAction(backup_action)
@@ -109,7 +109,15 @@ class AppView(QMainWindow):
         reorder_action = QAction('Reorder Accounts', self)
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
-        
+
+        sort_menu = tools_menu.addMenu('Sort Accounts')
+        alpha_sort_action = QAction("Alphabetically", self)
+        recency_action = QAction("Recently Used", self)
+        alpha_sort_action.triggered.connect(self.do_alpha_sort_action)
+        recency_action.triggered.connect(self.do_recency_sort_action)
+        sort_menu.addAction(alpha_sort_action)
+        sort_menu.addAction(recency_action)
+
         # providers_action = QAction('Providers', self)
         # providers_action.setEnabled(False)
         # providers_action.triggered.connect(self.manage_providers)
@@ -132,12 +140,12 @@ class AppView(QMainWindow):
         # Create toolbar
         toolbar = QToolBar()
         self.addToolBar(toolbar)
-        
+
         # Add quick access buttons
         add_btn = QPushButton("Add Account")
         add_btn.clicked.connect(self.show_add_account_form)
         toolbar.addWidget(add_btn)
-        
+
         # Add spacer to push search to the right
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -153,7 +161,7 @@ class AppView(QMainWindow):
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         toolbar.addWidget(spacer)
-        
+
         # Timer label
         timer_font = QFont("Courier", 24, QFont.Bold)
         self.timer_label = QLabel("  ")
@@ -331,7 +339,7 @@ class AppView(QMainWindow):
                 display_time = ' ' + display_time
         self.timer_label.setText(display_time)
         # refresh the display every 30 seconds
-        # NB: assumes timer period is 30 seconds for all accounts    
+        # NB: assumes timer period is 30 seconds for all accounts
         if time_remaining == 30:
             self.display_accounts()
 
@@ -416,6 +424,16 @@ class AppView(QMainWindow):
             self.account_manager.set_accounts(json_str)
             # Update main window display
             self.display_accounts()
+
+    def do_alpha_sort_action(self):
+        self.account_manager.sort_alphabetically()
+        self.accounts = self.account_manager.accounts
+        self.display_accounts()
+
+    def do_recency_sort_action(self):
+        self.account_manager.sort_recency()
+        self.accounts = self.account_manager.accounts
+        self.display_accounts()
 
     # def manage_providers(self):
     #     reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')

@@ -3,16 +3,17 @@ A 2FA secrets manager and TOTP generator for Linux desktop.
 Focus on ease of use for beginners using TOTP authentication. 
 
 ## Features
- - Stores your secret keys encrypted in a vault on your local machine (doesn't rely on third-party cloud services)
- - Generates Time-based One-time Passwords from your secret keys
+ - Stores your secret keys encrypted in a vault on your local machine (doesn't rely on third-party cloud services).
+ - Generates Time-based One-time Passwords from your secret keys.
  - Accounts are displayed in a scrollable list with a search feature.
- - The list can be reordered to place your most frequently used accounts at the top.
+ - The list can be sorted alphabetically or by most recently used.
+ - The list can be manually reordered to achieve a custom ordering. 
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
- - QR codes can be read from an image file
- - Familiar easy-to-navigate desktop GUI
- - Automatically finds favicons for many popular sites
+ - QR codes can be read from an image file.
+ - Familiar easy-to-navigate desktop GUI.
+ - Automatically finds favicons for many sites that offer TOTP verification.
  - Verifying with OTP in three easy steps: 
-   1. Open the application  
+   1. Open the application.  
    2. Click Copy button next to the account you are logging in to. 
    3. Paste into verification form.
  
