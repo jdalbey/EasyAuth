@@ -6,26 +6,26 @@ from QRselectionDialog import QRselectionDialog
 from account_manager import Account
 from account_confirm_dialog import ConfirmAccountDialog
 from otp_funcs import is_valid_secretkey
-
+import logging
 
 def fetch_qr_code():
     """ Look for a QR code.
     @param automatic True if auto scan for QR code setting is true
     @param confirm_dialog the dialog to be used to ask the user to confirm the QR code that was found"""
-    print ("starting qr hunt")
+    logging.debug ("starting qr hunt")
     if process_qr_codes(False):
         # confirm returned True
-        print("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
+        logging.debug("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
         return True
-    print ("Didn't get a QR code, showing dialog next.")
+    logging.debug ("Didn't get a QR code, showing dialog next.")
     # Either we didn't find any qr codes or auto_find is turned off
     return False
 
 def confirm_account(account): #, confirm_dialog):
     # check selection has valid secret key.
-    print(f"Checking validity of code for {account.provider}: {account.secret}")
+    logging.debug(f"Checking validity of code for {account.provider}: {account.secret}")
     if not is_valid_secretkey(account.secret):
-        print ("QR code invalid key")
+        logging.debug ("QR code invalid key")
         # if not valid secret key show message box then return to blank account_add form.
         reply = QMessageBox.information (None, 'Info', "QR code has invalid secret key.",QMessageBox.Ok)
     else:
@@ -34,7 +34,7 @@ def confirm_account(account): #, confirm_dialog):
         current_dialog = ConfirmAccountDialog()
         current_dialog.set_account(fields)
         if current_dialog.exec_() == QDialog.Accepted:
-            print (f"Confirm dialog was accepted.")
+            logging.debug (f"Confirm dialog was accepted.")
             #accept() # for case where we were called from Find QR button
             return True
     return False
@@ -42,7 +42,7 @@ def confirm_account(account): #, confirm_dialog):
 def process_qr_codes(called_from_Find_btn):
     # first go find_qr_codes
     urls = find_qr_codes.scan_screen_for_qr_codes()
-    print (f"Process got urls: {urls}")
+    logging.debug (f"Process got urls: {urls}")
     # Examine each url to see if it is an otpauth protocol and reject others
     otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]
     # Try to parse each url.  Put the fields into an account and append to displaylist.
@@ -57,7 +57,7 @@ def process_qr_codes(called_from_Find_btn):
         secret_key = totp_obj.secret
         account = Account(issuer,name,secret_key,"")
         # TODO: Extract the advanced parameters if they exists
-        print(f"In AddDialog: Scanned QR code: {issuer} {name} ")
+        logging.debug(f"In AddDialog: Scanned QR code: {issuer} {name} ")
         display_list.append(account)
     # How many valid URI's do we have?
     if len(display_list) == 0:
@@ -67,7 +67,7 @@ def process_qr_codes(called_from_Find_btn):
             return False # no QR
     if len(display_list) == 1:
         confirm_code = confirm_account(display_list[0])
-        print (f"Found 1 QR code and confirm dialog returned {confirm_code}")
+        logging.debug (f"Found 1 QR code and confirm dialog returned {confirm_code}")
         return confirm_code # True if accepted, False if declined
     # Wow, we got more than one QR code
     if len(display_list) > 1:
@@ -78,7 +78,7 @@ def process_qr_codes(called_from_Find_btn):
             selected_account = dialog.get_selected_account()
             # If user made a selection,
             if selected_account:
-                print(f"Selected Account: {selected_account.provider} - {selected_account.label}")
+                logging.debug(f"Selected Account: {selected_account.provider} - {selected_account.label}")
                 return confirm_account(selected_account)
 
     return False

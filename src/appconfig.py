@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-import os
+import os, logging
 from pathlib import Path
 
 
@@ -19,6 +19,7 @@ class AppConfig:
             return
         # This code executes just once for first/only instance
         self.config = ConfigParser()
+        self.logwriter = logging.getLogger(__name__)
         # If a filepath was provided load settings from there
         if filepath:
             self.filepath = filepath  #must initialize before read uses it
@@ -27,21 +28,21 @@ class AppConfig:
         else:
             home_dir_str = str(Path.home())
             self.filepath = Path.home().joinpath(home_dir_str, AppConfig.kDefaultPath)
-            print (f"using default: {self.filepath}")
-            self.restore_defaults()
+            self.logwriter.info (f"using default: {self.filepath}")
+            self.read(self.filepath)
         self._initialized = True
 
     def read(self, config_file):
         """ Read config file or create it with defaults """
         # does the file exist
         if not os.path.exists(config_file):
-            print (f"The configuration file '{config_file}' does not exist, creating it.")
+            self.logwriter.info(f"The configuration file '{config_file}' does not exist, creating it.")
             # is the directory missing?
             if not os.path.exists(os.path.dirname(config_file)):
                 os.makedirs(os.path.dirname(config_file),mode=0o777,exist_ok=True)
             # write defaults to the file
             self.restore_defaults()
-            print("restored defaults and saved to config file")
+            self.logwriter.info("restored defaults and saved to config file")
         else:
             self.config.read(config_file)
 
@@ -174,7 +175,7 @@ class AppConfig:
         self.set_minimize_after_copy(False)
         self.set_minimize_during_qr_search(False)
         self.set_auto_fetch_favicons(False)
-        self.set_display_favicons(False)
+        self.set_display_favicons(True)
         self.set_secret_key_hidden(False)
         self.set_language('English')
         self.set_animate_copy(False)

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout, QToolButton, QPushButton, \
     QDialog
 from provider_search_dialog import ProviderSearchDialog
-import provider_map
+
 class AccountEntryForm(QFrame):
     def __init__(self, save_button):
         super().__init__()
@@ -11,7 +11,6 @@ class AccountEntryForm(QFrame):
         self.setFrameStyle(QFrame.StyledPanel)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form_layout = QGridLayout(self)
-        self.providers = provider_map.Providers()
 
         help_style = """
             QToolButton {
@@ -109,6 +108,8 @@ class AccountEntryForm(QFrame):
     def provider_lookup(self):
         # Create and show the search page
         search_page = ProviderSearchDialog()
+        search_page.load_data()
+        search_page.lower()
         # Show the dialog and get the result
         if search_page.exec_() == QDialog.Accepted:
             selected = search_page.get_selected_provider()

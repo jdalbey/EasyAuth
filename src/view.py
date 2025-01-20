@@ -1,6 +1,6 @@
 import json
 import os
-import sys, logger
+import sys, logging
 from dataclasses import asdict
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
@@ -55,7 +55,8 @@ class AppView(QMainWindow):
         """
     def __init__(self, ):
         super().__init__()
-        self.logger = logger.configure_logging()
+        self.logger = logging.getLogger(__name__)
+        self.logger.debug("view init startup")
         self.account_manager = AccountManager()
         self.providers = Providers()
         self.vault_empty = False # Don't display timer if vault empty
@@ -75,6 +76,7 @@ class AppView(QMainWindow):
 
         self.display_accounts()
         self.start_timer()
+        self.logger.debug("view init complete")
 
     def create_menubar(self):
         # Create menubar
@@ -108,11 +110,11 @@ class AppView(QMainWindow):
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
         
-        providers_action = QAction('Providers', self)
-        providers_action.setEnabled(False)
-        providers_action.triggered.connect(self.manage_providers)
-        tools_menu.addAction(providers_action)
-        
+        # providers_action = QAction('Providers', self)
+        # providers_action.setEnabled(False)
+        # providers_action.triggered.connect(self.manage_providers)
+        # tools_menu.addAction(providers_action)
+        #
 
         # Help menu
         help_menu = menubar.addMenu('Help')
@@ -336,12 +338,12 @@ class AppView(QMainWindow):
     def copy_to_clipboard(self, otp, idx, account):
         """ @param otp is the label of the one-time password """
         pyperclip.copy(otp.text())
-        print(f"Copied OTP: {otp.text()}")
+        self.logger.debug(f"Copied OTP: {otp.text()}")
         now = datetime.datetime.now()
         # update last used time
         account.last_used = now.strftime("%Y-%m-%d %H:%M")
         self.account_manager.update_account(idx,account)
-        print(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
+        self.logger.debug(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
 
         # Provide visual feedback on copy: change the background color of the label to yellow
         otp.setStyleSheet(self.otplabel_style_clicked)
@@ -361,13 +363,13 @@ class AppView(QMainWindow):
 
     def show_add_account_form(self):
         """ User clicked Add Account button """
-        print("Starting Show_add_account_form")
+        self.logger.debug("Starting Show_add_account_form")
         # Are we in auto_find mode?
         if self.app_config.is_auto_find_qr_enabled():
             result_code = fetch_qr_code()
             # if process returned True we should skip exec_
             #result_code = QDialog.result(self.current_dialog)
-            print (f"AddAccountDialog closed with result code: {result_code}")
+            self.logger.debug (f"AddAccountDialog closed with result code: {result_code}")
             if not result_code:
                 self.current_dialog = AddAccountDialog()
                 self.current_dialog.exec_()
@@ -378,7 +380,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_edit_account_form(self,index,account):
-        print (f"entering show_edit_account_form with {index} {account.provider}")
+        self.logger.debug (f"entering show_edit_account_form with {index} {account.provider}")
         dialog_EditAcct = EditAccountDialog(self, index, account)
         dialog_EditAcct.exec_()
         self.display_accounts()
@@ -415,8 +417,8 @@ class AppView(QMainWindow):
             # Update main window display
             self.display_accounts()
 
-    def manage_providers(self):
-        reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
+    # def manage_providers(self):
+    #     reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
 
     def show_quick_start_dialog(self):
         dlg = QuickStartDialog(self)

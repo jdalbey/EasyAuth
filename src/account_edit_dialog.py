@@ -1,4 +1,4 @@
-import logger
+import logging
 import copy
 from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
@@ -14,7 +14,7 @@ import cipher_funcs
 class EditAccountDialog(QDialog):
     def __init__(self, parent, index, account):
         super().__init__(parent)
-        self.logger = logger.configure_logging()
+        self.logger = logging.getLogger(__name__)
         self.account_manager = AccountManager()
         self.account = account
         self.index = index
@@ -35,6 +35,7 @@ class EditAccountDialog(QDialog):
         self.save_btn.clicked.connect(
             lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
         self.save_btn.setEnabled(False)
+        self.save_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         # Add shared fields
         self.shared_fields = AccountEntryForm(self.save_btn)
@@ -48,13 +49,13 @@ class EditAccountDialog(QDialog):
         # Button section
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
-
+        button_layout.addStretch()
         self.delete_btn = QPushButton("Delete")
         self.delete_btn.clicked.connect(lambda: self.confirm_delete_account())
-
+        self.delete_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         cancel_btn = QPushButton("Cancel")
         cancel_btn.clicked.connect(self.reject)
-
+        cancel_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         button_layout.addWidget(self.save_btn)
         button_layout.addWidget(self.delete_btn)
         button_layout.addWidget(cancel_btn)
@@ -113,7 +114,7 @@ class EditAccountDialog(QDialog):
         """Update the account with the fields in the account dialog
            @param index is position in account list
            @param account is info given to edit dialog when launched"""
-        print (f"EditAcctDialog is handling update request for: {index} ")
+        self.logger.debug (f"EditAcctDialog is handling update request for: {index} ")
         self.encrypted_secret = None
         # Validate secret key
         if otp_funcs.is_valid_secretkey(self.shared_fields.secret_entry.text()):

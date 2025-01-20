@@ -1,3 +1,5 @@
+import logging
+
 import pyotp
 import qrcode
 from io import BytesIO
@@ -23,7 +25,7 @@ def otpauth_uri_from_account(account):
     decrypted_secret = cipher_funcs.decrypt(account.secret)
     totp = pyotp.TOTP(decrypted_secret)
     uri = totp.provisioning_uri(name=account.label, issuer_name=account.provider)
-    print (f"uri_from_account returning: {uri}")
+    logging.debug (f"otp_funcs: created uri from account info: {uri}")
     return uri
 
 def generate_qr_image(account):

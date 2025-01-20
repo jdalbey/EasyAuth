@@ -4,23 +4,15 @@ from appconfig import AppConfig
 from view import AppView
 from pathlib import Path # Python 3.5+
 
-# Global variable to store the application configuration
-app_config = None
-
 def main():
     app = QApplication(sys.argv)
     # Configure logging
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    """When you use basicConfig to specify the format option, it sets the format for the root logger """
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s - %(name)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    # Suppress log messages from the tkinter module
-    #logging.getLogger('PIL').setLevel(logging.WARNING)
-
-    # Initialize the application settings with a config file
-    kConfigPath = ".config/EasyAuth/config.ini"
-    home_dir_str = str(Path.home())
-    filepath = Path.home().joinpath(home_dir_str, kConfigPath)
-    AppConfig(filepath)
+    logger.debug("Application starting with default config")
+    AppConfig()
     view = AppView()
 
     # Start the application

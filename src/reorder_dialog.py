@@ -1,7 +1,7 @@
 import json
 
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
-                             QListWidgetItem, QPushButton, QWidget, QLabel, QApplication)
+                             QListWidgetItem, QPushButton, QWidget, QLabel, QApplication, QSizePolicy)
 from account_manager import AccountManager
 class ReorderDialog(QDialog):
     def __init__(self, accounts, parent=None):
@@ -9,7 +9,7 @@ class ReorderDialog(QDialog):
         # Create copies of each account
         self.accounts = AccountManager.duplicate_accounts(accounts)
         self.setWindowTitle("Reorder Accounts")
-        self.resize(700, 300)
+        self.resize(500, 300)
         self.setup_ui()
 
 
@@ -27,10 +27,12 @@ class ReorderDialog(QDialog):
         button_layout = QHBoxLayout()
         ok_button = QPushButton("OK")
         cancel_button = QPushButton("Cancel")
+        ok_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
-        
+        button_layout.addStretch()
         button_layout.addWidget(ok_button)
         button_layout.addWidget(cancel_button)
         layout.addLayout(button_layout)

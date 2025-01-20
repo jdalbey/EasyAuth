@@ -65,7 +65,7 @@ language = English\nanimate_copy = False\n"""
         vault_path = config.get_vault_path()
         assert vault_path == "vault.json"
 
-    def test_noarg(self):
+    def test_noarg_missingfile(self):
         # reset the singleton
         AppConfig._instance = None
         # use a temp file for testing
@@ -83,3 +83,19 @@ language = English\nanimate_copy = False\n"""
         # should have been created by restore_defaults()
         assert os.path.exists(filepath)
 
+    def test_noarg_existingfile(self):
+        # reset the singleton
+        AppConfig._instance = None
+        # use a temp file for testing
+        filepath = "/tmp/default_config.ini"
+        settings_string = "[Settings]\nvault_path = nowhere.json"
+        text_file = open(filepath, "w")
+        text_file.write(settings_string)
+        text_file.close()
+
+        AppConfig.kDefaultPath = filepath
+
+        config = AppConfig()  # noarg constructor
+
+        vault_path = config.get_vault_path()
+        assert vault_path == "nowhere.json"

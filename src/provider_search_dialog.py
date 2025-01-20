@@ -1,3 +1,4 @@
+import logging
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QTableWidget,
                              QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog, QMessageBox)
 from PyQt5.QtCore import Qt, QItemSelectionModel, QEvent
@@ -32,12 +33,13 @@ class ProviderSearchDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.selected_provider = None
+        self.logger = logging.getLogger(__name__)
         self.providers = provider_map.Providers()
         self.all_items = []  # Will store all items for filtering
         self.setup_ui()
-        self.load_data()
         self.resize(600, 400)
         self.setWindowTitle("Provider Search")
+        self.logger.info("init complete")
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
@@ -87,7 +89,6 @@ class ProviderSearchDialog(QDialog):
                     return True
         if obj == self.table.viewport():
             if event.type() == QEvent.MouseButtonDblClick:
-                print("mouse double click")
                 selected_row = self.table.currentRow()
                 item = self.table.item(selected_row, 1)
                 self.selected_provider = item.text()
@@ -120,12 +121,13 @@ class ProviderSearchDialog(QDialog):
         try:
             for provider_name, data in self.providers.provider_map.items():
                 # assemble a list item from the components of a provider entry
-                domain = data['domain']
+                domain = data['png_filename']
                 raw_image = data['raw_image']
                 list_item = {"icon": raw_image, "provider": provider_name, "domain": domain}
                 self.all_items.append(list_item)
         except Exception as ex:
-            QMessageBox.Warning(self,"Warning",f"Table initialization failed. {e}")
+            self.logger.warning(f"Table initialization failed. {ex}")
+            return
         self.populate_table(self.all_items)
 
     def populate_table(self, items):
@@ -143,7 +145,9 @@ class ProviderSearchDialog(QDialog):
             self.table.setItem(row, 1, provider_item)
             
             # Domain
-            domain_item = QTableWidgetItem(item['domain'])
+            domain_string = item['domain']
+            domain_string = domain_string.replace('.png','')
+            domain_item = QTableWidgetItem(domain_string)
             self.table.setItem(row, 2, domain_item)
 
     def filter_items(self):
@@ -167,7 +171,6 @@ class ProviderSearchDialog(QDialog):
             self.selected_provider = self.table.item(row, 1).text()
 
     def select_and_close(self):
-        print(f"Selected: {self.selected_provider}")
         self.accept()
 
     def get_selected_provider(self):
@@ -185,7 +188,6 @@ def main():
     # Show the dialog and get the result
     if dialog.exec_() == QDialog.Accepted:
         selected = dialog.get_selected_provider()
-        print(f"Main Selected provider: {selected}")
     else:
         print("No selection made")
 

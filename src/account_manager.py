@@ -11,8 +11,6 @@ import cipher_funcs
 from dataclasses import dataclass
 
 # TODO: Disambiguate - sometimes secret is used as the shared key and sometimes as the encrypted key.
-import logger
-
 
 @dataclass
 class Account:
@@ -41,7 +39,7 @@ class AccountManager:
 
         if not hasattr(self, 'initialized'):
             # Configure logging with more detail
-            self.logger = logger.configure_logging()
+            self.logger = logging.getLogger(__name__)
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )
@@ -200,7 +198,7 @@ class AccountManager:
                 json.dump(decrypted_accounts, f)
             self.logger.info(f"Accounts successfully backed up to {file_path}")
         except Exception as e:
-            print(f"Failed to backup accounts: {e}")
+            self.logger.error(f"Failed to backup accounts: {e}")
 
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""

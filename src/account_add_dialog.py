@@ -1,3 +1,5 @@
+import logging
+
 import pyotp
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
@@ -16,6 +18,7 @@ class AddAccountDialog(QDialog):
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.setWindowTitle("Add Account")
         self.setGeometry(100, 100, 400, 300)
+        self.logger = logging.getLogger(__name__)
         self.create_form()
 
     def create_form(self):
@@ -50,7 +53,10 @@ class AddAccountDialog(QDialog):
 
         # Declare the save button here so we can pass it to the Form
         self.button_layout = QHBoxLayout()
+        self.button_layout.addStretch()
+
         self.save_button = QPushButton("Save")
+        self.save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.save_button.clicked.connect(self.save_fields)
         self.save_button.setEnabled(False)
 
@@ -62,6 +68,7 @@ class AddAccountDialog(QDialog):
         self.button_layout.addWidget(self.save_button)
 
         self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.cancel_button.clicked.connect(self.close)
         self.button_layout.addWidget(self.cancel_button)
 
@@ -89,7 +96,7 @@ class AddAccountDialog(QDialog):
     def get_qr_code(self):
         """ User clicked User QR code """
         result_code = process_qr_codes(True)  # True = called from Use QR code
-        print (f"Finishing get_qr_code with result {result_code}")
+        self.logger.debug(f"Finishing get_qr_code with result {result_code}")
         if result_code:
             self.accept()
 

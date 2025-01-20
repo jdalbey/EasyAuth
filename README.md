@@ -26,7 +26,7 @@ Error handling implemented for core data model classes.
 
 ### Screenshot
  
-[![Main Window](https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png)
+[![Main Window](https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png)]
 ### Limitations
 
 Currently targets Linux OS.
@@ -47,3 +47,11 @@ pyzbar
 cryptography  
 qrcode  
 
+## Usage
+Practice storing a new secret key using the sample QR code below.
+1. Launch the application.
+2. Make sure the QR code below is visible on the screen. Click 'Add Account".
+3. The "Confirm New Account" dialog appears with the fields filled from the data in the QR code. Click "Accept".
+4. Observe the new account in the main window.
+
+[![Sample QR code](https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png)]

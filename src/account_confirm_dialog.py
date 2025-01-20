@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
 
 import otp_funcs
 from account_entry_form import AccountEntryForm
@@ -17,8 +17,11 @@ class ConfirmAccountDialog(QDialog):
         self.layout.addWidget(header_label)
 
         self.button_layout = QHBoxLayout()
+        self.button_layout.addStretch()
+
         self.save_button = QPushButton("Accept")
         self.save_button.setShortcut('Ctrl+A')
+        self.save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.save_button.clicked.connect(self.save_fields)
 
         # Add shared fields
@@ -28,6 +31,7 @@ class ConfirmAccountDialog(QDialog):
         self.button_layout.addWidget(self.save_button)
 
         self.cancel_button = QPushButton("Decline")
+        self.cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.cancel_button.clicked.connect(self.reject) # returns False
         self.button_layout.addWidget(self.cancel_button)
 
