@@ -27,7 +27,7 @@ Error handling implemented for core data model classes.
 
 ### Screenshot
  
-[![Main Window](https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png)]
+<img src="https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png" alt="Main Window">
 ### Limitations
 
 Currently targets Linux OS.
@@ -55,4 +55,4 @@ Practice storing a new secret key using the sample QR code below.
 3. The "Confirm New Account" dialog appears with the fields filled from the data in the QR code. Click "Accept".
 4. Observe the new account in the main window.
 
-[![Sample QR code](https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png)]
+<img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
