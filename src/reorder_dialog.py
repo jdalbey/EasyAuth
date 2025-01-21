@@ -1,8 +1,40 @@
 import json
 
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QPixmap, QDrag, QFont
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
                              QListWidgetItem, QPushButton, QWidget, QLabel, QApplication, QSizePolicy)
+
 from account_manager import AccountManager
+
+class CustomListWidget(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.dragged_row = None
+
+    def startDrag(self, supported_actions):
+        # Capture the source row
+        self.dragged_row = self.currentRow()
+        super().startDrag(supported_actions)
+
+    def dropEvent(self, event):
+        if event.source() == self:
+            target_row = self.indexAt(event.pos()).row()
+            if target_row == -1:
+                target_row = self.count() - 1
+
+            # Update the underlying model
+            parent = self.parentWidget()
+            if isinstance(parent, ReorderDialog):
+                account = parent.accounts.pop(self.dragged_row)
+                parent.accounts.insert(target_row, account)
+
+            # Let the parent class handle visual reordering
+            super().dropEvent(event)
+        else:
+            event.ignore()
+
+
 class ReorderDialog(QDialog):
     def __init__(self, accounts, parent=None):
         super().__init__(parent)
@@ -12,16 +44,38 @@ class ReorderDialog(QDialog):
         self.resize(500, 300)
         self.setup_ui()
 
-
     def setup_ui(self):
         # Main layout
         layout = QVBoxLayout(self)
+        hint_label = QLabel("Use drag and drop to reorder items.")
+        layout.addWidget(hint_label)
 
         # List widget to show accounts
-        self.list_widget = QListWidget()
+        self.list_widget = CustomListWidget()
+        self.list_widget.setDragEnabled(True)
+        self.list_widget.setAcceptDrops(True)
+        self.list_widget.setDragDropMode(QListWidget.InternalMove)
+        self.list_widget.setDefaultDropAction(Qt.MoveAction)
+        self.list_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.list_widget.setAutoScroll(True)
         self.populate_list()
         layout.addWidget(self.list_widget)
         self.list_widget.setCurrentRow(0)
+        self.list_widget.setStyleSheet("""QListWidget
+{
+border : 2px solid black;
+background: #fafbeb;  
+}
+QListView::item
+{
+    padding: 5px;
+}
+QListView::item:selected
+{
+border : 1px dashed black;
+background : lightblue;
+color:blue;
+}""")
 
         # Buttons layout
         button_layout = QHBoxLayout()
@@ -29,7 +83,7 @@ class ReorderDialog(QDialog):
         cancel_button = QPushButton("Cancel")
         ok_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
+
         ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
         button_layout.addStretch()
@@ -38,92 +92,32 @@ class ReorderDialog(QDialog):
         layout.addLayout(button_layout)
 
     def populate_list(self):
+        font = QFont("Serif", 12)
         for account in self.accounts:
-            # Display provider and label for each account
-            display_text = f"{account.provider} - {account.label}"
-            item = QListWidgetItem() #display_text)
-            widget = self.create_item_widget(account)
-            item.setSizeHint(widget.sizeHint())
+            display_text = f"⇳ {account.provider} - {account.label}"
+            item = QListWidgetItem(display_text)
+            item.setFont(font)
             self.list_widget.addItem(item)
-            self.list_widget.setItemWidget(item, widget)
 
-    def create_item_widget(self, account):
-        widget = QWidget()
-        layout = QHBoxLayout(widget)
-        layout.setContentsMargins(5, 2, 5, 2)
-
-        # Account label
-        label = QLabel(f"{account.provider} - {account.label}")
-        layout.addWidget(label)
-        
-        # Spacer to push buttons to the right
-        layout.addStretch()
-
-        # Up button
-        up_button = QPushButton("↑")
-        up_button.setFixedSize(30, 25)
-        up_button.clicked.connect(lambda: self.move_item_up(account))
-        layout.addWidget(up_button)
-
-        # Down button
-        down_button = QPushButton("↓")
-        down_button.setFixedSize(30, 25)
-        down_button.clicked.connect(lambda: self.move_item_down(account))
-        layout.addWidget(down_button)
-
-        return widget
-
-    def move_item_up(self, account):
-        current_row = self.find_account_row(account)
-        if current_row > 0:
-            self.swap_items(current_row, current_row - 1)
-            self.list_widget.setCurrentRow(current_row - 1)
-
-    def move_item_down(self, account):
-        current_row = self.find_account_row(account)
-        if current_row < self.list_widget.count() - 1:
-            self.swap_items(current_row, current_row + 1)
-            self.list_widget.setCurrentRow(current_row + 1)
-
-    def find_account_row(self, account):
-        # Compare accounts based on their attributes
-        for i in range(self.list_widget.count()):
-            curr_account = self.accounts[i]
-            if (curr_account.provider == account.provider and 
-                curr_account.label == account.label and 
-                curr_account.secret == account.secret and 
-                curr_account.last_used == account.last_used):
-                return i
-        return -1
-
-    def swap_items(self, row1, row2):
-        # Swap in the internal list
-        self.accounts[row1], self.accounts[row2] = self.accounts[row2], self.accounts[row1]
-        
-        # Clear and repopulate the list widget
-        self.list_widget.clear()
-        self.populate_list()
-        # Highlight the item at the new position (row2)
-        self.list_widget.setCurrentRow(row2)
     def get_ordered_accounts(self):
         return self.accounts
 
-# local main for unit testing
+
+# Local main for unit testing
 if __name__ == '__main__':
     import sys
-    from dataclasses import dataclass, asdict
+    from dataclasses import asdict
     from account_manager import AccountManager
+
     app = QApplication(sys.argv)
-    #controller = AppController()
     mgr = AccountManager()
     dialog = ReorderDialog(mgr.accounts, None)
     if dialog.exec() == QDialog.DialogCode.Accepted:
         accounts = dialog.get_ordered_accounts()
-
+        print (f"First account: {accounts[0].provider}")
+        [print (item.provider) for item in accounts]
         account_dicts = [asdict(account) for account in accounts]
         json_str = json.dumps(account_dicts)
         print(json_str)
-        mgr.set_accounts(json_str)
-        mgr.save_accounts()
-
-
+        #mgr.set_accounts(json_str)
+        #mgr.save_accounts()
