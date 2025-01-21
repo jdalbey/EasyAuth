@@ -47,11 +47,6 @@ class PreferencesDialog(QDialog):
         self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
 
-        # Auto fetch website favicons
-        self.auto_fetch_favicons = QCheckBox("Auto fetch provider favicons")
-        self.auto_fetch_favicons.setEnabled(False)
-        layout.addWidget(self.auto_fetch_favicons)
-
         # Display website favicons
         self.display_favicons = QCheckBox("Display provider favicons")
         self.display_favicons.setEnabled(True)
@@ -68,14 +63,6 @@ class PreferencesDialog(QDialog):
         self.font_button.clicked.connect(self.select_font)
         layout.addWidget(self.font_button)
 
-        # Language drop down box
-        language_label = QLabel("Language:")
-        layout.addWidget(language_label)
-        self.language_combo = QComboBox()
-        self.language_combo.addItems(["English", "Spanish"])
-        self.language_combo.setEnabled(False)
-        layout.addWidget(self.language_combo)
-
         # Theme drop down box
         theme_label = QLabel("Theme:")
         layout.addWidget(theme_label)
@@ -83,12 +70,6 @@ class PreferencesDialog(QDialog):
         self.theme_combo.setEnabled(False)
         self.theme_combo.addItems(["light", "dark"])
         layout.addWidget(self.theme_combo)
-
-        # Animate Copy to clipboard
-        self.animate_copy = QCheckBox("Animate Copy to clipboard")
-        self.animate_copy.setEnabled(False)
-        layout.addWidget(self.animate_copy)
-
 
         # Restore Defaults button
         self.restore_defaults_button = QPushButton("Restore Defaults")
@@ -113,11 +94,8 @@ class PreferencesDialog(QDialog):
         self.search_by_user.setChecked(self.app_config.get_search_by() == "User")
         self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
         self.minimize_during_qr_search.setChecked(self.app_config.is_minimize_during_qr_search())
-        self.auto_fetch_favicons.setChecked(self.app_config.is_auto_fetch_favicons())
         self.display_favicons.setChecked(self.app_config.is_display_favicons())
         self.secret_key_hidden.setChecked(self.app_config.is_secret_key_hidden())
-        self.language_combo.setCurrentText(self.app_config.get_language())
-        self.animate_copy.setChecked(self.app_config.is_animate_copy())
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
         self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
@@ -125,11 +103,8 @@ class PreferencesDialog(QDialog):
         self.app_config.set_search_by("Provider" if self.search_by_provider.isChecked() else "User")
         self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
         self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
-        self.app_config.set_auto_fetch_favicons(self.auto_fetch_favicons.isChecked())
         self.app_config.set_display_favicons(self.display_favicons.isChecked())
         self.app_config.set_secret_key_hidden(self.secret_key_hidden.isChecked())
-        self.app_config.set_language(self.language_combo.currentText())
-        self.app_config.set_animate_copy(self.animate_copy.isChecked())
         self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.accept()
