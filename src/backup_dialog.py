@@ -30,11 +30,11 @@ class BackupRestoreDialog(QDialog):
 
         # Restore panel
         restore_label = QLabel("Restore")
-        restore_label.setEnabled(False)
+        restore_label.setEnabled(True)
         layout.addWidget(restore_label)
 
         restore_easy_auth_btn = QPushButton("EasyAuth")
-        restore_easy_auth_btn.setEnabled(False)
+        restore_easy_auth_btn.setEnabled(True)
         restore_easy_auth_btn.clicked.connect(lambda: self.restore("EasyAuth"))
         layout.addWidget(restore_easy_auth_btn)
 
@@ -66,5 +66,8 @@ class BackupRestoreDialog(QDialog):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, f"Restore {app_name} Accounts", "", "JSON Files (*.json);;All Files (*)", options=options)
         if file_path:
-            # Implement restore functionality here
-            QMessageBox.information(self, "Info", f"Restore functionality for {app_name} is not implemented yet.")
+            try:
+                self.account_manager.restore_accounts(file_path)
+                QMessageBox.information(self, "Success", f"Accounts successfully restored from  {file_path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to restore accounts: {e}")

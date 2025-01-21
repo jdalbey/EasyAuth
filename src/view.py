@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
     QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea,
     QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout,
     QHBoxLayout, QWidget, QMessageBox, QFrame)
-from PyQt5.QtCore import Qt, QTimer, QSize, QUrl
+from PyQt5.QtCore import Qt, QTimer, QSize, QUrl, QRect
 from PyQt5.QtGui import QFont, QIcon, QPixmap, QDesktopServices
 import pyotp
 import time, datetime
@@ -349,7 +349,7 @@ class AppView(QMainWindow):
         self.logger.debug(f"Copied OTP: {otp.text()}")
         now = datetime.datetime.now()
         # update last used time
-        account.last_used = now.strftime("%Y-%m-%d %H:%M")
+        account.last_used = now.strftime("%Y-%m-%d %H:%M:%S")
         self.account_manager.update_account(idx,account)
         self.logger.debug(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
 
@@ -401,6 +401,7 @@ class AppView(QMainWindow):
     def show_backup_restore_dialog(self):
         dialog = BackupRestoreDialog(self.account_manager, self)
         dialog.exec_()
+        # After restore, reload display
         self.display_accounts()
 
     def import_accounts(self):
@@ -456,6 +457,12 @@ class AppView(QMainWindow):
             "http://www.github.com/jdalbey/EasyAuth",
             QMessageBox.Ok
         )
+
+    def closeEvent(self, event):
+        geometry = self.geometry()
+        print("Current window geometry:", QRect(geometry))
+        print("Current window position:", self.pos().x(), " x ", self.pos().y())
+        super().closeEvent(event)
 
 # local main for unit testing
 if __name__ == '__main__':

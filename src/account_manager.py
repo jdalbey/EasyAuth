@@ -161,7 +161,7 @@ class AccountManager:
                 provider=provider,
                 label=label,
                 secret=encrypted_secret,
-                last_used=datetime.now().strftime("%Y-%m-%d %H:%M")
+                last_used=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
 
             self.accounts.insert(0, account)
@@ -196,19 +196,82 @@ class AccountManager:
         self.logger.info(f"Accounts sorted by recently used.")
 
     def backup_accounts(self, file_path):
-        """ Store the accounts as json in the given file_path after decrypting the secret keys"""
+        """Store the accounts as JSON in the given file_path after decrypting the secret keys."""
         decrypted_accounts = []
+
+        # Check if accounts exist and are iterable
+        if not hasattr(self, 'accounts') or not isinstance(self.accounts, list):
+            self.logger.error("Internal error: No accounts to backup. 'self.accounts' is not a list.")
+            return
+
         for account in self.accounts:
-            decrypted_account = account.__dict__.copy()
-            decrypted_account['secret'] = cipher_funcs.decrypt(account.secret)
-            decrypted_accounts.append(decrypted_account)
+            try:
+                decrypted_account = account.__dict__.copy()
+                decrypted_account['secret'] = cipher_funcs.decrypt(account.secret)
+                decrypted_accounts.append(decrypted_account)
+            except AttributeError as e:
+                self.logger.error(f"Error processing account {account}: Missing required attribute - {e}")
+                continue  # Skip this account, but continue with the others
+            except Exception as e:
+                self.logger.error(f"Failed to decrypt secret for account {account}: {e}")
+                continue  # Skip this account, but continue with the others
+
+        # Ensure the file path is valid
+        if not os.path.dirname(file_path) or not os.access(os.path.dirname(file_path), os.W_OK):
+            self.logger.error(f"Invalid or inaccessible file path: {file_path}")
+            return
 
         try:
             with open(file_path, 'w') as f:
-                json.dump(decrypted_accounts, f)
-            self.logger.info(f"Accounts successfully backed up to {file_path}")
+                # Use JSON pretty printing for readability
+                json.dump(decrypted_accounts, f, indent=4)
+            self.logger.info(f"Successfully backed up {len(decrypted_accounts)} accounts to {file_path}")
+        except (OSError, IOError) as e:
+            self.logger.error(f"Failed to write backup to {file_path}: {e}")
         except Exception as e:
-            self.logger.error(f"Failed to backup accounts: {e}")
+            self.logger.error(f"Unexpected error during backup: {e}")
+
+    def restore_accounts(self, file_path):
+        """Restore the accounts from the given file_path by encrypting the secret keys."""
+        self.logger.debug("Starting restore_accounts")
+        if not os.path.isfile(file_path):
+            self.logger.error(f"Backup file {file_path} does not exist.")
+            return
+
+        try:
+            with open(file_path, 'r') as f:
+                decrypted_accounts = json.load(f)
+        except (OSError, IOError) as e:
+            self.logger.error(f"Failed to read backup file {file_path}: {e}")
+            return
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Failed to decode JSON from backup file {file_path}: {e}")
+            return
+
+        # Validate and restore each account
+        restored_accounts = []
+        for decrypted_account in decrypted_accounts:
+            try:
+                # Assuming decrypted_account has the same structure as the original account
+                #restored_account = decrypted_account  # Create a new account object (make sure Account is properly defined)
+                shared_secret = decrypted_account['secret']
+                restored_account = Account(decrypted_account['provider'],decrypted_account['label'],shared_secret,decrypted_account['last_used'])
+                # Restore the secret by encrypting it
+                restored_account.secret = cipher_funcs.encrypt(shared_secret)
+
+                restored_accounts.append(restored_account)
+
+            except KeyError as e:
+                self.logger.error(f"Missing expected key in account data: {e}")
+            except Exception as e:
+                self.logger.error(f"Failed to restore account from data {decrypted_account}: {e}")
+
+        # Assuming self.accounts is where you want to store the restored accounts
+        self.accounts = restored_accounts
+        self.logger.debug(f"Restored these accounts: {self.accounts}")
+        self.save_accounts()
+        self.logger.info(f"Restore completed for  {len(restored_accounts)} accounts from {file_path}")
+        self.logger.info(self.accounts)
 
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""

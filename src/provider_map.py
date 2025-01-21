@@ -75,17 +75,6 @@ class Providers:
     @staticmethod
     def make_pixmap(raw_img):
         # Assuming you have raw binary image data in variable 'raw_data'
-        # Specify the image width, height, and format
-        # width = 16
-        # height = 16
-        # format = QImage.Format_ARGB32  # Use ARGB32 format for PNG images
-        #
-        # # Create a QImage from raw binary data
-        # image = QImage(raw_img, width, height, format)
-        #
-        # # Convert the QImage to QPixmap
-        # pixmap = QPixmap.fromImage(image)
-        # return pixmap
         # Read image data into a QByteArray
         pixmap = QPixmap()
         image_data = QByteArray(raw_img)

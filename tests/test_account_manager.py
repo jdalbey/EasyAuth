@@ -8,20 +8,6 @@ from unittest.mock import Mock, patch
 
 from account_manager import AccountManager, Account
 
-#@pytest.fixture
-# def temp_dir():
-#     """Create a temporary directory for test files.
-#      On completion of the context or destruction of the temporary directory object,
-#      the newly created temporary directory and all its contents are removed from the filesystem."""
-#     with tempfile.TemporaryDirectory() as tmpdirname:
-#         yield tmpdirname
-#
-# @pytest.fixture
-# def mock_home_dir(temp_dir, monkeypatch):
-#     """Mock the home directory to use our temp directory."""
-#     monkeypatch.setattr(Path, 'home', lambda: Path(temp_dir))
-#     return temp_dir
-
 @pytest.fixture
 def account_manager():
     """Create an AccountManager instance with a test home directory."""
