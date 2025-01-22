@@ -21,3 +21,8 @@ def main():
 if __name__ == '__main__':
     main()
 
+"""    def showEvent(self, event):
+        super().showEvent(event)
+        # Store the initial size when the dialog is first shown
+        if self.initial_size is None:
+            self.initial_size = self.size()"""

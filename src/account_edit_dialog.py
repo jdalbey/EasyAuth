@@ -3,15 +3,14 @@ import copy
 from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
-    QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton
+    QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton, QApplication
 
 import otp_funcs
-from account_entry_form import AccountEntryForm
+from account_entry_dialog import AccountEntryDialog
 from account_manager import Account, AccountManager
 import cipher_funcs
 
-
-class EditAccountDialog(QDialog):
+class EditAccountDialog(AccountEntryDialog):
     def __init__(self, parent, index, account):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
@@ -20,15 +19,17 @@ class EditAccountDialog(QDialog):
         self.index = index
         self.qr_code_label = None
         self.is_qr_visible = False
-
-        # Store initial size
+        #self.setFixedSize(self.size())
+        # Store initial size - gets set in showEvent()
         self.initial_size = None
 
         self.setWindowTitle("Edit Account")
         self.setMinimumWidth(475)
 
-        # Main layout
-        layout = QVBoxLayout(self)
+        # Frame for the edit dialog features
+        dialog_frame = QFrame()
+        dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.bottom_layout = QVBoxLayout(dialog_frame)
 
         # Declare save button here so we can add it to Form
         self.save_btn = QPushButton("Save")
@@ -38,13 +39,13 @@ class EditAccountDialog(QDialog):
         self.save_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         # Add shared fields
-        self.shared_fields = AccountEntryForm(self.save_btn)
-        layout.addWidget(self.shared_fields)
+        #self.shared_fields = AccountEntryDialog(self.save_btn)
+        #layout.addWidget(self.shared_fields)
 
         # Place current account data into fields for updating
         editable_account = copy.deepcopy(account)
         editable_account.secret = cipher_funcs.decrypt(account.secret)
-        self.shared_fields.set_fields(editable_account)
+        self.set_fields(editable_account)
 
         # Button section
         button_frame = QWidget()
@@ -59,7 +60,7 @@ class EditAccountDialog(QDialog):
         button_layout.addWidget(self.save_btn)
         button_layout.addWidget(self.delete_btn)
         button_layout.addWidget(cancel_btn)
-        layout.addWidget(button_frame)
+        self.bottom_layout.addWidget(button_frame)
 
         # Last Used section
         last_used_frame = QFrame()
@@ -72,13 +73,6 @@ class EditAccountDialog(QDialog):
         self.last_used_label = QLabel(account.last_used)
         last_used_layout.addWidget(self.last_used_label, 0, 1)
 
-        help_style = """
-            QToolButton {
-                border: none;       /* Remove border */
-                background: none;   /* Remove background */
-                padding: 0px;       /* Remove padding */
-            }
-            """
         # Reveal QR Code Button
         self.reveal_qr_button = QPushButton("Reveal QR code")
         self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -90,21 +84,56 @@ class EditAccountDialog(QDialog):
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        user_info_btn.setStyleSheet(help_style)
+        user_info_btn.setStyleSheet(self.help_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         last_used_layout.addWidget(user_info_btn, 1, 1, Qt.AlignCenter)
-        layout.addWidget(last_used_frame)
+        self.bottom_layout.addWidget(last_used_frame)
 
         # Add spacer to push buttons toward top
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        layout.addWidget(spacer)
+        self.bottom_layout.addWidget(spacer)
+
+        self.form_layout.addWidget(dialog_frame,4,1)
+
+        # Set tab order for subclass fields, maintaining parent order
+        # First clear any existing tab order by setting all widgets to NoFocus
+        for child in self.findChildren(QWidget):
+            child.setFocusPolicy(Qt.NoFocus)
+
+        # Now explicitly set focus policy for just the widgets we want in our cycle
+        self.provider_entry.setFocusPolicy(Qt.StrongFocus)
+        self.label_entry.setFocusPolicy(Qt.StrongFocus)
+        self.secret_entry.setFocusPolicy(Qt.StrongFocus)
+        self.save_btn.setFocusPolicy(Qt.StrongFocus)
+        self.delete_btn.setFocusPolicy(Qt.StrongFocus)
+        cancel_btn.setFocusPolicy(Qt.StrongFocus)
+        self.reveal_qr_button.setFocusPolicy(Qt.StrongFocus)
+        # Create closed tab cycle among specific widgets
+        self.setTabOrder(self.provider_entry, self.label_entry)  # Start with parent class fields
+        self.setTabOrder(self.label_entry, self.secret_entry)
+        self.setTabOrder(self.secret_entry, self.save_btn)
+        self.setTabOrder(self.save_btn, self.delete_btn)
+        self.setTabOrder(self.delete_btn, cancel_btn)
+        self.setTabOrder(cancel_btn, self.reveal_qr_button)
+        self.setTabOrder(self.reveal_qr_button, self.provider_entry)  # Complete the cycle
+
+        # Disable tab focus for any other widgets you want to skip
+        user_info_btn.setFocusPolicy(Qt.NoFocus)
+
 
     def showEvent(self, event):
         super().showEvent(event)
         # Store the initial size when the dialog is first shown
         if self.initial_size is None:
             self.initial_size = self.size()
+            self.setFixedWidth(self.size().width())
+
+    def validate_form(self):
+        """ Ensure all fields have values before enabling the save button."""
+        # Check if all fields are filled
+        all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
+        self.save_btn.setEnabled(all_filled)
 
     def update_qr_button_text(self):
         """Update button text based on QR code visibility state"""
@@ -117,9 +146,9 @@ class EditAccountDialog(QDialog):
         self.logger.debug (f"EditAcctDialog is handling update request for: {index} ")
         self.encrypted_secret = None
         # Validate secret key
-        if otp_funcs.is_valid_secretkey(self.shared_fields.secret_entry.text()):
-            self.encrypted_secret = cipher_funcs.encrypt(self.shared_fields.secret_entry.text())
-            up_account = Account(self.shared_fields.provider_entry.text(), self.shared_fields.label_entry.text(),
+        if otp_funcs.is_valid_secretkey(self.secret_entry.text()):
+            self.encrypted_secret = cipher_funcs.encrypt(self.secret_entry.text())
+            up_account = Account(self.provider_entry.text(), self.label_entry.text(),
                                  self.encrypted_secret, account.last_used)
             self.account_manager.update_account(index, up_account)
             self.close()
@@ -147,9 +176,9 @@ class EditAccountDialog(QDialog):
             pixmap.loadFromData(qr_code_image)
             self.qr_code_label = QLabel()
             self.qr_code_label.setPixmap(pixmap)
-            self.layout().addWidget(self.qr_code_label)
+            self.form_layout.addWidget(self.qr_code_label,5,1)
             self.reveal_qr_button.setText("Hide QR code")
-            self.shared_fields.disable_fields()
+            self.disable_fields()
             self.is_qr_visible = True
         else:
             # Hide QR code
@@ -157,7 +186,7 @@ class EditAccountDialog(QDialog):
                 self.qr_code_label.hide()  # Hide immediately
                 self.qr_code_label.deleteLater()
                 self.qr_code_label = None
-                self.shared_fields.enable_fields()
+                self.enable_fields()
                 self.is_qr_visible = False
 
                 # Use QTimer to resize after the event loop processes the deletion
@@ -165,3 +194,11 @@ class EditAccountDialog(QDialog):
 
         self.update_qr_button_text()
 
+# Local main for unit testing
+if __name__ == '__main__':
+    import sys
+    app = QApplication(sys.argv)
+    acct = Account("A","B","AB34","2000-01-01 00:00:00")
+    acct.secret = cipher_funcs.encrypt("AB34")
+    dialog = EditAccountDialog(None, 1, acct)
+    dialog.exec()

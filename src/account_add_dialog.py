@@ -3,15 +3,15 @@ import logging
 import pyotp
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication, QFileDialog
+    QApplication, QFileDialog, QFrame, QWidget
 
-from account_entry_form import AccountEntryForm
 from appconfig import AppConfig
 from account_manager import Account, AccountManager
 from otp_funcs import is_valid_secretkey
 from qr_hunting import process_qr_codes
+from account_entry_dialog import AccountEntryDialog
 
-class AddAccountDialog(QDialog):
+class AddAccountDialog(AccountEntryDialog):
     def __init__(self, parent=None, ):
         super(AddAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
@@ -22,7 +22,11 @@ class AddAccountDialog(QDialog):
         self.create_form()
 
     def create_form(self):
-        self.layout = QVBoxLayout()
+        # Frame for the dialog features
+        directions_frame = QFrame()
+        directions_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.layout = QVBoxLayout(directions_frame)
+
         header_label = QLabel("Choose how to create your new account:")
         self.layout.addWidget(header_label)
         # choices section
@@ -50,19 +54,20 @@ class AddAccountDialog(QDialog):
         manual_label = QLabel("• Enter the data manually")
         manual_label.setContentsMargins(20, 0, 0, 0)
         self.layout.addWidget(manual_label)
+        self.form_layout.addWidget(directions_frame, 0,0,1,3 )
+
+        # Declare the button frame
+        button_frame = QFrame()
+        button_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.button_layout = QHBoxLayout(button_frame)
 
         # Declare the save button here so we can pass it to the Form
-        self.button_layout = QHBoxLayout()
         self.button_layout.addStretch()
 
         self.save_button = QPushButton("Save")
         self.save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.save_button.clicked.connect(self.save_fields)
         self.save_button.setEnabled(False)
-
-        # Add shared fields
-        self.shared_fields = AccountEntryForm(self.save_button)
-        self.layout.addWidget(self.shared_fields)
 
         # Add the save button to the layout here
         self.button_layout.addWidget(self.save_button)
@@ -72,14 +77,38 @@ class AddAccountDialog(QDialog):
         self.cancel_button.clicked.connect(self.close)
         self.button_layout.addWidget(self.cancel_button)
 
-        self.layout.addLayout(self.button_layout)
-        self.setLayout(self.layout)
+        #self.layout.addLayout(self.button_layout)
+        self.form_layout.addWidget(button_frame, 4, 1)
+        #self.setLayout(self.layout)
 
+        # Set tab order for subclass fields, maintaining parent order
+        # First clear any existing tab order by setting all widgets to NoFocus
+        for child in self.findChildren(QWidget):
+            child.setFocusPolicy(Qt.NoFocus)
+
+        # Now explicitly set focus policy for just the widgets we want in our cycle
+        self.provider_entry.setFocusPolicy(Qt.StrongFocus)
+        self.label_entry.setFocusPolicy(Qt.StrongFocus)
+        self.secret_entry.setFocusPolicy(Qt.StrongFocus)
+        self.save_button.setFocusPolicy(Qt.StrongFocus)
+        self.cancel_button.setFocusPolicy(Qt.StrongFocus)
+        # Create closed tab cycle among specific widgets
+        self.setTabOrder(self.provider_entry, self.label_entry)  # Start with parent class fields
+        self.setTabOrder(self.label_entry, self.secret_entry)
+        self.setTabOrder(self.secret_entry, self.save_button)
+        self.setTabOrder(self.save_button, self.cancel_button)
+        self.setTabOrder(self.cancel_button, self.provider_entry)  # Complete the cycle
+
+    def validate_form(self):
+        """ Ensure all fields have values before enabling the save button."""
+        # Check if all fields are filled
+        all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
+        self.save_button.setEnabled(all_filled)
 
     def save_fields(self):
-        provider = self.shared_fields.provider_entry.text()
-        label = self.shared_fields.label_entry.text()
-        secret = self.shared_fields.secret_entry.text()
+        provider = self.provider_entry.text()
+        label = self.label_entry.text()
+        secret = self.secret_entry.text()
         # Validate secret key
         if is_valid_secretkey(secret):
             if self.account_manager.save_new_account(provider, label, secret):
@@ -91,7 +120,7 @@ class AddAccountDialog(QDialog):
 
     # Set values into fields (used by auto qr code scanning)
     def set_account(self, account):
-        self.shared_fields.set_fields(account)
+        self.set_fields(account)
 
     def get_qr_code(self):
         """ User clicked User QR code """
@@ -129,23 +158,17 @@ class AddAccountDialog(QDialog):
                     QMessageBox.critical(self, "Error", f"QR code invalid {e}")
                     return
                 # copy the retrieved attributes into the shared_fields
-                self.shared_fields.provider_entry.setText(totp_obj.issuer)
-                self.shared_fields.label_entry.setText(totp_obj.name)
-                self.shared_fields.secret_entry.setText(totp_obj.secret)
+                self.provider_entry.setText(totp_obj.issuer)
+                self.label_entry.setText(totp_obj.name)
+                self.secret_entry.setText(totp_obj.secret)
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to read QR image: {e}")
 
-# local main for unit testing
-# if __name__ == '__main__':
-#     import sys
-#     # Initialize the application settings with a config file
-#     kConfigPath = ".config/EasyAuth/config.ini"
-#     home_dir_str = str(Path.home())
-#     filepath = Path.home().joinpath(home_dir_str, kConfigPath)
-#
-#     app = QApplication(sys.argv)
-#     app_config = AppConfig(filepath)
-#     ctrl = AppController()
-#     dlg = AddAccountDialog(ctrl,None)
-#     sys.exit()
 
+# Local main for unit testing
+if __name__ == '__main__':
+    import sys
+    app = QApplication(sys.argv)
+    app_config = AppConfig()
+    dialog = AddAccountDialog(None)
+    dialog.exec()
