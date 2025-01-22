@@ -6,6 +6,7 @@ import shutil
 import tempfile
 from unittest.mock import Mock, patch
 
+import cipher_funcs
 from account_manager import AccountManager, Account
 
 @pytest.fixture
@@ -27,13 +28,13 @@ def sample_accounts():
         {
             "provider": "Google",
             "label": "Work",
-            "secret": "encrypted_secret_1",
+            "secret": 'gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==',
             "last_used": "2024-01-14 10:00"
         },
         {
             "provider": "GitHub",
             "label": "Personal",
-            "secret": "encrypted_secret_2",
+            "secret": 'gAAAAABnkHqr0nPIqDdHwAEXwRiB53q5sgS3AUF-RG9SpbHwpNowsuLjqpuY2coo9VlqkZk5Fit3-vbduso6X7CzT2nKJG8TgQ==',
             "last_used": "2024-01-14 11:00"
         }
     ]
@@ -64,6 +65,31 @@ class TestAccountManager:
         assert log_dir.exists()
         assert log_dir.is_dir()
 
+    def test_vault_data_validation(self, account_manager):
+        """Test validation of account data structure."""
+        invalid_data = [{"provider": "Test"}]  # Missing required fields
+
+        assert not account_manager._validate_account_data(invalid_data)
+
+        # Contains all fields but secret is not encrypted
+        invalid_data = [{
+            "provider": "Test",
+            "label": "Test",
+            "secret": "secret",
+            "last_used": "2024-01-14 12:00"
+        }]
+
+        assert not account_manager._validate_account_data(invalid_data)
+
+        valid_data = [{
+            "provider": "Test",
+            "label": "Test",
+            "secret": "gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==",
+            "last_used": "2024-01-14 12:00"
+        }]
+
+        assert account_manager._validate_account_data(valid_data)
+
     def test_save_and_load_accounts(self, account_manager, sample_accounts):
         """Test saving and loading accounts."""
         # Create Account objects
@@ -81,10 +107,26 @@ class TestAccountManager:
 
     def test_backup_creation(self, account_manager, sample_accounts):
         """Test that backup file is created when saving accounts."""
-        account_manager.accounts = [Account(**acc) for acc in sample_accounts]
+        test_accounts = [
+            {
+                "provider": "Google",
+                "label": "Work",
+                "secret": "encrypted_secret_1",
+                "last_used": "2024-01-14 10:00"
+            },
+            {
+                "provider": "GitHub",
+                "label": "Personal",
+                "secret": "encrypted_secret_2",
+                "last_used": "2024-01-14 11:00"
+            }
+        ]
+        test_accounts[0]['secret'] = cipher_funcs.encrypt(test_accounts[0]['secret'])
+        test_accounts[1]['secret'] = cipher_funcs.encrypt(test_accounts[1]['secret'])
+        account_manager.accounts = [Account(**acc) for acc in test_accounts]
         account_manager.save_accounts()
-        
         backup_path = account_manager.vault_path.with_suffix('.backup.json')
+        account_manager.backup_accounts(backup_path)
         assert backup_path.exists()
 
     @patch('cipher_funcs.encrypt')
@@ -250,17 +292,3 @@ class TestAccountManager:
             os.chmod(test_dir, 0o777)
             shutil.rmtree(test_dir, ignore_errors=True)
 
-    def test_vault_data_validation(self, account_manager):
-        """Test validation of account data structure."""
-        invalid_data = [{"provider": "Test"}]  # Missing required fields
-        
-        assert not account_manager._validate_account_data(invalid_data)
-        
-        valid_data = [{
-            "provider": "Test",
-            "label": "Test",
-            "secret": "secret",
-            "last_used": "2024-01-14 12:00"
-        }]
-        
-        assert account_manager._validate_account_data(valid_data)

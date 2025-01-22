@@ -7,6 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
+import cryptography
+
 import cipher_funcs
 from dataclasses import dataclass
 
@@ -16,7 +18,7 @@ from dataclasses import dataclass
 class Account:
     provider: str
     label: str
-    secret: str
+    secret: str  # encrypted secret key
     last_used: str
 
 
@@ -196,19 +198,33 @@ class AccountManager:
         self.logger.info(f"Accounts sorted by recently used.")
 
     def backup_accounts(self, file_path):
-        """Store the accounts as JSON in the given file_path after decrypting the secret keys."""
-        decrypted_accounts = []
+        self.write_accounts_file(file_path, export_mode=False)
+    def export_accounts(self, file_path):
+        self.write_accounts_file(file_path, export_mode=True)
+    def write_accounts_file(self, file_path, export_mode=False):
+        """Store the accounts as JSON in the given file_path with an encrypted secret.
+          Accounts in the vault are encrypted.
+            1. For backup they need no special treatment before writing.
+            2. for export, they need to be decrypted before writing.
+         @param file_path location of file
+         @param export_mode decrypt the keys before writing accounts to the file."""
+        target = "Backup"
+        if export_mode:
+            target = "Export"
+
+        vault_accounts = []
 
         # Check if accounts exist and are iterable
         if not hasattr(self, 'accounts') or not isinstance(self.accounts, list):
-            self.logger.error("Internal error: No accounts to backup. 'self.accounts' is not a list.")
+            self.logger.error(f"Internal error: No accounts to {target}. 'self.accounts' is not a list.")
             return
 
         for account in self.accounts:
             try:
-                decrypted_account = account.__dict__.copy()
-                decrypted_account['secret'] = cipher_funcs.decrypt(account.secret)
-                decrypted_accounts.append(decrypted_account)
+                vault_account = account.__dict__.copy()
+                if export_mode:
+                    vault_account['secret'] = cipher_funcs.decrypt(account.secret)
+                vault_accounts.append(vault_account)
             except AttributeError as e:
                 self.logger.error(f"Error processing account {account}: Missing required attribute - {e}")
                 continue  # Skip this account, but continue with the others
@@ -224,53 +240,67 @@ class AccountManager:
         try:
             with open(file_path, 'w') as f:
                 # Use JSON pretty printing for readability
-                json.dump(decrypted_accounts, f, indent=4)
-            self.logger.info(f"Successfully backed up {len(decrypted_accounts)} accounts to {file_path}")
+                json.dump(vault_accounts, f, indent=4)
+            self.logger.info(f"Successful {target} of {len(vault_accounts)} accounts to {file_path}")
         except (OSError, IOError) as e:
-            self.logger.error(f"Failed to write backup to {file_path}: {e}")
+            self.logger.error(f"{target} failed to write to {file_path}: {e}")
         except Exception as e:
-            self.logger.error(f"Unexpected error during backup: {e}")
+            self.logger.error(f"Unexpected error during {target}: {e}")
 
     def restore_accounts(self, file_path):
-        """Restore the accounts from the given file_path by encrypting the secret keys."""
-        self.logger.debug("Starting restore_accounts")
+        self.read_accounts_file(file_path, import_mode=False)
+    def import_accounts(self, file_path):
+        self.read_accounts_file(file_path, import_mode=True)
+    def read_accounts_file(self, file_path, import_mode=False):
+        """Read the accounts from the given file_path.
+          Accounts in the vault are encrypted.
+            1. for restore, the accounts from the file need no encryption.
+            2. for import, the accounts from the file need to be encrypted.
+         @param file_path location of file
+         @param import_mode encrypt the keys before rebuilding the accounts."""
+        self.logger.debug("Starting read_accounts_file")
+        target = "Backup"
+        if import_mode:
+            target = "Export"
+
         if not os.path.isfile(file_path):
-            self.logger.error(f"Backup file {file_path} does not exist.")
+            self.logger.error(f"{target} file {file_path} does not exist.")
             return
 
         try:
             with open(file_path, 'r') as f:
-                decrypted_accounts = json.load(f)
+                json_accounts = json.load(f)
         except (OSError, IOError) as e:
-            self.logger.error(f"Failed to read backup file {file_path}: {e}")
+            self.logger.error(f"Failed to read {target} file {file_path}: {e}")
             return
         except json.JSONDecodeError as e:
-            self.logger.error(f"Failed to decode JSON from backup file {file_path}: {e}")
+            self.logger.error(f"Failed to decode JSON from {target} file {file_path}: {e}")
             return
 
         # Validate and restore each account
         restored_accounts = []
-        for decrypted_account in decrypted_accounts:
+        for json_account in json_accounts:
             try:
                 # Assuming decrypted_account has the same structure as the original account
-                #restored_account = decrypted_account  # Create a new account object (make sure Account is properly defined)
-                shared_secret = decrypted_account['secret']
-                restored_account = Account(decrypted_account['provider'],decrypted_account['label'],shared_secret,decrypted_account['last_used'])
-                # Restore the secret by encrypting it
-                restored_account.secret = cipher_funcs.encrypt(shared_secret)
+                # Restore will leave the secret encrypted
+                # An Imported file has plaintext keys that must be encrypted before constructing the accounts
+                secret_key = json_account['secret']
+                if import_mode:
+                    secret_key = cipher_funcs.encrypt(json_account['secret'])
+                restored_account = Account(json_account['provider'],json_account['label'],secret_key,json_account['last_used'])
 
                 restored_accounts.append(restored_account)
 
             except KeyError as e:
                 self.logger.error(f"Missing expected key in account data: {e}")
             except Exception as e:
-                self.logger.error(f"Failed to restore account from data {decrypted_account}: {e}")
+                self.logger.error(f"Failed to read account from data {json_account}: {e}")
 
         # Assuming self.accounts is where you want to store the restored accounts
         self.accounts = restored_accounts
-        self.logger.debug(f"Restored these accounts: {self.accounts}")
+        self.logger.debug(f"Read these accounts: {self.accounts}")
         self.save_accounts()
-        self.logger.info(f"Restore completed for  {len(restored_accounts)} accounts from {file_path}")
+        self.logger.info(f"Read completed for  {len(restored_accounts)} accounts from {file_path}")
         self.logger.info(self.accounts)
 
     def _handle_external_modification(self):
@@ -321,11 +351,20 @@ class AccountManager:
     def _validate_account_data(content: list) -> bool:
         """Validate account data structure."""
         required_fields = {'provider', 'label', 'secret', 'last_used'}
-        return all(
-            isinstance(acc, dict) and
-            all(field in acc for field in required_fields)
-            for acc in content
-        )
+        for acct in content:
+            if not isinstance(acct, dict):
+                return False
+            for field in required_fields:
+                if field not in acct:
+                    return False
+            # Verify the secret can be decrypted
+            try:
+                cipher_funcs.decrypt(acct['secret'])
+            except cryptography.fernet.InvalidToken as e:
+                print (f"Found invalid secret loading accounts for {acct['provider']}")
+                print (e)
+                return False
+        return True
 
     @staticmethod
     def _account_key(account: dict) -> str:

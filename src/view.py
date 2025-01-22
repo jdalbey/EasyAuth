@@ -20,7 +20,7 @@ import cipher_funcs
 from account_add_dialog import AddAccountDialog
 from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
-from backup_dialog import BackupRestoreDialog
+from export_import_dialog import ExportImportDialog
 from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
@@ -91,14 +91,9 @@ class AppView(QMainWindow):
 
         file_menu.addSeparator()
 
-        import_action = QAction('Import', self)
-        import_action.setEnabled(False)
-        import_action.triggered.connect(self.import_accounts)
-        file_menu.addAction(import_action)
-
-        backup_action = QAction('Backup/Restore', self)
-        backup_action.triggered.connect(self.show_backup_restore_dialog)
-        file_menu.addAction(backup_action)
+        export_action = QAction('Export/Import', self)
+        export_action.triggered.connect(self.show_export_import_dialog)
+        file_menu.addAction(export_action)
 
         preferences_action = QAction('Preferences', self)
         preferences_action.triggered.connect(self.show_preferences_dialog)
@@ -398,21 +393,11 @@ class AppView(QMainWindow):
         dialog.exec_()
         self.display_accounts()
 
-    def show_backup_restore_dialog(self):
-        dialog = BackupRestoreDialog(self.account_manager, self)
+    def show_export_import_dialog(self):
+        dialog = ExportImportDialog(self.account_manager, self)
         dialog.exec_()
         # After restore, reload display
         self.display_accounts()
-
-    def import_accounts(self):
-        reply = QMessageBox.information(
-            self,
-            'Information',
-            f'Importing accounts not yet implemented',
-            QMessageBox.Ok
-        )
-        self.display_accounts()
-
 
     def show_reorder_dialog(self):
         account_list = self.account_manager.accounts

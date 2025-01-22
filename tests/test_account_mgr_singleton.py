@@ -74,11 +74,11 @@ def test_typical_use():
     text_file = open("/tmp/testbackup.json", "r")
     actual = text_file.read()
     text_file.close()
-    expected_begin = '[\n    {\n        "provider": "Woogle",\n        "label": "me@woogle.com",\n        "secret": "ABC234",\n        "last_used": '
-    expected_end = '{\n        "provider": "MichaelangeloSite",\n        "label": "Michael@woopmail.com",\n        "secret": "CD333",\n        "last_used": ""\n    }\n]'
+    expected_begin = '[\n    {\n        "provider": "Woogle",\n        "label": "me@woogle.com",\n        "secret":'
+    expected_end = '{\n        "provider": "MichaelangeloSite",\n        "label": "Michael@woopmail.com",\n        "secret": '
     print (actual)
     assert actual.startswith(expected_begin)
-    assert actual.endswith(expected_end)
+    assert actual.__contains__(expected_end)
 
 def test_duplicate_accounts(sample_accounts):
     instance = AccountManager("/tmp/testvault.json")

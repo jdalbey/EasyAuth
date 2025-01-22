@@ -91,7 +91,6 @@ class Providers:
         try:
             img_raw = self.provider_map[provider]['raw_image']
         except KeyError:
-            Providers.logwriter.info(f"Missing {provider} in map, can't get favicon.")
             return None
         pixmap = self.make_pixmap(img_raw)
         return pixmap
