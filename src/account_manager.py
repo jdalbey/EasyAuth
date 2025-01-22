@@ -5,6 +5,7 @@ import shutil
 import threading
 from datetime import datetime
 from pathlib import Path
+import platform
 from typing import List, Optional
 
 import cryptography
@@ -13,6 +14,8 @@ import cipher_funcs
 from dataclasses import dataclass
 
 # TODO: Disambiguate - sometimes secret is used as the shared key and sometimes as the encrypted key.
+from appconfig import AppConfig
+
 
 @dataclass
 class Account:
@@ -35,7 +38,9 @@ class AccountManager:
 
     def __init__(self, filename=None):
         if filename is None:
-            filename = str(Path.home() / ".var/app/org.redpoint.EasyAuth/data/vault.json")
+            config = AppConfig()
+            self.data_dir = Path.home() / config.get_os_data_dir()
+            filename = str(self.data_dir.joinpath("vault.json"))
         if not os.access(os.path.dirname(filename), os.W_OK):
             raise ValueError(f"The directory for the file '{filename}' is not writable.")
 
@@ -47,7 +52,7 @@ class AccountManager:
             )
             
             # Add file handler for persistent logging
-            log_path = Path.home().joinpath('.var/app/org.redpoint.EasyAuth/logs')
+            log_path = Path(os.path.dirname(filename)).joinpath('logs')
             os.makedirs(log_path, exist_ok=True)
             fh = logging.FileHandler(log_path.joinpath('account_manager.log'))
             fh.setFormatter(formatter)
@@ -394,3 +399,6 @@ class AccountManager:
             )
             list_copy.append(newitem)
         return list_copy
+
+if __name__ == '__main__':
+    am = AccountManager()

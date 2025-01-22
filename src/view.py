@@ -439,7 +439,8 @@ class AppView(QMainWindow):
             'About',
             f'EasyAuth\n\n2FA authenticator\n\n' +
             f"Version 0.0.1\n\n" +
-            "http://www.github.com/jdalbey/EasyAuth",
+            "http://www.github.com/jdalbey/EasyAuth\n\n" +
+            f"Vault directory: " + self.app_config.get_os_data_dir(),
             QMessageBox.Ok
         )
 

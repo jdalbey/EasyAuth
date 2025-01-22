@@ -10,9 +10,9 @@ class TestAppConfig:
         # reset the singleton
         AppConfig._instance = None
         # A complete config file
-        settings_string = """[Settings]\nauto_find_qr = False\nsearch_by = Provider\nminimize_after_copy = False
+        settings_string = """[Settings]\nauto_find_qr = True\nsearch_by = Provider\nminimize_after_copy = False
         minimize_during_qr_search = False\nauto_fetch_favicons = False\ndisplay_favicons = False\nsecret_key_hidden = False
-        language = English\nanimate_copy = False\nvault_path = vault.json"""
+        language = English\nanimate_copy = False"""
         kConfigPath = "/tmp/config_test.ini"
         text_file = open(kConfigPath, "w")
         text_file.write(settings_string)
@@ -21,12 +21,11 @@ class TestAppConfig:
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        vault_path = config.get_vault_path()
         smart_filter = config.is_smart_filtering_enabled()
         theme = config.get_theme_name()
         alt_id = config.get_alt_id()
 
-        assert vault_path == "vault.json"
+        assert config.is_auto_find_qr_enabled()
         assert smart_filter == False
         assert theme == "light"
         #assert alt_id.startswith("10b")
@@ -36,7 +35,7 @@ class TestAppConfig:
         # reset the singleton
         AppConfig._instance = None
         # A config file with missing setting for vault_path
-        settings_string = """[Settings]\nauto_find_qr = False\nsearch_by = Provider\nminimize_after_copy = False
+        settings_string = """[Settings]\nauto_find_qr = True\nsearch_by = Provider\nminimize_after_copy = False
 minimize_during_qr_search = False\nauto_fetch_favicons = False\ndisplay_favicons = False\nsecret_key_hidden = False
 language = English\nanimate_copy = False\n"""
         kConfigPath = "/tmp/config_partial_test.ini"
@@ -47,8 +46,7 @@ language = English\nanimate_copy = False\n"""
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        vault_path = config.get_vault_path()
-        assert vault_path == "vault.json"
+        assert config.is_auto_find_qr_enabled()
 
     def test_missing_config(self):
         # reset the singleton
@@ -62,8 +60,7 @@ language = English\nanimate_copy = False\n"""
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        vault_path = config.get_vault_path()
-        assert vault_path == "vault.json"
+        assert config.is_auto_find_qr_enabled()
 
     def test_noarg_missingfile(self):
         # reset the singleton
@@ -78,8 +75,7 @@ language = English\nanimate_copy = False\n"""
 
         config = AppConfig()  # noarg constructor
 
-        vault_path = config.get_vault_path()
-        assert vault_path == "vault.json"
+        assert config.is_auto_find_qr_enabled()
         # should have been created by restore_defaults()
         assert os.path.exists(filepath)
 
@@ -88,7 +84,7 @@ language = English\nanimate_copy = False\n"""
         AppConfig._instance = None
         # use a temp file for testing
         filepath = "/tmp/default_config.ini"
-        settings_string = "[Settings]\nvault_path = nowhere.json"
+        settings_string = "[Settings]\ntheme_name = Cobalt"
         text_file = open(filepath, "w")
         text_file.write(settings_string)
         text_file.close()
@@ -97,5 +93,4 @@ language = English\nanimate_copy = False\n"""
 
         config = AppConfig()  # noarg constructor
 
-        vault_path = config.get_vault_path()
-        assert vault_path == "nowhere.json"
+        assert config.get_theme_name() == "Cobalt"

@@ -1,11 +1,13 @@
 from configparser import ConfigParser
 import os, logging
 from pathlib import Path
+import platform
 
 
 class AppConfig:
     """Application configuration settings (Preferences)"""
-    _instance = None
+    _instance = None  # Use singleton pattern
+    # Path to configuration file
     kDefaultPath = ".config/EasyAuth/config.ini"
 
     def __new__(cls, filepath=None):
@@ -68,12 +70,6 @@ class AppConfig:
     def set_auto_find_qr_enabled(self, value):
         self.set('Settings', 'auto_find_qr', 'True' if value else 'False')
 
-    def get_search_by(self):
-        return self.get('Settings', 'search_by', fallback='Provider')
-
-    def set_search_by(self, value):
-        self.set('Settings', 'search_by', value)
-
     def is_minimize_after_copy(self):
         return self.get('Settings', 'minimize_after_copy', fallback='False') == 'True'
 
@@ -85,12 +81,6 @@ class AppConfig:
 
     def set_minimize_during_qr_search(self, value):
         self.set('Settings', 'minimize_during_qr_search', 'True' if value else 'False')
-
-    def is_auto_fetch_favicons(self):
-        return self.get('Settings', 'auto_fetch_favicons', fallback='False') == 'True'
-
-    def set_auto_fetch_favicons(self, value):
-        self.set('Settings', 'auto_fetch_favicons', 'True' if value else 'False')
 
     def is_display_favicons(self):
         return self.get('Settings', 'display_favicons', fallback='False') == 'True'
@@ -109,24 +99,6 @@ class AppConfig:
 
     def set_language(self, value):
         self.set('Settings', 'language', value)
-
-    def is_animate_copy(self):
-        return self.get('Settings', 'animate_copy', fallback='False') == 'True'
-
-    def set_animate_copy(self, value):
-        self.set('Settings', 'animate_copy', 'True' if value else 'False')
-
-    def get_vault_path(self):
-        """
-        Get the path to the application database.
-        """
-        return self.config.get('Settings', 'vault_path', fallback='vault.json')
-
-    def set_vault_path(self, path):
-        """
-        Set the path to the application database.
-        """
-        self.set('Settings', 'vault_path', path)
 
     def is_smart_filtering_enabled(self):
         """
@@ -162,24 +134,29 @@ class AppConfig:
         else:
             return alt_id_string
 
-    def set_alt_id(self, alt_id):
-        """
-        Set the alternate id.
-        """
-        self.set('Settings', 'alt_id', alt_id)
+    def get_os_data_dir(self):
+        """ Determine the appropriate path to the database based on the OS """
+        if platform.system() == "Windows":
+            return self.config.get('Settings','win_data_dir')
+        else:  # Default to Linux or Unix-like systems
+            return self.config.get('Settings','linux_data_dir')
 
     def restore_defaults(self):
         """ restore and write defaults """
         self.set_auto_find_qr_enabled(True)
-        self.set_search_by('Provider')
         self.set_minimize_after_copy(False)
         self.set_minimize_during_qr_search(False)
-        self.set_auto_fetch_favicons(False)
         self.set_display_favicons(True)
         self.set_secret_key_hidden(False)
         self.set_language('English')
-        self.set_animate_copy(False)
-        self.set_vault_path("vault.json")
         self.set_smart_filtering_enabled(False)
         self.set_theme_name("light")
-        self.set_alt_id("")
+        # 'Hidden' settings are not listed in the Preferences dialog and don't have public setter methods
+        """ Alternate machine id.  If you want to use a vault created on a different machine you need to
+           use the machine id the vault was created on.  """
+        self.set('Settings', 'alt_id', "")
+        """ the path to the application data directory (for vault and logs). """
+        dirpath = str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data")
+        self.set('Settings', 'win_data_dir', dirpath)
+        dirpath = str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data")
+        self.set('Settings', 'linux_data_dir', dirpath)

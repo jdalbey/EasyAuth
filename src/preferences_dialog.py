@@ -26,17 +26,6 @@ class PreferencesDialog(QDialog):
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
         layout.addWidget(self.auto_find_qr_checkbox)
 
-        # Search by: Provider or User
-        search_by_label = QLabel("Search by:")
-        search_by_label.setEnabled(False)
-        layout.addWidget(search_by_label)
-        self.search_by_provider = QRadioButton("Provider")
-        self.search_by_provider.setEnabled(False)
-        self.search_by_user = QRadioButton("User")
-        self.search_by_user.setEnabled(False)
-        layout.addWidget(self.search_by_provider)
-        layout.addWidget(self.search_by_user)
-
         # Minimize application after TOTP copy to clipboard
         self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
         self.minimize_after_copy.setEnabled(False)
@@ -90,8 +79,6 @@ class PreferencesDialog(QDialog):
         self.setLayout(layout)
 
     def load_settings(self):
-        self.search_by_provider.setChecked(self.app_config.get_search_by() == "Provider")
-        self.search_by_user.setChecked(self.app_config.get_search_by() == "User")
         self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
         self.minimize_during_qr_search.setChecked(self.app_config.is_minimize_during_qr_search())
         self.display_favicons.setChecked(self.app_config.is_display_favicons())
@@ -100,7 +87,6 @@ class PreferencesDialog(QDialog):
         self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
     def save_settings(self):
-        self.app_config.set_search_by("Provider" if self.search_by_provider.isChecked() else "User")
         self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
         self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
         self.app_config.set_display_favicons(self.display_favicons.isChecked())
