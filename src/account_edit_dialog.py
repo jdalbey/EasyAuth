@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
     QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton, QApplication
 
 import otp_funcs
-from account_entry_dialog import AccountEntryDialog
+from account_entry_dialog import AccountEntryDialog, help_style
 from account_manager import Account, AccountManager
 import cipher_funcs
 
@@ -84,7 +84,7 @@ class EditAccountDialog(AccountEntryDialog):
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        user_info_btn.setStyleSheet(self.help_style)
+        user_info_btn.setStyleSheet(help_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         last_used_layout.addWidget(user_info_btn, 1, 1, Qt.AlignCenter)
         self.bottom_layout.addWidget(last_used_frame)

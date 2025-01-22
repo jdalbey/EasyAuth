@@ -102,7 +102,6 @@ class Providers:
             # Set the QPixmap to the QLabel
             my_icon_label.setPixmap(provider_icon_pixmap)
         else:
-            Providers.logwriter.info(f"No icon for {provider}, generating initial.")
             # IF icon not available show the first letter of provider's name
             provider_initial = provider[0]  # get first letter of provider name
             my_icon_label.setText(provider_initial + '')

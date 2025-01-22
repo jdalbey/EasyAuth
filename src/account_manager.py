@@ -219,6 +219,7 @@ class AccountManager:
             self.logger.error(f"Internal error: No accounts to {target}. 'self.accounts' is not a list.")
             return
 
+        # Convert accounts to plaintext
         for account in self.accounts:
             try:
                 vault_account = account.__dict__.copy()
@@ -234,9 +235,14 @@ class AccountManager:
 
         # Ensure the file path is valid
         if not os.path.dirname(file_path) or not os.access(os.path.dirname(file_path), os.W_OK):
-            self.logger.error(f"Invalid or inaccessible file path: {file_path}")
-            return
+            self.logger.error("invalid file path")
+            raise OSError(8675309,"invalid file path")
+        # If the file already exists, ensure the file is writeable
+        if os.path.exists(file_path) and not os.access(file_path, os.W_OK):
+            self.logger.error("File is read-only.")
+            raise OSError(8675309,"File is read-only.")
 
+        # Dump the accounts to a json file
         try:
             with open(file_path, 'w') as f:
                 # Use JSON pretty printing for readability
@@ -251,7 +257,9 @@ class AccountManager:
         self.read_accounts_file(file_path, import_mode=False)
     def import_accounts(self, file_path):
         self.read_accounts_file(file_path, import_mode=True)
-    def read_accounts_file(self, file_path, import_mode=False):
+    def import_preview(self, file_path):
+        return self.read_accounts_file(file_path, import_mode=True, preview=True)
+    def read_accounts_file(self, file_path, import_mode=False, preview=False):
         """Read the accounts from the given file_path.
           Accounts in the vault are encrypted.
             1. for restore, the accounts from the file need no encryption.
@@ -259,9 +267,9 @@ class AccountManager:
          @param file_path location of file
          @param import_mode encrypt the keys before rebuilding the accounts."""
         self.logger.debug("Starting read_accounts_file")
-        target = "Backup"
+        target = "Restore"
         if import_mode:
-            target = "Export"
+            target = "Import"
 
         if not os.path.isfile(file_path):
             self.logger.error(f"{target} file {file_path} does not exist.")
@@ -296,6 +304,8 @@ class AccountManager:
             except Exception as e:
                 self.logger.error(f"Failed to read account from data {json_account}: {e}")
 
+        if preview:
+            return restored_accounts
         # Assuming self.accounts is where you want to store the restored accounts
         self.accounts = restored_accounts
         self.logger.debug(f"Read these accounts: {self.accounts}")

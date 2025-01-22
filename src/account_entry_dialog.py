@@ -4,20 +4,19 @@ from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy,
     QDialog, QApplication
 from provider_search_dialog import ProviderSearchDialog
 
+help_style = """
+    QToolButton {
+        border: none;       /* Remove border */
+        background: none;   /* Remove background */
+        padding: 0px;       /* Remove padding */
+    }
+    """
 class AccountEntryDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.form_layout = QGridLayout(self)
         #self.setFrameStyle(QFrame.StyledPanel)
-
-        self.help_style = """
-            QToolButton {
-                border: none;       /* Remove border */
-                background: none;   /* Remove background */
-                padding: 0px;       /* Remove padding */
-            }
-            """
 
         # Provider
         self.form_layout.addWidget(QLabel("Provider:"), 1, 0, Qt.AlignRight)
@@ -36,7 +35,7 @@ class AccountEntryDialog(QDialog):
         provider_info_btn.setIcon(info_icon)
         provider_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        provider_info_btn.setStyleSheet(self.help_style)
+        provider_info_btn.setStyleSheet(help_style)
         #provider_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(provider_info_btn, 1, 3)
 
@@ -58,7 +57,7 @@ class AccountEntryDialog(QDialog):
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        user_info_btn.setStyleSheet(self.help_style)
+        user_info_btn.setStyleSheet(help_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(user_info_btn, 2, 3)
 
@@ -73,7 +72,7 @@ class AccountEntryDialog(QDialog):
         secret_info_btn.setIcon(info_icon)
         secret_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        secret_info_btn.setStyleSheet(self.help_style)
+        secret_info_btn.setStyleSheet(help_style)
         #secret_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(secret_info_btn, 3, 3)
 
