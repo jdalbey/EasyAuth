@@ -74,8 +74,8 @@ def test_typical_use():
     text_file = open("/tmp/testbackup.json", "r")
     actual = text_file.read()
     text_file.close()
-    expected_begin = '[{"provider": "Woogle", "label": "me@woogle.com", "secret": "ABC234", "last_used": '
-    expected_end = '{"provider": "MichaelangeloSite", "label": "Michael@woopmail.com", "secret": "CD333", "last_used": ""}]'
+    expected_begin = '[\n    {\n        "provider": "Woogle",\n        "label": "me@woogle.com",\n        "secret": "ABC234",\n        "last_used": '
+    expected_end = '{\n        "provider": "MichaelangeloSite",\n        "label": "Michael@woopmail.com",\n        "secret": "CD333",\n        "last_used": ""\n    }\n]'
     print (actual)
     assert actual.startswith(expected_begin)
     assert actual.endswith(expected_end)

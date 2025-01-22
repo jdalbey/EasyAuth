@@ -35,8 +35,8 @@ class TestAccountDeletion(unittest.TestCase):
         # setup the mocks
         dialog = EditAccountDialog(None, 1, account_in)
         # mock updated fields the user has modified
-        dialog.shared_fields.provider_entry.setText("ModifiedWoogle")
-        dialog.shared_fields.label_entry.setText("x@w.com")
+        dialog.provider_entry.setText("ModifiedWoogle")
+        dialog.label_entry.setText("x@w.com")
         dialog.account_manager = MockAccountManager
         dialog.close = Mock()  # Mock the accept method of the dialog
         # Call the method that shows the dialog

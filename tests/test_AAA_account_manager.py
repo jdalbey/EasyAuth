@@ -41,6 +41,7 @@ def sample_accounts():
 class TestAccountManager:
     def test_account_manager_init(self, account_manager):
         """ must be first method in suite to ensure the singleton uses a tmp file for all other tests"""
+        x = str(account_manager.vault_path)
         assert str(account_manager.vault_path).startswith("/tmp")
 
     def test_singleton_pattern(self):
