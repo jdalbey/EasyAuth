@@ -53,8 +53,9 @@ class AppView(QMainWindow):
             text-decoration: underline;
         }
         """
-    def __init__(self, ):
+    def __init__(self, q_app):
         super().__init__()
+        self.q_app = q_app
         self.logger = logging.getLogger(__name__)
         self.logger.debug("view init startup")
         self.account_manager = AccountManager()
@@ -112,12 +113,6 @@ class AppView(QMainWindow):
         recency_action.triggered.connect(self.do_recency_sort_action)
         sort_menu.addAction(alpha_sort_action)
         sort_menu.addAction(recency_action)
-
-        # providers_action = QAction('Providers', self)
-        # providers_action.setEnabled(False)
-        # providers_action.triggered.connect(self.manage_providers)
-        # tools_menu.addAction(providers_action)
-        #
 
         # Help menu
         help_menu = menubar.addMenu('Help')
@@ -185,6 +180,17 @@ class AppView(QMainWindow):
         self.scroll_layout = QVBoxLayout(scroll_content)
         scroll_area.setWidget(scroll_content)
         self.main_layout.addWidget(scroll_area)
+        self.set_theme()
+
+    def set_theme(self):
+        chosen_theme = self.app_config.get_theme_name()
+        fn = chosen_theme + '.css'
+        try:
+            with open('assets/themes/'+fn) as f:
+                theme = f.read()
+                self.q_app.setStyleSheet(theme)
+        except FileNotFoundError as e:
+            self.logger.debug(f"set_theme failed to find {fn}")
 
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
@@ -259,23 +265,24 @@ class AppView(QMainWindow):
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
                     provider_label.setFont(QFont("Arial", 12))
-                    provider_label.setStyleSheet("""
-                        QLabel {
-                            border: 1px;
-                            background: transparent;
-                            color: black;
-                            font-size: 16px;
-                            text-align: left;
-                        }
-                    """)
-                    #provider_label.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
-                    # Set the size policy for widget
-                    #provider_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    # provider_label.setStyleSheet("""
+                    #     QLabel {
+                    #         border: 1px;
+                    #         background: transparent;
+                    #         color: black;
+                    #         font-size: 16px;
+                    #         text-align: left;
+                    #     }
+                    # """)
 
                     edit_btn = QPushButton()
                     if os.path.exists("images/edit_icon.png"):
                         edit_icon = QIcon("images/edit_icon.png")
                         edit_btn.setIcon(edit_icon)
+                        # enable the app stylesheet to target the edit_btn button for the image styling.
+                        # "QPushButton#edit_btn {"
+                        #     "background-image: url(path/to/your/new_icon.png);"
+                        edit_btn.setObjectName("edit_btn")
                         edit_btn.setIconSize(QSize(16,16))
                         # Apply a stylesheet to change the icon on hover
                         edit_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
@@ -389,7 +396,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_preferences_dialog(self):
-        dialog = PreferencesDialog(self)
+        dialog = PreferencesDialog(self.q_app, parent=self)
         dialog.exec_()
         self.display_accounts()
 

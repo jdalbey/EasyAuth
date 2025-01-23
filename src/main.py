@@ -1,7 +1,6 @@
 import sys, logging
 from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
-from view import AppView
 from pathlib import Path # Python 3.5+
 
 def main():
@@ -12,8 +11,9 @@ def main():
     logger = logging.getLogger(__name__)
 
     logger.debug("Application starting with default config")
-    AppConfig()
-    view = AppView()
+    logger.debug("Application starting with default config")
+    from view import AppView
+    view = AppView(app)
 
     # Start the application
     view.show()

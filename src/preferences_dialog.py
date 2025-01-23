@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
-    QFontDialog, QSizePolicy
+    QFontDialog, QSizePolicy, QApplication
 from appconfig import AppConfig
 """GUI design ideas.
 buttons:   OK | CANCEL | APPLY
@@ -13,8 +13,10 @@ Use dimmed text for explanation:
 See Oracle Dialog style guide.      
 """
 class PreferencesDialog(QDialog):
-    def __init__(self, parent=None):
+
+    def __init__(self, q_app, parent=None, ):
         super(PreferencesDialog, self).__init__(parent)
+        self.q_app = q_app
         self.app_config = AppConfig()
         self.setWindowTitle("Preferences")
         self.setMinimumWidth(400)
@@ -56,8 +58,8 @@ class PreferencesDialog(QDialog):
         theme_label = QLabel("Theme:")
         layout.addWidget(theme_label)
         self.theme_combo = QComboBox()
-        self.theme_combo.setEnabled(False)
         self.theme_combo.addItems(["light", "dark"])
+        self.theme_combo.currentIndexChanged.connect(self.set_theme)
         layout.addWidget(self.theme_combo)
 
         # Restore Defaults button
@@ -100,6 +102,16 @@ class PreferencesDialog(QDialog):
         if ok:
             # Save the selected font to the configuration if needed
             pass
+
+    def set_theme(self):
+        self.app_config.set_theme_name(self.theme_combo.currentText())
+        self.parent().set_theme()
+        # chosen_theme = self.theme_combo.currentText()
+        # print (f"New theme chosen: {chosen_theme}")
+        # fn = chosen_theme + '.css'
+        # with open('assets/themes/'+fn) as f:
+        #     theme = f.read()
+        #     self.q_app.setStyleSheet(theme)
 
     def restore_defaults(self):
         self.app_config.restore_defaults()

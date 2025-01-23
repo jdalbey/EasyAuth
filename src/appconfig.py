@@ -137,9 +137,9 @@ class AppConfig:
     def get_os_data_dir(self):
         """ Determine the appropriate path to the database based on the OS """
         if platform.system() == "Windows":
-            return self.config.get('Settings','win_data_dir')
+            return self.config.get('Settings','win_data_dir',fallback=str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data"))
         else:  # Default to Linux or Unix-like systems
-            return self.config.get('Settings','linux_data_dir')
+            return self.config.get('Settings','linux_data_dir', fallback=str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data"))
 
     def restore_defaults(self):
         """ restore and write defaults """

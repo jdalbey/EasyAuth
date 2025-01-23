@@ -63,7 +63,10 @@ def process_qr_codes(called_from_Find_btn):
     if len(display_list) == 0:
         # This should only be shown during a requested find, not an automatic one.
         if called_from_Find_btn:  # we might have got here from Find button even though auto_hunt was on and failed.
-            QMessageBox.information(None, 'Alert', "No QR code found.  Be sure the QR code is visible on your screen and try again.", QMessageBox.Ok)
+            QMessageBox.information(None, 'Alert',
+"""No QR code found.  Be sure the QR code is visible on your screen and try again.
+(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
+""" , QMessageBox.Ok)
             return False # no QR
     if len(display_list) == 1:
         confirm_code = confirm_account(display_list[0])

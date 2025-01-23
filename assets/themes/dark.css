@@ -1,0 +1,5 @@
+        QWidget { background-color: #2E2E2E; color: white; }
+        QPushButton { background-color: #444444; color: white; border-radius: 5px; padding: 10px; }
+        QPushButton:hover { background-color: #666666; }
+        QPushButton:pressed { background-color: #888888; }
+        AppView QFrame QLabel { color:  #f9e79f; }

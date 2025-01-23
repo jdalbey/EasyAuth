@@ -101,9 +101,11 @@ class TestQRHunting(unittest.TestCase):
         mock_scan_screen_for_qr_codes.assert_called_once_with()
         # When True is passed should get an alert
         MockQMessageBox.information.assert_called_once_with(
-            None, 'Alert', "No QR code found.  Be sure the QR code is visible on your screen and try again.",
+            None, 'Alert', unittest.mock.ANY,
             unittest.mock.ANY
         )
+        # Additional assertion to check if the third parameter starts with a specific value
+        assert MockQMessageBox.information.call_args[0][2].startswith('No QR code found.')
 
     @patch("find_qr_codes.scan_screen_for_qr_codes")
     @patch("qr_hunting.confirm_account")

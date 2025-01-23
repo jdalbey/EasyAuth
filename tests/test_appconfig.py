@@ -34,10 +34,8 @@ class TestAppConfig:
     def test_partial_config(self):
         # reset the singleton
         AppConfig._instance = None
-        # A config file with missing setting for vault_path
-        settings_string = """[Settings]\nauto_find_qr = True\nsearch_by = Provider\nminimize_after_copy = False
-minimize_during_qr_search = False\nauto_fetch_favicons = False\ndisplay_favicons = False\nsecret_key_hidden = False
-language = English\nanimate_copy = False\n"""
+        # A config file with missing setting for auto_find
+        settings_string = """[Settings]\nlanguage = English\n"""
         kConfigPath = "/tmp/config_partial_test.ini"
         text_file = open(kConfigPath, "w")
         text_file.write(settings_string)
@@ -46,7 +44,11 @@ language = English\nanimate_copy = False\n"""
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        assert config.is_auto_find_qr_enabled()
+        result = config.is_auto_find_qr_enabled()
+        assert not result  # fallback = False
+        result = config.get_os_data_dir()
+        assert result.endswith("data")
+
 
     def test_missing_config(self):
         # reset the singleton

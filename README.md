@@ -40,6 +40,8 @@ you may lose access to your online accounts unless you have saved the recover co
 This software is issued with no guarantee.  There is a risk of data loss, including loss of your secret keys.
 
 ### Dependencies
+Python 3.5+
+
 PyQt5  
 pyotp  
 pyperclip  
