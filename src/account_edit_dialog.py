@@ -24,7 +24,7 @@ class EditAccountDialog(AccountEntryDialog):
         self.initial_size = None
 
         self.setWindowTitle("Edit Account")
-        self.setMinimumWidth(475)
+        self.setMinimumWidth(500)
 
         # Frame for the edit dialog features
         dialog_frame = QFrame()

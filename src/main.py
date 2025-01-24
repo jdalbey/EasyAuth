@@ -2,8 +2,11 @@ import sys, logging
 from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
 from pathlib import Path # Python 3.5+
-
+import qdarktheme
 def main():
+    # Enable HiDPI.
+    qdarktheme.enable_hi_dpi()
+
     app = QApplication(sys.argv)
     # Configure logging
     """When you use basicConfig to specify the format option, it sets the format for the root logger """

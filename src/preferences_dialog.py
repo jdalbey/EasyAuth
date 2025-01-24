@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
     QFontDialog, QSizePolicy, QApplication
 from appconfig import AppConfig
+import qdarktheme
 """GUI design ideas.
 buttons:   OK | CANCEL | APPLY
 Category tabs: vertical for many, horizontal for few
@@ -58,8 +59,8 @@ class PreferencesDialog(QDialog):
         theme_label = QLabel("Theme:")
         layout.addWidget(theme_label)
         self.theme_combo = QComboBox()
-        self.theme_combo.addItems(["light", "dark"])
-        self.theme_combo.currentIndexChanged.connect(self.set_theme)
+        self.theme_combo.addItems(["light","dark"])
+        self.theme_combo.currentTextChanged.connect(self.set_theme)
         layout.addWidget(self.theme_combo)
 
         # Restore Defaults button
@@ -104,14 +105,9 @@ class PreferencesDialog(QDialog):
             pass
 
     def set_theme(self):
+        # Save chosen theme in Configuration
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.parent().set_theme()
-        # chosen_theme = self.theme_combo.currentText()
-        # print (f"New theme chosen: {chosen_theme}")
-        # fn = chosen_theme + '.css'
-        # with open('assets/themes/'+fn) as f:
-        #     theme = f.read()
-        #     self.q_app.setStyleSheet(theme)
 
     def restore_defaults(self):
         self.app_config.restore_defaults()

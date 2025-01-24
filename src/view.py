@@ -12,8 +12,7 @@ from PyQt5.QtGui import QFont, QIcon, QPixmap, QDesktopServices
 import pyotp
 import time, datetime
 import pyperclip
-
-import provider_map
+import qdarktheme
 from provider_map import Providers
 from qr_hunting import fetch_qr_code
 import cipher_funcs
@@ -27,6 +26,57 @@ from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 
 class AppView(QMainWindow):
+    mydarkqss = """
+    /*QLabel {
+        color: goldenrod;
+    }*/
+    QPushButton {
+        border-width: 2px;
+    }
+    QPushButton#editButton {
+        qproperty-icon: url("images/edit_icon_dark.png");
+    }
+    QPushButton#copyButton {
+        qproperty-icon: url("images/copy_icon_dark.png");
+    }
+    QPushButton#otpLabel {
+        font-family: "DejaVu Sans Mono";
+        font-size: 16px;
+    }
+
+
+    """
+    mylightqss = """
+    QLabel {
+        /* color: green; */
+    }
+    QLineEdit {
+        background-color: beige;
+        color: black;
+    }
+    QPushButton#editButton {
+        qproperty-icon: url("images/edit_icon_light.png");
+    }
+    QPushButton#copyButton {
+        qproperty-icon: url("images/copy_icon_light.png");
+    }
+    QPushButton#otpLabel {
+        font-family: "DejaVu Sans Mono";
+        font-size: 16px;
+        /*
+        border: None;
+        background: transparent;
+        color: black;
+        */
+    }
+    QPushButton#otpLabel:hover {
+        text-decoration: underline;
+        color: blue;
+        }
+    /*QPushButton#editButton:hover { background-color: lightgray; }*/
+
+    """
+
     otplabel_style_normal = """
         QPushButton {
             border: None;
@@ -129,6 +179,7 @@ class AppView(QMainWindow):
     def create_toolbar(self):
         # Create toolbar
         toolbar = QToolBar()
+        toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
         # Add quick access buttons
@@ -183,14 +234,13 @@ class AppView(QMainWindow):
         self.set_theme()
 
     def set_theme(self):
+        # Get desired theme from Configuration
         chosen_theme = self.app_config.get_theme_name()
-        fn = chosen_theme + '.css'
-        try:
-            with open('assets/themes/'+fn) as f:
-                theme = f.read()
-                self.q_app.setStyleSheet(theme)
-        except FileNotFoundError as e:
-            self.logger.debug(f"set_theme failed to find {fn}")
+        self.logger.debug(f"Loading theme preference: {chosen_theme}")
+        if chosen_theme == "dark":
+            qdarktheme.setup_theme(chosen_theme,additional_qss=self.mydarkqss)
+        else:
+            qdarktheme.setup_theme(chosen_theme,additional_qss=self.mylightqss)
 
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
@@ -264,7 +314,7 @@ class AppView(QMainWindow):
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
-                    provider_label.setFont(QFont("Arial", 12))
+                    provider_label.setFont(QFont("Verdana", 12))
                     # provider_label.setStyleSheet("""
                     #     QLabel {
                     #         border: 1px;
@@ -276,31 +326,29 @@ class AppView(QMainWindow):
                     # """)
 
                     edit_btn = QPushButton()
-                    if os.path.exists("images/edit_icon.png"):
-                        edit_icon = QIcon("images/edit_icon.png")
-                        edit_btn.setIcon(edit_icon)
-                        # enable the app stylesheet to target the edit_btn button for the image styling.
-                        # "QPushButton#edit_btn {"
-                        #     "background-image: url(path/to/your/new_icon.png);"
-                        edit_btn.setObjectName("edit_btn")
-                        edit_btn.setIconSize(QSize(16,16))
-                        # Apply a stylesheet to change the icon on hover
-                        edit_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
-                        # edit_btn.setStyleSheet("""
-                        #     QPushButton:hover {
-                        #         qproperty-icon: url(images/edit_icon_hover.png);
-                        #     }
-                        # """)
-                    else:
-                        self.logger.warning("missing edit icon")
+                    #edit_icon = QIcon("images/edit_icon.png")
+                    #edit_btn.setIcon(edit_icon)
+                    # enable the app stylesheet to target the edit_btn button for the image styling.
+                    # "QPushButton#edit_btn {"
+                    #     "background-image: url(path/to/your/new_icon.png);"
+                    edit_btn.setObjectName("editButton")
+                    #edit_btn.setIconSize(QSize(16,16))
+                    # Apply a stylesheet to change the icon on hover
+                    #edit_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
+                    # edit_btn.setStyleSheet("""
+                    #     QPushButton:hover {
+                    #         qproperty-icon: url(images/edit_icon_hover.png);
+                    #     }
+                    # """)
                     edit_btn.setToolTip("Edit account")
                     # pass the current values of index, account to show_edit_account_form
                     edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
                     rowframe_layout.addWidget(edit_btn)
 
-                    otplabel = QPushButton(f"{otp}")
-                    otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
-                    otplabel.setStyleSheet(self.otplabel_style_normal)
+                    otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
+                    otplabel.setObjectName("otpLabel")
+                    #otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
+                    #otplabel.setStyleSheet(self.otplabel_style_normal)
                     otplabel.setToolTip("Copy code to clipboard")
                     otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
@@ -308,23 +356,6 @@ class AppView(QMainWindow):
                     rowframe_layout.addWidget(edit_btn)
                     rowframe_layout.addStretch()
                     rowframe_layout.addWidget(otplabel)
-
-                    copy_btn = QPushButton()
-                    """# Apply a stylesheet to change the icon on hover
-                        my_button.setStyleSheet("QPushButton:hover {"
-                            "icon: url(path/to/hovered_icon.png);"
-                            "}")"""
-                    if os.path.exists("images/copy_icon.png"):
-                        copy_icon = QIcon("images/copy_icon.png")
-                        copy_btn.setIcon(copy_icon)
-                        copy_btn.setIconSize(QSize(18, 18))
-                        copy_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
-                    else:
-                        self.logger.warning("missing copy icon")
-                    copy_btn.setToolTip("Copy code to clipboard")
-                    copy_btn.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
-                    rowframe_layout.addWidget(copy_btn)
-
 
                     self.scroll_layout.addWidget(row_frame)
 
@@ -345,31 +376,33 @@ class AppView(QMainWindow):
         if time_remaining == 30:
             self.display_accounts()
 
-    def copy_to_clipboard(self, otp, idx, account):
-        """ @param otp is the label of the one-time password """
-        pyperclip.copy(otp.text())
-        self.logger.debug(f"Copied OTP: {otp.text()}")
+    def copy_to_clipboard(self, totp_label, idx, account):
+        """ @param totp_label is the label of the one-time password """
+        pyperclip.copy(totp_label.text())
+        self.logger.debug(f"Copied OTP: {totp_label.text()}")
         now = datetime.datetime.now()
         # update last used time
         account.last_used = now.strftime("%Y-%m-%d %H:%M:%S")
         self.account_manager.update_account(idx,account)
         self.logger.debug(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
 
-        # Provide visual feedback on copy: change the background color of the label to yellow
-        otp.setStyleSheet(self.otplabel_style_clicked)
-        # Use QTimer to reset the background color back to the original color
-        QTimer.singleShot(1000, lambda otp=otp: self.reset_label_color(label=otp))
+        # Show the floating message relative to the given label position
+        popup = QLabel("Copied", self)
+        popup.setObjectName("copyPopup")
+        popup.setAlignment(Qt.AlignCenter)
+        popup.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
+        popup.setStyleSheet("QLabel#copyPopup {background-color: #dff0d8; color: #3c763d; padding: 5px; border: 1px solid #d6e9c6;}")
+        popup.resize(90, 40)
+        # Calculate position just above the button
+        button_geometry = totp_label.parent().mapToGlobal(totp_label.geometry().topLeft())
+        button_center_x = button_geometry.x() + totp_label.width() // 2
+        popup_x = button_center_x - popup.width() // 2
+        popup_y = button_geometry.y() - popup.height() - 5  # 5 pixels gap above the button
 
-    def reset_label_color(self,label):
-        # Reset the background color to the original (no background color)
-        try:
-            label.setStyleSheet(self.otplabel_style_normal)
-            pass
-        except RuntimeError as e:
-            """ if you hit copy with only 1 second left the label will get reset when the new code is'
-            generated and the attempt to reset the old label will fail.  But that's okay because
-            the new label will have reset the background color anyway."""
-            pass
+        popup.move(popup_x, popup_y)
+        popup.show()
+
+        QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
 
     def show_add_account_form(self):
         """ User clicked Add Account button """
