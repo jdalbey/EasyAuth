@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
-    QFontDialog, QSizePolicy, QApplication
+    QFontDialog, QSizePolicy, QApplication, QFormLayout
 from appconfig import AppConfig
 import qdarktheme
 """GUI design ideas.
@@ -50,10 +50,10 @@ class PreferencesDialog(QDialog):
         layout.addWidget(self.secret_key_hidden)
 
         # Font button
-        self.font_button = QPushButton("Font")
-        self.font_button.setEnabled(False)
-        self.font_button.clicked.connect(self.select_font)
-        layout.addWidget(self.font_button)
+        # self.font_button = QPushButton("Font")
+        # self.font_button.setEnabled(False)
+        # self.font_button.clicked.connect(self.select_font)
+        # layout.addWidget(self.font_button)
 
         # Theme drop down box
         theme_label = QLabel("Theme:")
@@ -63,12 +63,19 @@ class PreferencesDialog(QDialog):
         self.theme_combo.currentTextChanged.connect(self.set_theme)
         layout.addWidget(self.theme_combo)
 
+        # Create a QFormLayout to align the label and line edit in a form-like style
+        form_layout = QFormLayout()
+        form_layout.addRow(theme_label, self.theme_combo)
+
+        # Set the form layout for the window
+        layout.addLayout(form_layout)
+
         # Restore Defaults button
         self.restore_defaults_button = QPushButton("Restore Defaults")
         self.restore_defaults_button.clicked.connect(self.restore_defaults)
-        layout.addWidget(self.restore_defaults_button)
         self.restore_defaults_button.setContentsMargins(40, 0, 0, 0)
         self.restore_defaults_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.restore_defaults_button.setFocusPolicy(Qt.NoFocus)
         layout.addWidget(self.restore_defaults_button, alignment=Qt.AlignCenter)
 
         # Load settings
@@ -77,6 +84,7 @@ class PreferencesDialog(QDialog):
         # Save button
         save_button = QPushButton("Save")
         save_button.clicked.connect(self.save_settings)
+        save_button.setFocusPolicy(Qt.NoFocus)
         layout.addWidget(save_button)
 
         self.setLayout(layout)

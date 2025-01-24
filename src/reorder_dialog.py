@@ -58,24 +58,9 @@ class ReorderDialog(QDialog):
         self.list_widget.setDefaultDropAction(Qt.MoveAction)
         self.list_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.list_widget.setAutoScroll(True)
-        self.populate_list()
         layout.addWidget(self.list_widget)
         self.list_widget.setCurrentRow(0)
-        self.list_widget.setStyleSheet("""QListWidget
-{
-border : 2px solid black;
-background: #fafbeb;  
-}
-QListView::item
-{
-    padding: 5px;
-}
-QListView::item:selected
-{
-border : 1px dashed black;
-background : lightblue;
-color:blue;
-}""")
+        self.populate_list()
 
         # Buttons layout
         button_layout = QHBoxLayout()
@@ -92,11 +77,11 @@ color:blue;
         layout.addLayout(button_layout)
 
     def populate_list(self):
-        font = QFont("Serif", 12)
+        #font = QFont("Serif", 12)
         for account in self.accounts:
             display_text = f"⇳ {account.provider} - {account.label}"
             item = QListWidgetItem(display_text)
-            item.setFont(font)
+            #item.setFont(font)
             self.list_widget.addItem(item)
 
     def get_ordered_accounts(self):

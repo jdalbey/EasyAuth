@@ -86,7 +86,7 @@ class EditAccountDialog(AccountEntryDialog):
         # Make square button invisible so only circular icon shows
         user_info_btn.setStyleSheet(help_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
-        last_used_layout.addWidget(user_info_btn, 1, 1, Qt.AlignCenter)
+        last_used_layout.addWidget(user_info_btn, 1, 2, Qt.AlignCenter)
         self.bottom_layout.addWidget(last_used_frame)
 
         # Add spacer to push buttons toward top

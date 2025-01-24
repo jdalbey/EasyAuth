@@ -24,85 +24,34 @@ from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
-
+from assets.styles import dark_qss, light_qss
 class AppView(QMainWindow):
-    mydarkqss = """
-    /*QLabel {
-        color: goldenrod;
-    }*/
-    QPushButton {
-        border-width: 2px;
-    }
-    QPushButton#editButton {
-        qproperty-icon: url("images/edit_icon_dark.png");
-    }
-    QPushButton#copyButton {
-        qproperty-icon: url("images/copy_icon_dark.png");
-    }
-    QPushButton#otpLabel {
-        font-family: "DejaVu Sans Mono";
-        font-size: 16px;
-    }
-
-
-    """
-    mylightqss = """
-    QLabel {
-        /* color: green; */
-    }
-    QLineEdit {
-        background-color: beige;
-        color: black;
-    }
-    QPushButton#editButton {
-        qproperty-icon: url("images/edit_icon_light.png");
-    }
-    QPushButton#copyButton {
-        qproperty-icon: url("images/copy_icon_light.png");
-    }
-    QPushButton#otpLabel {
-        font-family: "DejaVu Sans Mono";
-        font-size: 16px;
-        /*
-        border: None;
-        background: transparent;
-        color: black;
-        */
-    }
-    QPushButton#otpLabel:hover {
-        text-decoration: underline;
-        color: blue;
-        }
-    /*QPushButton#editButton:hover { background-color: lightgray; }*/
-
-    """
-
-    otplabel_style_normal = """
-        QPushButton {
-            border: None;
-            background: transparent;
-            color: black;
-            font-size: 16px;
-            text-align: left;
-        }
-        QPushButton:hover {
-            text-decoration: underline;
-            color: blue;
-            }
-        """
-    otplabel_style_clicked = """
-        QPushButton {
-            border: None;
-            background: transparent;
-            background-color: #82e0aa;
-            color: black;
-            font-size: 16px;
-            text-align: left;
-        }
-        QPushButton:hover {
-            text-decoration: underline;
-        }
-        """
+    # otplabel_style_normal = """
+    #     QPushButton {
+    #         border: None;
+    #         background: transparent;
+    #         color: black;
+    #         font-size: 16px;
+    #         text-align: left;
+    #     }
+    #     QPushButton:hover {
+    #         text-decoration: underline;
+    #         color: blue;
+    #         }
+    #     """
+    # otplabel_style_clicked = """
+    #     QPushButton {
+    #         border: None;
+    #         background: transparent;
+    #         background-color: #82e0aa;
+    #         color: black;
+    #         font-size: 16px;
+    #         text-align: left;
+    #     }
+    #     QPushButton:hover {
+    #         text-decoration: underline;
+    #     }
+    #     """
     def __init__(self, q_app):
         super().__init__()
         self.q_app = q_app
@@ -206,21 +155,9 @@ class AppView(QMainWindow):
         # Timer label
         timer_font = QFont("Courier", 24, QFont.Bold)
         self.timer_label = QLabel("  ")
+        self.timer_label.setObjectName("timerLabel")
         self.timer_label.setToolTip("Time remaining until current TOTP code expires.")
         self.timer_label.setFont(timer_font)
-        self.timer_label.setStyleSheet("""
-            QLabel {
-                background-color: lightgray;
-                color: black;
-                padding: 3px 15px;
-                border-radius: 15px;
-            }
-            QToolTip {
-                color: black;
-                background-color: ivory;
-                border: 1px solid black;
-            }
-        """)
         toolbar.addWidget(self.timer_label)
 
     def create_main_panel(self):
@@ -238,9 +175,9 @@ class AppView(QMainWindow):
         chosen_theme = self.app_config.get_theme_name()
         self.logger.debug(f"Loading theme preference: {chosen_theme}")
         if chosen_theme == "dark":
-            qdarktheme.setup_theme(chosen_theme,additional_qss=self.mydarkqss)
+            qdarktheme.setup_theme(chosen_theme,additional_qss=dark_qss)
         else:
-            qdarktheme.setup_theme(chosen_theme,additional_qss=self.mylightqss)
+            qdarktheme.setup_theme(chosen_theme,additional_qss=light_qss)
 
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
