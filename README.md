@@ -57,6 +57,75 @@ cryptography
 qrcode  
 qdarktheme
 
+---
+## Installation
+
+### Prerequisites
+
+- Currently this program only runs on Linux systems.
+- Ensure you have Python 3.5+ installed on your system.
+
+### Step 1: Fork or Download the Repository
+
+#### Fork the Repository
+
+1. Click the "Fork" button at the top-right corner of the page to create a copy of the repository under your GitHub account.
+
+#### Download the Repository
+
+1. Click the "Code" button and select "Download ZIP".
+2. Extract the downloaded ZIP file to a directory of your choice.
+
+Alternatively, you can clone the repository using Git:
+
+```bash
+git clone https://github.com/jdalbey/EasyAuth.git
+cd EasyAuth
+```
+
+### Step 2: Create a Virtual Environment
+
+It is recommended to create a virtual environment to manage dependencies. Run the following commands in your terminal:
+
+```bash
+python -m venv venv
+source venv/bin/activate  
+```
+
+### Step 3: Install Dependencies
+
+Install the required dependencies using `pip`:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4: Launch the Application
+
+Run the application using the following command:
+
+```bash
+python src/main.py
+```
+
+### Additional Information
+
+- **Logging**: The application uses logging to provide debug information. You can configure the logging settings in the `main.py` file.
+- **HiDPI Support**: The application uses `qdarktheme` to enable HiDPI support.
+
+### Troubleshooting
+
+If you encounter any issues, please check the following:
+
+- Ensure all dependencies are installed correctly.
+- Check the console output for any error messages.
+
+For further assistance, you can open an Issue here.
+
+---
+
+
+
 ## Usage
 Practice storing a new secret key using the sample QR code below.
 1. Launch the application.

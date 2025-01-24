@@ -6,6 +6,7 @@
 !.idea/codeStyles
 !.idea/inspectionProfiles
 !.idea/runConfigurations
+/.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

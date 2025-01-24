@@ -3,11 +3,11 @@ import sys, logging
 from dataclasses import asdict
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
-    QSizePolicy, QMenuBar, QMenu, QAction, QLabel, QLineEdit, QToolBar, QScrollArea,
-    QToolButton, QDialog, QLabel, QPushButton, QGridLayout, QLineEdit, QVBoxLayout,
-    QHBoxLayout, QWidget, QMessageBox, QFrame)
-from PyQt5.QtCore import Qt, QTimer, QSize, QUrl, QRect
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QDesktopServices
+                             QSizePolicy, QAction, QToolBar, QScrollArea,
+                             QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
+                             QHBoxLayout, QWidget, QMessageBox, QFrame)
+from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
+from PyQt5.QtGui import QFont, QDesktopServices
 import pyotp
 import time, datetime
 import pyperclip
@@ -23,7 +23,7 @@ from appconfig import AppConfig
 from account_manager import AccountManager
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
-from assets.styles import dark_qss, light_qss
+from styles import dark_qss, light_qss
 class AppView(QMainWindow):
     def __init__(self, q_app):
         super().__init__()
