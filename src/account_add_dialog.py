@@ -114,12 +114,12 @@ class AddAccountDialog(AccountEntryDialog):
         self.save_button.setEnabled(all_filled)
 
     def save_fields(self):
-        provider = self.provider_entry.text()
+        issuer = self.provider_entry.text()
         label = self.label_entry.text()
         secret = self.secret_entry.text()
         # Validate secret key
         if is_valid_secretkey(secret):
-            if self.account_manager.save_new_account(provider, label, secret):
+            if self.account_manager.save_new_account(issuer, label, secret):
                 self.accept()
             else:
                  QMessageBox.information(self,"Warning","Account with same provider and label already exists")

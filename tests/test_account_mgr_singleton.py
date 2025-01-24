@@ -10,8 +10,8 @@ from account_manager import AccountManager, Account
 def sample_accounts():
     """Sample account data for testing."""
     return [
-        {"provider": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00"},
-        {"provider": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00"},
+        {"issuer": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00"},
+        {"issuer": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00"},
     ]
 
 @pytest.fixture(autouse=True)
@@ -49,7 +49,7 @@ def test_load_accounts(mock_open, mock_exists):
 
 def test_typical_use():
     # Create a test vault
-    outMessage = '[{"provider": "Bogus", "label": "boogum@badmail.com", "secret": "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "last_used": ""}, {"provider": "MichaelangeloSite", "label": "Michael@woopmail.com", "secret": "gAAAAABngeZJ7iSx3k33zLLDh9KoTosnTxBooUGvzKLBlrqa-BwNEpgvsZfYRF4z8DxdvrqxvGgWWE7aealVfXzln5QKTiETEA==", "last_used": ""}]'
+    outMessage = '[{"issuer": "Bogus", "label": "boogum@badmail.com", "secret": "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "last_used": ""}, {"issuer": "MichaelangeloSite", "label": "Michael@woopmail.com", "secret": "gAAAAABngeZJ7iSx3k33zLLDh9KoTosnTxBooUGvzKLBlrqa-BwNEpgvsZfYRF4z8DxdvrqxvGgWWE7aealVfXzln5QKTiETEA==", "last_used": ""}]'
     text_file = open("/tmp/testvault.json", "w")
     text_file.write(outMessage)
     text_file.close()
@@ -59,7 +59,7 @@ def test_typical_use():
     # Add a new item
     instance.save_new_account("Woogle","me@woogle.com","ABC234")
     assert len(instance.accounts) == 3
-    assert instance.accounts[0].provider == "Woogle"
+    assert instance.accounts[0].issuer == "Woogle"
     # Update an existing item
     update_me = Account("Bogus", "update_me@slowmail.com", "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "2000-01-01 12:01")
     instance.update_account(1,update_me)
@@ -74,8 +74,8 @@ def test_typical_use():
     text_file = open("/tmp/testbackup.json", "r")
     actual = text_file.read()
     text_file.close()
-    expected_begin = '[\n    {\n        "provider": "Woogle",\n        "label": "me@woogle.com",\n        "secret":'
-    expected_end = '{\n        "provider": "MichaelangeloSite",\n        "label": "Michael@woopmail.com",\n        "secret": '
+    expected_begin = '[\n    {\n        "issuer": "Woogle",\n        "label": "me@woogle.com",\n        "secret":'
+    expected_end = '{\n        "issuer": "MichaelangeloSite",\n        "label": "Michael@woopmail.com",\n        "secret": '
     print (actual)
     assert actual.startswith(expected_begin)
     assert actual.__contains__(expected_end)
@@ -85,5 +85,5 @@ def test_duplicate_accounts(sample_accounts):
     accounts = [Account(**acc) for acc in sample_accounts]
     duplicates = instance.duplicate_accounts(accounts)
     assert len(duplicates) == 2, "duplicate_accounts should create copies of all accounts"
-    assert duplicates[0].provider == accounts[0].provider
+    assert duplicates[0].issuer == accounts[0].issuer
     assert duplicates[0] is not accounts[0], "duplicate_accounts should create distinct copies"

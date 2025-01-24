@@ -35,7 +35,7 @@ class TestConfirmAccountDialog(unittest.TestCase):
 
         # Mock data to populate fields
         mock_account = Mock()
-        mock_account.provider = "Test Provider"
+        mock_account.issuer = "Test Provider"
         mock_account.label = "Test Label"
         mock_account.secret = "AB34"
 
@@ -72,7 +72,7 @@ class TestConfirmAccountDialog(unittest.TestCase):
 
         # Mock data to populate fields
         mock_account = Mock()
-        mock_account.provider = "Test Provider"
+        mock_account.issuer = "Test Provider"
         mock_account.label = "Test Label"
         mock_account.secret = "invalid secret"
 
@@ -102,7 +102,7 @@ class TestConfirmAccountDialog(unittest.TestCase):
 
         # Mock data to populate fields
         mock_account = Mock()
-        mock_account.provider = "Test Provider"
+        mock_account.issuer = "Test Provider"
         mock_account.label = "Test Label"
         mock_account.secret = "Test Secret"
 

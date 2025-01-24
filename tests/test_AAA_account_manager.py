@@ -26,13 +26,13 @@ def sample_accounts():
     """Return sample account data for testing."""
     return [
         {
-            "provider": "Google",
+            "issuer": "Google",
             "label": "Work",
             "secret": 'gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==',
             "last_used": "2024-01-14 10:00"
         },
         {
-            "provider": "GitHub",
+            "issuer": "GitHub",
             "label": "Personal",
             "secret": 'gAAAAABnkHqr0nPIqDdHwAEXwRiB53q5sgS3AUF-RG9SpbHwpNowsuLjqpuY2coo9VlqkZk5Fit3-vbduso6X7CzT2nKJG8TgQ==',
             "last_used": "2024-01-14 11:00"
@@ -67,13 +67,13 @@ class TestAccountManager:
 
     def test_vault_data_validation(self, account_manager):
         """Test validation of account data structure."""
-        invalid_data = [{"provider": "Test"}]  # Missing required fields
+        invalid_data = [{"issuer": "Test"}]  # Missing required fields
 
         assert not account_manager._validate_account_data(invalid_data)
 
         # Contains all fields but secret is not encrypted
         invalid_data = [{
-            "provider": "Test",
+            "issuer": "Test",
             "label": "Test",
             "secret": "secret",
             "last_used": "2024-01-14 12:00"
@@ -82,7 +82,7 @@ class TestAccountManager:
         assert not account_manager._validate_account_data(invalid_data)
 
         valid_data = [{
-            "provider": "Test",
+            "issuer": "Test",
             "label": "Test",
             "secret": "gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==",
             "last_used": "2024-01-14 12:00"
@@ -102,20 +102,20 @@ class TestAccountManager:
         # Load accounts
         loaded_accounts = account_manager.load_accounts()
         assert len(loaded_accounts) == len(sample_accounts)
-        assert loaded_accounts[0].provider == sample_accounts[0]["provider"]
+        assert loaded_accounts[0].issuer == sample_accounts[0]["issuer"]
         assert loaded_accounts[0].label == sample_accounts[0]["label"]
 
     def test_backup_creation(self, account_manager, sample_accounts):
         """Test that backup file is created when saving accounts."""
         test_accounts = [
             {
-                "provider": "Google",
+                "issuer": "Google",
                 "label": "Work",
                 "secret": "encrypted_secret_1",
                 "last_used": "2024-01-14 10:00"
             },
             {
-                "provider": "GitHub",
+                "issuer": "GitHub",
                 "label": "Personal",
                 "secret": "encrypted_secret_2",
                 "last_used": "2024-01-14 11:00"
@@ -142,7 +142,7 @@ class TestAccountManager:
         # Save the new account
         try:
             account_manager.save_new_account(
-                provider="Test",
+                issuer="Test",
                 label="TestLabel",
                 secret="test_secret"
             )
@@ -152,7 +152,7 @@ class TestAccountManager:
 
         assert len(account_manager.accounts) == 1
         new_account = account_manager.accounts[0]
-        assert new_account.provider == "Test"
+        assert new_account.issuer == "Test"
         assert new_account.label == "TestLabel"
         assert new_account.secret == "encrypted_test_secret"
 
@@ -169,7 +169,7 @@ class TestAccountManager:
         # Save the new account
         try:
             account_manager.save_new_account(
-                provider="Test",
+                issuer="Test",
                 label="TestLabel",
                 secret="test_secret"
             )
@@ -187,7 +187,7 @@ class TestAccountManager:
 
         assert len(account_manager.accounts) == 1
         updated_account = account_manager.accounts[0]
-        assert updated_account.provider == "Foobar"
+        assert updated_account.issuer == "Foobar"
         assert updated_account.label == "Barfoo"
         assert updated_account.secret == "encrypted_test_secret"
 
@@ -229,7 +229,7 @@ class TestAccountManager:
 
         # create a new account from the components of the existing one.
         retcode = account_manager.save_new_account(
-            provider=sample_accounts[0]["provider"],
+            issuer=sample_accounts[0]["issuer"],
             label=sample_accounts[0]["label"],
             secret="new_secret"
         )
@@ -267,7 +267,7 @@ class TestAccountManager:
         # Load should recover from backup
         loaded_accounts = account_manager.load_accounts()
         assert len(loaded_accounts) == len(sample_accounts)
-        assert loaded_accounts[0].provider == sample_accounts[0]["provider"]
+        assert loaded_accounts[0].issuer == sample_accounts[0]["issuer"]
 
     @patch('logging.Logger.error')
     def test_handle_save_failure(self, mock_log_error, account_manager, sample_accounts):

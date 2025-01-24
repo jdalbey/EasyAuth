@@ -26,13 +26,13 @@ def sample_accounts():
     """Return sample account data for testing."""
     return [
         {
-            "provider": "Google",
+            "issuer": "Google",
             "label": "Work",
             "secret": "encrypted_secret_1",
             "last_used": "2024-01-14 10:00"
         },
         {
-            "provider": "GitHub",
+            "issuer": "GitHub",
             "label": "Personal",
             "secret": "encrypted_secret_2",
             "last_used": "2024-01-14 11:00"
@@ -82,8 +82,8 @@ class TestAccountManager:
 
         # Restore from backup file
         account_manager.restore_accounts("/tmp/backup_test1.json")
-        assert account_manager.accounts[0].provider == acct1.provider
-        assert account_manager.accounts[1].provider == acct2.provider
+        assert account_manager.accounts[0].issuer == acct1.issuer
+        assert account_manager.accounts[1].issuer == acct2.issuer
         assert account_manager.accounts[0].label == acct1.label
         assert account_manager.accounts[1].label == acct2.label
         assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
@@ -91,7 +91,7 @@ class TestAccountManager:
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
             vault_accounts = json.load(f)
-            assert vault_accounts[0]['provider'] == "Boggle"
+            assert vault_accounts[0]['issuer'] == "Boggle"
         os.remove("/tmp/backup_test1.json")
 
     def test_export_and_import(self,account_manager, sample_accounts):
@@ -122,8 +122,8 @@ class TestAccountManager:
 
         # Import from exported file
         account_manager.import_accounts("/tmp/backup_test2.json")
-        assert account_manager.accounts[0].provider == acct1.provider
-        assert account_manager.accounts[1].provider == acct2.provider
+        assert account_manager.accounts[0].issuer == acct1.issuer
+        assert account_manager.accounts[1].issuer == acct2.issuer
         assert account_manager.accounts[0].label == acct1.label
         assert account_manager.accounts[1].label == acct2.label
         assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
@@ -131,7 +131,7 @@ class TestAccountManager:
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
             vault_accounts = json.load(f)
-            assert vault_accounts[0]['provider'] == "Boggle"
+            assert vault_accounts[0]['issuer'] == "Boggle"
         os.remove("/tmp/backup_test2.json")
 
     def test_import_preview(self,account_manager, sample_accounts):
@@ -152,8 +152,8 @@ class TestAccountManager:
         assert len(account_manager.accounts) == 0  # preview should not touch accounts
         assert account_list is not None
         assert len(account_list) == 2
-        assert account_list[0].provider == acct1.provider
-        assert account_list[1].provider == acct2.provider
+        assert account_list[0].issuer == acct1.issuer
+        assert account_list[1].issuer == acct2.issuer
         assert account_list[0].label == acct1.label
         assert account_list[1].label == acct2.label
         assert cipher_funcs.decrypt(account_list[0].secret) == acct1.secret

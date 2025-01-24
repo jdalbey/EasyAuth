@@ -91,11 +91,11 @@ class AccountEntryDialog(QDialog):
         pass
 
     def set_fields(self, account):
-        self.provider_entry.setText(account.provider)
+        self.provider_entry.setText(account.issuer)
         self.label_entry.setText(account.label)
         self.secret_entry.setText(account.secret)
-        # if len(account.provider) > 0:
-        #     tmplabel = self.providers.get_provider_icon(account.provider)
+        # if len(account.issuer) > 0:
+        #     tmplabel = self.providers.get_provider_icon(account.issuer)
         #     self.favicon.setPixmap(tmplabel.pixmap())
 
     # disable the secret key so it can't be altered while QR code is revealed.

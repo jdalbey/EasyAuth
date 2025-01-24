@@ -23,14 +23,14 @@ def fetch_qr_code():
 
 def confirm_account(account): #, confirm_dialog):
     # check selection has valid secret key.
-    logging.debug(f"Checking validity of code for {account.provider}: {account.secret}")
+    logging.debug(f"Checking validity of code for {account.issuer}: {account.secret}")
     if not is_valid_secretkey(account.secret):
         logging.debug ("QR code invalid key")
         # if not valid secret key show message box then return to blank account_add form.
         reply = QMessageBox.information (None, 'Info', "QR code has invalid secret key.",QMessageBox.Ok)
     else:
         # if valid key place the fields from that account into the Confirm dialog form field.
-        fields = Account(account.provider, account.label, account.secret, "")
+        fields = Account(account.issuer, account.label, account.secret, "")
         current_dialog = ConfirmAccountDialog()
         current_dialog.set_account(fields)
         if current_dialog.exec_() == QDialog.Accepted:
@@ -81,7 +81,7 @@ def process_qr_codes(called_from_Find_btn):
             selected_account = dialog.get_selected_account()
             # If user made a selection,
             if selected_account:
-                logging.debug(f"Selected Account: {selected_account.provider} - {selected_account.label}")
+                logging.debug(f"Selected Account: {selected_account.issuer} - {selected_account.label}")
                 return confirm_account(selected_account)
 
     return False

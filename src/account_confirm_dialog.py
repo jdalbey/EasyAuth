@@ -67,10 +67,10 @@ class ConfirmAccountDialog(AccountEntryDialog):
 
     def save_fields(self):
         if otp_funcs.is_valid_secretkey(self.secret_entry.text()):
-            provider = self.provider_entry.text()
+            issuer = self.provider_entry.text()
             label = self.label_entry.text()
             secret = self.secret_entry.text()
-            retcode = self.account_manager.save_new_account(provider, label, secret)
+            retcode = self.account_manager.save_new_account(issuer, label, secret)
             if retcode:
                 self.accept()  # returns True
             else:

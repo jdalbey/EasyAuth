@@ -19,11 +19,11 @@ from appconfig import AppConfig
 
 @dataclass
 class Account:
-    provider: str
+    issuer: str
     label: str
     secret: str # encrypted secret key
     last_used: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    usage_count: int = 0
+    used_frequency: int = 0
     favorite: bool = False
 
 # TODO: move otpauth_uri_from_account() here as get_otp_auth_uri()
@@ -32,16 +32,16 @@ class Account:
         if self.secret == "":
             raise ValueError("Secret cannot be empty")
 
-    # Override __eq__ to compare only provider and label
+    # Override __eq__ to compare only issuer and label
     # used by account_manager.save_new_account
     def __eq__(self, other):
         if isinstance(other, Account):
-            return self.provider == other.provider and self.label == other.label
+            return self.issuer == other.issuer and self.label == other.label
         return NotImplemented
 
 @dataclass(frozen=True)
 class OtpRecord:
-    provider: str
+    issuer: str
     label: str
     secret: str  # plain-text secret key
 
@@ -172,12 +172,12 @@ class AccountManager:
 
         return False
 
-    def save_new_account(self, provider: str, label: str, secret: str) -> bool:
+    def save_new_account(self, issuer: str, label: str, secret: str) -> bool:
         """Save new account with duplicate checking."""
         try:
             # Check for duplicates
             if any(
-                acc.provider == provider and acc.label == label 
+                acc.issuer == issuer and acc.label == label
                 for acc in self.accounts
             ):
                 #raise ValueError("Account with same provider and label already exists")
@@ -185,7 +185,7 @@ class AccountManager:
 
             encrypted_secret = cipher_funcs.encrypt(secret)
             account = Account(
-                provider=provider,
+                issuer=issuer,
                 label=label,
                 secret=encrypted_secret,
                 last_used=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -193,7 +193,7 @@ class AccountManager:
 
             self.accounts.insert(0, account)
             if self.save_accounts():
-                self.logger.info(f"Successfully saved new account: {provider} ({label})")
+                self.logger.info(f"Successfully saved new account: {issuer} ({label})")
             else:
                 raise RuntimeError("Failed to save account to vault")
 
@@ -205,15 +205,15 @@ class AccountManager:
     def update_account(self, index, account):
         self.accounts[index] = account
         self.save_accounts()
-        self.logger.info(f"Updated account: {account.provider} ({account.label})")
+        self.logger.info(f"Updated account: {account.issuer} ({account.label})")
 
     def delete_account(self, account):
         self.accounts.remove(account)
         self.save_accounts()
-        self.logger.info(f"Deleted account: {account.provider} ({account.label})")
+        self.logger.info(f"Deleted account: {account.issuer} ({account.label})")
 
     def sort_alphabetically(self):
-        self.accounts = sorted(self.accounts, key=lambda x: x.provider)
+        self.accounts = sorted(self.accounts, key=lambda x: x.issuer)
         self.save_accounts()
         self.logger.info(f"Accounts sorted alphabetically.")
 
@@ -320,7 +320,7 @@ class AccountManager:
                 secret_key = json_account['secret']
                 if import_mode:
                     secret_key = cipher_funcs.encrypt(json_account['secret'])
-                restored_account = Account(json_account['provider'],json_account['label'],secret_key,json_account['last_used'])
+                restored_account = Account(json_account['issuer'],json_account['label'],secret_key,json_account['last_used'])
 
                 restored_accounts.append(restored_account)
 
@@ -385,7 +385,7 @@ class AccountManager:
     @staticmethod
     def _validate_account_data(content: list) -> bool:
         """Validate account data structure."""
-        required_fields = {'provider', 'label', 'secret', 'last_used'}
+        required_fields = {'issuer', 'label', 'secret', 'last_used'}
         for acct in content:
             if not isinstance(acct, dict):
                 return False
@@ -396,7 +396,7 @@ class AccountManager:
             try:
                 cipher_funcs.decrypt(acct['secret'])
             except cryptography.fernet.InvalidToken as e:
-                print (f"Found invalid secret loading accounts for {acct['provider']}")
+                print (f"Found invalid secret loading accounts for {acct['issuer']}")
                 print (e)
                 return False
         return True
@@ -404,7 +404,7 @@ class AccountManager:
     @staticmethod
     def _account_key(account: dict) -> str:
         """Generate unique key for account used to detect external modification """
-        return f"{account['provider']}:{account['label']}"
+        return f"{account['issuer']}:{account['label']}"
 
 
     @staticmethod
@@ -412,7 +412,7 @@ class AccountManager:
         list_copy = []
         for item in accounts:
             newitem = Account(
-                provider=item.provider,
+                issuer=item.issuer,
                 label=item.label,
                 secret=item.secret,
                 last_used=item.last_used

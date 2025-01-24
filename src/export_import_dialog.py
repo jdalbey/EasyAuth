@@ -5,6 +5,22 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDial
 
 from account_entry_dialog import help_style
 from account_manager import AccountManager
+""" Reference: Gnome-Authenticator backup JSON format
+  {
+    "secret": "37E4WSILXWLQ87C2QJ4MXABCD2OW7L6H",
+    "issuer": "Figma",
+    "label": "fig@figma.commy",
+    "digits": 6,
+    "type": "totp",
+    "algorithm": "sha1",
+    "thumbnail": null,
+    "last_used": 0,
+    "used_frequency": 0,
+    "counter": 1,
+    "tags": [],
+    "period": 30
+  }
+"""
 
 class ExportImportDialog(QDialog):
     def __init__(self, account_manager: AccountManager, parent=None):

@@ -24,7 +24,7 @@ def generate_otp(secret):
 def otpauth_uri_from_account(account):
     decrypted_secret = cipher_funcs.decrypt(account.secret)
     totp = pyotp.TOTP(decrypted_secret)
-    uri = totp.provisioning_uri(name=account.label, issuer_name=account.provider)
+    uri = totp.provisioning_uri(name=account.label, issuer_name=account.issuer)
     logging.debug (f"otp_funcs: created uri from account info: {uri}")
     return uri
 

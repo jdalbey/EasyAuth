@@ -200,7 +200,7 @@ class AppView(QMainWindow):
             # Adjust the spacing of the scroll_layout
             self.scroll_layout.setSpacing(2)  # Set vertical spacing between rows
             for index, account in enumerate(self.account_manager.accounts):
-                if search_term in account.provider.lower():
+                if search_term in account.issuer.lower():
                     secret_key = cipher_funcs.decrypt(account.secret)
                     try:
                         otp = pyotp.TOTP(secret_key).now()
@@ -219,10 +219,10 @@ class AppView(QMainWindow):
                     # Set external padding around the frame by adjusting the layout margins of the parent widget
                     #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
                     if self.app_config.is_display_favicons():
-                        icon_label = self.providers.get_provider_icon(account.provider)
+                        icon_label = self.providers.get_provider_icon(account.issuer)
                         rowframe_layout.addWidget(icon_label)
 
-                    label_string = f"{account.provider} ({account.label})"
+                    label_string = f"{account.issuer} ({account.label})"
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
@@ -282,7 +282,7 @@ class AppView(QMainWindow):
         # update last used time
         account.last_used = now.strftime("%Y-%m-%d %H:%M:%S")
         self.account_manager.update_account(idx,account)
-        self.logger.debug(f"Updated last_used time for: {idx} {account.provider} ({account.label})")
+        self.logger.debug(f"Updated last_used time for: {idx} {account.issuer} ({account.label})")
 
         # Show the floating message relative to the given label position
         popup = QLabel("Copied", self)
@@ -321,7 +321,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_edit_account_form(self,index,account):
-        self.logger.debug (f"entering show_edit_account_form with {index} {account.provider}")
+        self.logger.debug (f"entering show_edit_account_form with {index} {account.issuer}")
         dialog_EditAcct = EditAccountDialog(self, index, account)
         dialog_EditAcct.exec_()
         self.display_accounts()

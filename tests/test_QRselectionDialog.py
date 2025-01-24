@@ -47,4 +47,4 @@ def test_dialog_selection(qtbot):
 
     # Verify the dialog was accepted
     assert dialog.result() == QDialog.Accepted, "Failed: Dialog was not accepted"
-    assert dialog.get_selected_account().provider == "Woogle"
+    assert dialog.get_selected_account().issuer == "Woogle"

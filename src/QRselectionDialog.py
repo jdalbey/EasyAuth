@@ -34,7 +34,7 @@ class QRselectionDialog(QDialog):
             radio_button = QRadioButton()
             self.button_group.addButton(radio_button)  # Add radio button to the button group
             # Label should be adjacent to radio button
-            label = QLabel(f"{account.provider} - {account.label}")
+            label = QLabel(f"{account.issuer} - {account.label}")
 
             # Add the radio button and label to the row layout
             row_layout.addWidget(radio_button)
@@ -81,9 +81,9 @@ class QRselectionDialog(QDialog):
 
 # Sample accounts
 accounts = [
-    Account(provider="Provider1", label="Account1",secret="x",last_used=""),
-    Account(provider="Provider2", label="Account2",secret="x",last_used=""),
-    Account(provider="Provider3", label="Account3",secret="x",last_used=""),
+    Account(issuer="Provider1", label="Account1",secret="x",last_used=""),
+    Account(issuer="Provider2", label="Account2",secret="x",last_used=""),
+    Account(issuer="Provider3", label="Account3",secret="x",last_used=""),
 ]
 
 # Test the dialog
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     if dialog.exec_() == QDialog.Accepted:
         selected_account = dialog.get_selected_account()
         if selected_account:
-            print(f"Selected Account: {selected_account.provider} - {selected_account.label}")
+            print(f"Selected Account: {selected_account.issuer} - {selected_account.label}")
         else:
             print("No account selected.")
 

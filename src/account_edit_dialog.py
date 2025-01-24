@@ -159,8 +159,8 @@ class EditAccountDialog(AccountEntryDialog):
         reply = QMessageBox.question(
             self,
             'Confirm Delete',
-            f'Are you sure you want to delete this account?\n\n{self.account.provider} ({self.account.label})\n\n'+
-            f"You will lose access to {self.account.provider} unless you have saved the restore codes. (Learn more)",
+            f'Are you sure you want to delete this account?\n\n{self.account.issuer} ({self.account.label})\n\n'+
+            f"You will lose access to {self.account.issuer} unless you have saved the restore codes. (Learn more)",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )

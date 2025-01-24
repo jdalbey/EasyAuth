@@ -79,7 +79,7 @@ class ReorderDialog(QDialog):
     def populate_list(self):
         #font = QFont("Serif", 12)
         for account in self.accounts:
-            display_text = f"⇳ {account.provider} - {account.label}"
+            display_text = f"⇳ {account.issuer} - {account.label}"
             item = QListWidgetItem(display_text)
             #item.setFont(font)
             self.list_widget.addItem(item)
