@@ -26,32 +26,6 @@ from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 from assets.styles import dark_qss, light_qss
 class AppView(QMainWindow):
-    # otplabel_style_normal = """
-    #     QPushButton {
-    #         border: None;
-    #         background: transparent;
-    #         color: black;
-    #         font-size: 16px;
-    #         text-align: left;
-    #     }
-    #     QPushButton:hover {
-    #         text-decoration: underline;
-    #         color: blue;
-    #         }
-    #     """
-    # otplabel_style_clicked = """
-    #     QPushButton {
-    #         border: None;
-    #         background: transparent;
-    #         background-color: #82e0aa;
-    #         color: black;
-    #         font-size: 16px;
-    #         text-align: left;
-    #     }
-    #     QPushButton:hover {
-    #         text-decoration: underline;
-    #     }
-    #     """
     def __init__(self, q_app):
         super().__init__()
         self.q_app = q_app
@@ -263,20 +237,8 @@ class AppView(QMainWindow):
                     # """)
 
                     edit_btn = QPushButton()
-                    #edit_icon = QIcon("images/edit_icon.png")
-                    #edit_btn.setIcon(edit_icon)
-                    # enable the app stylesheet to target the edit_btn button for the image styling.
-                    # "QPushButton#edit_btn {"
-                    #     "background-image: url(path/to/your/new_icon.png);"
                     edit_btn.setObjectName("editButton")
-                    #edit_btn.setIconSize(QSize(16,16))
-                    # Apply a stylesheet to change the icon on hover
-                    #edit_btn.setStyleSheet("QPushButton:hover {background-color: lightgray; }")
-                    # edit_btn.setStyleSheet("""
-                    #     QPushButton:hover {
-                    #         qproperty-icon: url(images/edit_icon_hover.png);
-                    #     }
-                    # """)
+
                     edit_btn.setToolTip("Edit account")
                     # pass the current values of index, account to show_edit_account_form
                     edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
@@ -284,8 +246,6 @@ class AppView(QMainWindow):
 
                     otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
                     otplabel.setObjectName("otpLabel")
-                    #otplabel.setFont(QFont("DejaVu Sans Mono", 14)) #, QFont.Bold))
-                    #otplabel.setStyleSheet(self.otplabel_style_normal)
                     otplabel.setToolTip("Copy code to clipboard")
                     otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
