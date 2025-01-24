@@ -81,9 +81,9 @@ class QRselectionDialog(QDialog):
 
 # Sample accounts
 accounts = [
-    Account(provider="Provider1", label="Account1",secret="",last_used=""),
-    Account(provider="Provider2", label="Account2",secret="",last_used=""),
-    Account(provider="Provider3", label="Account3",secret="",last_used=""),
+    Account(provider="Provider1", label="Account1",secret="x",last_used=""),
+    Account(provider="Provider2", label="Account2",secret="x",last_used=""),
+    Account(provider="Provider3", label="Account3",secret="x",last_used=""),
 ]
 
 # Test the dialog

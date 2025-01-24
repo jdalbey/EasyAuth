@@ -21,9 +21,29 @@ from appconfig import AppConfig
 class Account:
     provider: str
     label: str
-    secret: str  # encrypted secret key
-    last_used: str
+    secret: str # encrypted secret key
+    last_used: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    usage_count: int = 0
+    favorite: bool = False
 
+# TODO: move otpauth_uri_from_account() here as get_otp_auth_uri()
+
+    def __post_init__(self):
+        if self.secret == "":
+            raise ValueError("Secret cannot be empty")
+
+    # Override __eq__ to compare only provider and label
+    # used by account_manager.save_new_account
+    def __eq__(self, other):
+        if isinstance(other, Account):
+            return self.provider == other.provider and self.label == other.label
+        return NotImplemented
+
+@dataclass(frozen=True)
+class OtpRecord:
+    provider: str
+    label: str
+    secret: str  # plain-text secret key
 
 class AccountManager:
     _instance = None

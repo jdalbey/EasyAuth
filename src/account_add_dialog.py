@@ -2,8 +2,9 @@ import logging
 
 import pyotp
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication, QFileDialog, QFrame, QWidget
+    QApplication, QFileDialog, QFrame, QWidget, QGridLayout
 
 from appconfig import AppConfig
 from account_manager import Account, AccountManager
@@ -25,35 +26,42 @@ class AddAccountDialog(AccountEntryDialog):
         # Frame for the dialog features
         directions_frame = QFrame()
         directions_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.layout = QVBoxLayout(directions_frame)
+        self.layout = QGridLayout(directions_frame)
+        self.layout.setVerticalSpacing(15)
 
-        header_label = QLabel("Choose how to create your new account:")
-        self.layout.addWidget(header_label)
+        header_label = QLabel("Choose how to create a new account:")
+        self.layout.addWidget(header_label, 0,0,1,2)
         # choices section
-        qr_screen_label = QLabel("• Fill the form automatically from a QR code on the screen")
-        qr_screen_label.setContentsMargins(20, 0, 0, 0)
-        self.layout.addWidget(qr_screen_label)
 
         self.find_qr_btn = QPushButton("Use QR code")
         self.find_qr_btn.setShortcut('Ctrl+U')
         self.find_qr_btn.clicked.connect(lambda: self.get_qr_code())
         self.find_qr_btn.setContentsMargins(40, 0, 0, 0)
         self.find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.layout.addWidget(self.find_qr_btn, alignment=Qt.AlignCenter)
+        self.layout.addWidget(self.find_qr_btn, 1,0, alignment=Qt.AlignRight)
+        qr_screen_label = QLabel("Automatically obtain the data from a QR code on the screen.")
+        qr_screen_label.setContentsMargins(5, 0, 0, 0)
+        self.layout.addWidget(qr_screen_label,1,1, alignment=Qt.AlignLeft)
 
-        qr_file_label = QLabel("• Fill the form automatically from a QR image in a file")
-        qr_file_label.setContentsMargins(20, 0, 0, 0)
-        self.layout.addWidget(qr_file_label)
-
-        open_file_btn = QPushButton("Open file")
+        open_file_btn = QPushButton("Open QR image")
         open_file_btn.clicked.connect(self.open_qr_image)
         open_file_btn.setContentsMargins(40, 0, 0, 0)
         open_file_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.layout.addWidget(open_file_btn, alignment=Qt.AlignCenter)
+        self.layout.addWidget(open_file_btn, 2,0)
+        qr_file_label = QLabel("Automatically obtain the data from a QR image in a file.")  # •
+        qr_file_label.setContentsMargins(5, 0, 0, 0)
+        self.layout.addWidget(qr_file_label, 2,1)
 
-        manual_label = QLabel("• Enter the data manually")
-        manual_label.setContentsMargins(20, 0, 0, 0)
-        self.layout.addWidget(manual_label)
+        ellipsis_label = QLabel("...")
+        ellipsis_label.setFont(QFont('monospaced',16))
+        ellipsis_label.setContentsMargins(40, 0, 0, 10)
+        self.layout.addWidget(ellipsis_label,3,0, alignment=Qt.AlignRight)
+
+        manual_label = QLabel("Manually enter the data in the following fields.")
+        """Enter the data manually"""
+        manual_label.setContentsMargins(5, 0, 0, 0)
+        self.layout.addWidget(manual_label,3,1)
+
         self.form_layout.addWidget(directions_frame, 0,0,1,3 )
 
         # Declare the button frame

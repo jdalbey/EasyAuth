@@ -1,4 +1,6 @@
 # Custom additions to dark theme
+import qdarktheme
+
 dark_qss = """
 /*QLabel {
     color: goldenrod;
@@ -37,6 +39,12 @@ QLineEdit {
     background-color: floralwhite;
     color:  #212f3c; /* near black */
 }
+QPushButton { background-color: #ebecf0 }  
+/*toolbar background #ebebeb */
+QPushButton#addAccountButton { background-color: #f0f0f0; }
+QPushButton#addAccountButton:hover { background-color: #d6dfea; }
+QPushButton#addAccountButton:pressed { background-color: #b9cee9; }
+
 QPushButton#editButton {
     qproperty-icon: url("images/edit_icon_light.png");
 }
@@ -44,6 +52,7 @@ QPushButton#otpLabel {
     font-family: "DejaVu Sans Mono";
     font-size: 16px;
     /*
+    background-color: gray;
     border: None;
     background: transparent;
     color: black;

@@ -107,6 +107,7 @@ class AppView(QMainWindow):
 
         # Add quick access buttons
         add_btn = QPushButton("Add Account")
+        add_btn.setObjectName("addAccountButton")
         add_btn.clicked.connect(self.show_add_account_form)
         toolbar.addWidget(add_btn)
 

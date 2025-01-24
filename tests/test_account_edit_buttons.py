@@ -44,7 +44,7 @@ class TestAccountDeletion(unittest.TestCase):
         # verify results
         assert dialog.encrypted_secret.startswith('gAAAA')
         # We expect the account sent to update has the modified fields
-        expected_account = Account("ModifiedWoogle","x@w.com","","2000-01-01 01:01")
+        expected_account = Account("ModifiedWoogle","x@w.com","x","2000-01-01 01:01")
         expected_account.secret = dialog.encrypted_secret
         MockAccountManager.update_account.assert_called_once_with(1, expected_account)
         dialog.close.assert_called_once()
