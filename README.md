@@ -51,7 +51,6 @@ Python 3.5+
 PyQt5  
 pyotp  
 pyperclip  
-pyautogui  
 pyzbar  
 cryptography  
 qrcode  

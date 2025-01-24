@@ -40,9 +40,6 @@ QLineEdit {
 QPushButton#editButton {
     qproperty-icon: url("images/edit_icon_light.png");
 }
-QPushButton#copyButton {
-    qproperty-icon: url("images/copy_icon_light.png");
-}
 QPushButton#otpLabel {
     font-family: "DejaVu Sans Mono";
     font-size: 16px;
@@ -83,7 +80,4 @@ QToolTip#timerLabel {
     background-color: ivory;
     border: 1px solid black;
 }
-
-
-
 """
