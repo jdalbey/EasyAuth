@@ -26,13 +26,13 @@ The quide will show how to store shared keys in your EasyAuth vault and use Time
 1. Now that EasyAuth has created an account for the desired website, it  will display a six-digit One-Time Password (TOTP) for the account that  changes every 30 seconds. The seconds timer indicates how much  time remains for the displayed TOTP to be active.  
 <img src="images/TOTP-code.png" alt="TOTP-code" border="0">
 
-2. Click the "copy to clipboard" icon and the TOTP code will be placed on the clipboard.
+2. Click the 6-digit TOTP code to copy it to the clipboard.
 
-3. Complete the setup process on the website by copying this code into the verify field in your browser. 
+3. Complete the setup process on the website by pasting this code into the verify field in your browser. 
 
 4. Next time you attempt to login to your online account you will be prompted to verify your identity. An entry form will be displayed requesting a  one-time code. 
 
-5. In EasyAuth locate the TOTP for the desired account and click on the "copy to clipboard" icon. Return to the website verification form and paste the six-digit code into the verification field.
+5. In EasyAuth locate the TOTP for the desired account and click on the TOTP code. Return to the website verification form and paste the six-digit code into the verification field.
 
 6. If you are delayed in completing the copy-and-paste operation the 30-second activation period may expire and the website will decline to verify you.  Simply click the next TOTP code that appears in the main window and try again. 
 

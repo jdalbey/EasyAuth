@@ -1,5 +1,4 @@
 import json
-import os
 import sys, logging
 from dataclasses import asdict
 

@@ -10,24 +10,30 @@ Focus on ease of use for beginners using TOTP authentication.
  - The list can be manually reordered to achieve a custom ordering. 
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
  - QR codes can be read from an image file.
+ - Export and Import vault to plain-text JSON file.
  - Familiar easy-to-navigate desktop GUI.
  - Automatically finds favicons for many sites that offer TOTP verification.
- - Verifying with OTP in three easy steps: 
+ - GUI includes light and dark themes.
+ - Preferences dialog has some customization settings.
+ - Verifying with TOTP in three easy steps: 
    1. Open the application.  
-   2. Click Copy button next to the account you are logging in to. 
+   2. Click the TOTP code for the account you are logging in to. 
    3. Paste into verification form.
  
    No text messages to your phone, no email to check. Quick and hassle-free.
 
 
 ### Status
-Development underway.  Core features and GUI are implemented.
+All features above are implemented.
+Developer is "eating his own dog food" by using the program to login to Github to maintain this project repository.
 Error handling implemented for core data model classes.
-52 unit tests for are passing.  Approximately 2000 lines of code.
+Approximately 2000 lines of code.  67 automated unit tests for are passing.  
 
-### Screenshot
+### Screenshots
  
-<img src="https://i.ibb.co/LphWpmN/Easy-Auth-main-window.png" alt="Main Window">
+<a href="https://ibb.co/M5FwMGb"><img src="https://i.ibb.co/93QKsVJ/Main-Window.png" alt="Main-Window" border="0"></a>
+
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/kM9b2Tb/Edit-Account-Dialog.png" alt="Edit-Account-Dialog" border="0"></a>
 ### Limitations
 
 Currently targets Linux OS.
@@ -49,6 +55,7 @@ pyautogui
 pyzbar  
 cryptography  
 qrcode  
+qdarktheme
 
 ## Usage
 Practice storing a new secret key using the sample QR code below.
