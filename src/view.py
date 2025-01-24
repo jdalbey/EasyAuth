@@ -70,6 +70,7 @@ class AppView(QMainWindow):
         file_menu.addAction(export_action)
 
         preferences_action = QAction('Preferences', self)
+        preferences_action.setShortcut('Ctrl+P')
         preferences_action.triggered.connect(self.show_preferences_dialog)
         file_menu.addAction(preferences_action)
 
@@ -206,7 +207,7 @@ class AppView(QMainWindow):
                     except:  # This would only happen from internal error
                         otp = "??????"
                     row_frame = QFrame()
-                    row_frame.setFrameShape(QFrame.StyledPanel)
+                    row_frame.setFrameShape(QFrame.NoFrame) #QFrame.StyledPanel)
                     # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
                     row_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     # Set internal padding for the frame
