@@ -131,12 +131,10 @@ class TestAccountManager:
 
     @patch('cipher_funcs.encrypt')
     def test_save_new_account(self, mock_encrypt, account_manager):
-
         """Test saving a new account."""
-        vault_dir = os.path.dirname(account_manager.vault_path)
 
-        mock_encrypt.return_value = "encrypted_test_secret"
-
+        encrypted_secret = 'gAAAAABnlSYl5cBXe7783zthq1-sSuRoccpcmsICsySJPKYYARcED4GB7XCMi5kzO8soJljShxSqXjVnFcJjeFLtq_hriG9IsA=='
+        mock_encrypt.return_value = encrypted_secret
         # Clear any existing accounts
         account_manager.accounts = []
         # Save the new account
@@ -154,7 +152,7 @@ class TestAccountManager:
         new_account = account_manager.accounts[0]
         assert new_account.issuer == "Test"
         assert new_account.label == "TestLabel"
-        assert new_account.secret == "encrypted_test_secret"
+        assert new_account.secret == encrypted_secret
 
     @patch('cipher_funcs.encrypt')
     def test_update_account(self, mock_encrypt, account_manager):
@@ -162,7 +160,8 @@ class TestAccountManager:
         """Test updating an existing account."""
         vault_dir = os.path.dirname(account_manager.vault_path)
 
-        mock_encrypt.return_value = "encrypted_test_secret"
+        encrypted_secret = 'gAAAAABnlSYl5cBXe7783zthq1-sSuRoccpcmsICsySJPKYYARcED4GB7XCMi5kzO8soJljShxSqXjVnFcJjeFLtq_hriG9IsA=='
+        mock_encrypt.return_value = encrypted_secret
 
         # Clear any existing accounts
         account_manager.accounts = []
@@ -178,7 +177,7 @@ class TestAccountManager:
             print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
             raise
         # Update the existing account
-        revised_data = Account("Foobar",'Barfoo',"encrypted_test_secret","2020-12-12 01:01")
+        revised_data = Account("Foobar",'Barfoo',encrypted_secret,"2020-12-12 01:01")
         try:
             account_manager.update_account(0, revised_data)
         except Exception as e:
@@ -189,7 +188,7 @@ class TestAccountManager:
         updated_account = account_manager.accounts[0]
         assert updated_account.issuer == "Foobar"
         assert updated_account.label == "Barfoo"
-        assert updated_account.secret == "encrypted_test_secret"
+        assert updated_account.secret == encrypted_secret
 
     @patch('cipher_funcs.encrypt')
     def test_delete_account(self, mock_encrypt, account_manager):
@@ -197,7 +196,8 @@ class TestAccountManager:
         """Test deleting an existing account."""
         vault_dir = os.path.dirname(account_manager.vault_path)
 
-        mock_encrypt.return_value = "encrypted_test_secret"
+        encrypted_secret = 'gAAAAABnlSYl5cBXe7783zthq1-sSuRoccpcmsICsySJPKYYARcED4GB7XCMi5kzO8soJljShxSqXjVnFcJjeFLtq_hriG9IsA=='
+        mock_encrypt.return_value = encrypted_secret
 
         # Clear any existing accounts
         account_manager.accounts = []

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch, MagicMock
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
-from account_manager import Account
+from account_manager import Account, OtpRecord
 from qr_hunting import confirm_account, process_qr_codes
 
 class TestQRHunting(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestQRHunting(unittest.TestCase):
         mock_ConfirmAccountDialog.return_value = mock_dialog_instance
 
         # Create a sample account
-        account = Account(issuer="TestProvider", label="TestLabel", secret="ValidSecret", last_used="")
+        account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="ValidSecret")
 
         # Call the function
         result = confirm_account(account)
@@ -45,7 +45,7 @@ class TestQRHunting(unittest.TestCase):
         mock_ConfirmAccountDialog.return_value = mock_dialog_instance
 
         # Create a sample account
-        account = Account(issuer="TestProvider", label="TestLabel", secret="ValidSecret", last_used="")
+        account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="ValidSecret")
 
         # Call the function
         result = confirm_account(account)
@@ -62,7 +62,7 @@ class TestQRHunting(unittest.TestCase):
         mock_is_valid_secretkey.return_value = False
 
         # Create a sample account
-        account = Account(issuer="TestProvider", label="TestLabel", secret="InvalidSecret", last_used="")
+        account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="InvalidSecret")
 
         # Call the function
         result = confirm_account(account)

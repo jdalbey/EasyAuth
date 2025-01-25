@@ -2,16 +2,16 @@ import pytest
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtCore import Qt
 from reorder_dialog import ReorderDialog
-from account_manager import Account
+from account_manager import OtpRecord
 @pytest.fixture
 def app(qtbot):
     app = QApplication([])
     return app
 
 def test_dialog_noselection_OK(qtbot):
-    accounts = [Account("Woogle","me@woogle.com","secret","2000-01-01 01:01"),
-                Account("Boogle","me@boogle.com","secret","2000-01-01 01:01")]
-
+    rec1 = OtpRecord("Woogle","me@woogle.com","secret")
+    rec2 = OtpRecord("Boogle","me@boogle.com","secret")
+    accounts = [rec1.toAccount(), rec2.toAccount()]
     # Create and show the dialog
     dialog = ReorderDialog(accounts)
 

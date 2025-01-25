@@ -9,7 +9,7 @@ class TestOTPfuncs:
 
     def test_otpauth_uri_from_account(self):
         account = Account("Woogle","me@woogle.com","gAAAAABngpqkACjKleIWZa3xdgSjtAagXkdaAjRuMCpqHCcXAKbtZ6RpB9mKeHdToEn1TOIkhqmEXSiyfX0MgYekjYbU79k0TA==","2001-01-01 12:01")
-        uri = otp_funcs.otpauth_uri_from_account(account)
+        uri = account.get_otp_auth_uri()
         expected = "otpauth://totp/Woogle:me%40woogle.com?secret=ABC234&issuer=Woogle"
         assert uri == expected
 

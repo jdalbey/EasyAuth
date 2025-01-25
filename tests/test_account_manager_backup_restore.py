@@ -69,10 +69,11 @@ class TestAccountManager:
 
     def test_backup_and_restore(self,account_manager, sample_accounts):
         # Create Account objects
-        acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
-        acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
-        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
+        acct1 = OtpRecord("Boggle", "Work", "secret_1")
+        acct2 = OtpRecord("Github", "Personal", "secret_2")
+
+        account_manager.save_new_account(acct2)
+        account_manager.save_new_account(acct1)
         # Backup these existing accounts
         account_manager.backup_accounts("/tmp/backup_test1.json")
         # assert that file exists with non-zero size
@@ -99,10 +100,10 @@ class TestAccountManager:
         # Erase accounts for a clean fixture
         account_manager.accounts = []
         # Create Account objects
-        acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
-        acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
-        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
+        acct1 = OtpRecord("Boggle", "Work", "secret_1")
+        acct2 = OtpRecord("Github", "Personal", "secret_2")
+        account_manager.save_new_account(acct2)
+        account_manager.save_new_account(acct1)
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test2.json",'json')
         # assert that file exists with non-zero size
@@ -140,10 +141,10 @@ class TestAccountManager:
         # Erase accounts for a clean fixture
         account_manager.accounts = []
         # Create Account objects
-        acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
-        acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
-        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
+        acct1 = OtpRecord("Boggle", "Work", "secret_1")
+        acct2 = OtpRecord("Github", "Personal", "secret_2")
+        account_manager.save_new_account(acct2)
+        account_manager.save_new_account(acct1)
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test3.json",'json')
         # Remove accounts for the test - so we can verify that preview doesn't touch the vault.
@@ -166,10 +167,10 @@ class TestAccountManager:
         # Erase accounts for a clean fixture
         account_manager.accounts = []
         # Create Account objects
-        acct1 = Account("Boggle", "Work", "AB23", "2024-01-14 10:00")
-        acct2 = Account("Github", "Personal", "BC34", "2024-01-14 10:00")
-        account_manager.save_new_account(OtpRecord("Github", "Personal", "BC34"))
-        account_manager.save_new_account(OtpRecord("Boggle", "Work", "AB23"))
+        acct1 = OtpRecord("Boggle", "Work", "secret_1")
+        acct2 = OtpRecord("Github", "Personal", "secret_2")
+        account_manager.save_new_account(acct2)
+        account_manager.save_new_account(acct1)
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test4.txt","uri")
         # assert that file exists with non-zero size

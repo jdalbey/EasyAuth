@@ -94,10 +94,11 @@ class AccountEntryDialog(QDialog):
         # Stub implementation is completed by subclasses
         pass
 
-    def set_fields(self, account):
-        self.provider_entry.setText(account.issuer)
-        self.label_entry.setText(account.label)
-        self.secret_entry.setText(account.secret)
+    def set_fields(self, otp_record):
+        self.provider_entry.setText(otp_record.issuer)
+        self.label_entry.setText(otp_record.label)
+        self.secret_entry.setText(otp_record.secret)
+        # find icon to show in edit form
         # if len(account.issuer) > 0:
         #     tmplabel = self.providers.get_provider_icon(account.issuer)
         #     self.favicon.setPixmap(tmplabel.pixmap())

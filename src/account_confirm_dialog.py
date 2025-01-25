@@ -62,8 +62,8 @@ class ConfirmAccountDialog(AccountEntryDialog):
         self.setTabOrder(self.cancel_button, self.provider_entry)  # Complete the cycle
 
     # Set values into fields (used by auto qr code scanning)
-    def set_account(self, account):
-        self.set_fields(account)        
+    def set_account(self, otp_record):
+        self.set_fields(otp_record)
 
 # Local main for unit testing
 if __name__ == '__main__':

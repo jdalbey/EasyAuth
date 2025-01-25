@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QDialog, QMessageBox
 
 import find_qr_codes
 from QRselectionDialog import QRselectionDialog
-from account_manager import Account
+from account_manager import Account, OtpRecord
 from account_confirm_dialog import ConfirmAccountDialog
 from otp_funcs import is_valid_secretkey
 import logging
@@ -21,16 +21,16 @@ def fetch_qr_code():
     # Either we didn't find any qr codes or auto_find is turned off
     return False
 
-def confirm_account(account): #, confirm_dialog):
+def confirm_account(otp_record): #, confirm_dialog):
     # check selection has valid secret key.
-    logging.debug(f"Checking validity of code for {account.issuer}: {account.secret}")
-    if not is_valid_secretkey(account.secret):
+    logging.debug(f"Checking validity of code for {otp_record.issuer}: {otp_record.secret}")
+    if not is_valid_secretkey(otp_record.secret):
         logging.debug ("QR code invalid key")
         # if not valid secret key show message box then return to blank account_add form.
         reply = QMessageBox.information (None, 'Info', "QR code has invalid secret key.",QMessageBox.Ok)
     else:
         # if valid key place the fields from that account into the Confirm dialog form field.
-        fields = Account(account.issuer, account.label, account.secret, "")
+        fields = OtpRecord(otp_record.issuer, otp_record.label, otp_record.secret)
         current_dialog = ConfirmAccountDialog()
         current_dialog.set_account(fields)
         if current_dialog.exec_() == QDialog.Accepted:
@@ -55,10 +55,10 @@ def process_qr_codes(called_from_Find_btn):
         issuer = totp_obj.issuer
         name = totp_obj.name
         secret_key = totp_obj.secret
-        account = Account(issuer,name,secret_key,"")
+        otp_record = OtpRecord(issuer,name,secret_key)
         # TODO: Extract the advanced parameters if they exists
         logging.debug(f"In AddDialog: Scanned QR code: {issuer} {name} ")
-        display_list.append(account)
+        display_list.append(otp_record)
     # How many valid URI's do we have?
     if len(display_list) == 0:
         # This should only be shown during a requested find, not an automatic one.

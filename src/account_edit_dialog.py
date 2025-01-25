@@ -156,18 +156,14 @@ class EditAccountDialog(AccountEntryDialog):
             QMessageBox.information(self,"Error",f'The secret key is invalid')
 
     def confirm_delete_account(self):
-        # Create the message box
+        # Create the message box to be a question with Yes and No buttons
         msg = QMessageBox()
         msg.setWindowTitle("Confirm Account Delete")
-
-        # Set the message box to be a question with Yes and No buttons
+        msg.setTextFormat(Qt.RichText)  # Use rich text for HTML links
         msg.setIcon(QMessageBox.Question)
         msg.setText(f'Are you sure you want to delete this account?<br>{self.account.issuer} ({self.account.label})<br>'+
             f"You will lose access to {self.account.issuer} unless you have saved the restore codes. "+
             '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md#Deleting-an-account">(Learn more)</a>')
-
-        # Enable the link to be clickable
-        msg.setTextFormat(Qt.RichText)  # Use rich text for HTML links
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 
         # Display the message box
@@ -177,6 +173,8 @@ class EditAccountDialog(AccountEntryDialog):
         if reply == QMessageBox.Yes:
             self.account_manager.delete_account(self.account)
             self.accept()
+        else:
+            self.reject()
 
     def handle_QR_reveal(self):
         if not self.is_qr_visible:

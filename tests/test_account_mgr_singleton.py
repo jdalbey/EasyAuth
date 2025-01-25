@@ -81,7 +81,7 @@ def test_typical_use():
 
 def test_duplicate_accounts(sample_accounts):
     instance = AccountManager("/tmp/testvault.json")
-    accounts = [Account(**acc) for acc in sample_accounts]
+    accounts = [OtpRecord(acc['issuer'],acc['label'],acc['secret']).toAccount() for acc in sample_accounts]
     duplicates = instance.duplicate_accounts(accounts)
     assert len(duplicates) == 2, "duplicate_accounts should create copies of all accounts"
     assert duplicates[0].issuer == accounts[0].issuer

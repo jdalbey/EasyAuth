@@ -3,12 +3,13 @@ import logging
 import os
 import shutil
 import threading
+import urllib
 from datetime import datetime
 from pathlib import Path
 import platform
 from typing import List, Optional
 
-import cryptography
+import cryptography.fernet
 import pyotp
 
 import cipher_funcs
@@ -34,7 +35,13 @@ class Account:
 
     def __post_init__(self):
         if self.secret == "":
-            raise ValueError("Secret cannot be empty")
+            raise ValueError("Can't create Account with empty secret.")
+        try:
+            cipher_funcs.decrypt(self.secret)
+        except cryptography.fernet.InvalidToken as e:
+            raise ValueError("Can't create Account with plain-text secret.")
+        except Exception as e:
+            raise (e)
 
 @dataclass(frozen=True)
 class OtpRecord:
@@ -42,6 +49,11 @@ class OtpRecord:
     issuer: str
     label: str
     secret: str  # plain-text secret key
+
+    def toAccount(self):
+        encryped_secret = cipher_funcs.encrypt(self.secret)
+        return Account(self.issuer, self.label, encryped_secret, "1980-01-01 00:00:00")
+
 
 class AccountManager:
     _instance = None
@@ -228,35 +240,40 @@ class AccountManager:
     def backup_accounts(self, file_path):
         self.write_accounts_file(file_path, 'json')
     def export_accounts(self, file_path, desired_format):
-        self.write_accounts_file(file_path, desired_format, export_mode=True)
-    def write_accounts_file(self, file_path, desired_format='json', export_mode=False):
-        """Store the accounts as JSON in the given file_path with an encrypted secret.
+        self.write_accounts_file(file_path, desired_format, use_encrypted_keys=False)
+    def write_accounts_file(self, file_path, desired_format='json', use_encrypted_keys=True):
+        """Store the accounts in the desired_format in the given file_path.
           Accounts in the vault are encrypted.
             1. For backup they need no special treatment before writing.
             2. for export, they need to be decrypted before writing.
          @param file_path location of file
          @param desired_format 'json' or 'uri'
-         @param export_mode decrypt the keys before writing accounts to the file."""
-        target = "Backup"
-        if export_mode:
-            target = "Export"
+         @param use_encrypted_keys before writing accounts to the file. (False for exporting which wants decrypted keys)"""
+        # Create a label for logging and error messages appropriate to mode
+        target_label = "Export"
+        if use_encrypted_keys:
+            target_label = "Backup"
 
         vault_accounts = []
 
         # Check if accounts exist and are iterable
         if not hasattr(self, 'accounts') or not isinstance(self.accounts, list):
-            self.logger.error(f"Internal error: No accounts to {target}. 'self.accounts' is not a list.")
+            self.logger.error(f"Internal error: No accounts to {target_label}. 'self.accounts' is not a list.")
             return
 
         # Convert accounts to plaintext
         uri_list = ""
         for account in self.accounts:
             try:
-                uri_list += account.get_otp_auth_uri() + "\n" # convert to URI and append to string
                 # turn the Account object into a dictionary so it can be serialized by json.dump
                 vault_account = account.__dict__.copy()
-                if export_mode:
+                # Export mode wants plain-text keys
+                if not use_encrypted_keys:
                     vault_account['secret'] = cipher_funcs.decrypt(account.secret)
+                    if desired_format == 'uri':
+                        # Convert account to URI and append to string
+                        # Expects encrypted keys that it converts to plain URI
+                        uri_list += account.get_otp_auth_uri() + "\n"  # convert to URI and append to string
                 vault_accounts.append(vault_account)
             except AttributeError as e:
                 self.logger.error(f"Error processing account {account}: Missing required attribute - {e}")
@@ -284,11 +301,11 @@ class AccountManager:
         try:
             with open(file_path, 'w') as f:
                 f.write(result)
-            self.logger.info(f"Successful {target} of {len(vault_accounts)} accounts to {file_path}")
+            self.logger.info(f"Successful {target_label} of {len(vault_accounts)} accounts to {file_path}")
         except (OSError, IOError) as e:
-            self.logger.error(f"{target} failed to write to {file_path}: {e}")
+            self.logger.error(f"{target_label} failed to write to {file_path}: {e}")
         except Exception as e:
-            self.logger.error(f"Unexpected error during {target}: {e}")
+            self.logger.error(f"Unexpected error during {target_label}: {e}")
 
     def restore_accounts(self, file_path):
         self.read_accounts_file(file_path, import_mode=False)

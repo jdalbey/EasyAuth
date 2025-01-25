@@ -2,13 +2,13 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QRadioButton, QPushButton, \
     QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup
-from account_manager import Account
+from account_manager import Account, OtpRecord
 
 class QRselectionDialog(QDialog):
     def __init__(self, accounts, parent=None ):
         super().__init__(parent)
         self.setWindowTitle("Select a QR code")
-        self.selected_account = None
+        self.selected_otp_record = None
 
         # Layout setup
         layout = QVBoxLayout(self)
@@ -25,7 +25,7 @@ class QRselectionDialog(QDialog):
         self.button_group = QButtonGroup(self)
 
         # Add accounts as rows with radio buttons
-        for account in accounts:
+        for otp_record in accounts:
             row_widget = QWidget()
             row_layout = QHBoxLayout(row_widget)
             row_layout.setAlignment(Qt.AlignLeft)
@@ -34,7 +34,7 @@ class QRselectionDialog(QDialog):
             radio_button = QRadioButton()
             self.button_group.addButton(radio_button)  # Add radio button to the button group
             # Label should be adjacent to radio button
-            label = QLabel(f"{account.issuer} - {account.label}")
+            label = QLabel(f"{otp_record.issuer} - {otp_record.label}")
 
             # Add the radio button and label to the row layout
             row_layout.addWidget(radio_button)
@@ -42,7 +42,7 @@ class QRselectionDialog(QDialog):
             self.scroll_layout.addWidget(row_widget)
 
             # Store a reference to the account in the row widget
-            row_widget.account = account
+            row_widget.account = otp_record
 
         # Scroll area
         scroll_area = QScrollArea()
@@ -71,19 +71,19 @@ class QRselectionDialog(QDialog):
             if button.isChecked():
                 # Find the corresponding account from the row widget
                 row_widget = button.parentWidget()
-                self.selected_account = row_widget.account
+                self.selected_otp_record = row_widget.account
                 break
         self.accept()  # Close the dialog after selection
 
     def get_selected_account(self):
-        return self.selected_account
+        return self.selected_otp_record
 
 
 # Sample accounts
 accounts = [
-    Account(issuer="Provider1", label="Account1",secret="x",last_used=""),
-    Account(issuer="Provider2", label="Account2",secret="x",last_used=""),
-    Account(issuer="Provider3", label="Account3",secret="x",last_used=""),
+    OtpRecord(issuer="Provider1", label="Account1",secret="x"),
+    OtpRecord(issuer="Provider2", label="Account2",secret="x"),
+    OtpRecord(issuer="Provider3", label="Account3",secret="x"),
 ]
 
 # Test the dialog
