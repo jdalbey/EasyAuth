@@ -65,19 +65,6 @@ class ConfirmAccountDialog(AccountEntryDialog):
     def set_account(self, account):
         self.set_fields(account)        
 
-    def save_fields(self):
-        if otp_funcs.is_valid_secretkey(self.secret_entry.text()):
-            issuer = self.provider_entry.text()
-            label = self.label_entry.text()
-            secret = self.secret_entry.text()
-            retcode = self.account_manager.save_new_account(issuer, label, secret)
-            if retcode:
-                self.accept()  # returns True
-            else:
-                QMessageBox.information(self,"Warning","Account with same provider and user already exists")
-        else:
-            QMessageBox.information(self,"Error",f'The secret key is invalid')
-
 # Local main for unit testing
 if __name__ == '__main__':
     import sys

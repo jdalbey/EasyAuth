@@ -7,7 +7,8 @@ import tempfile
 from unittest.mock import Mock, patch
 
 import cipher_funcs
-from account_manager import AccountManager, Account
+from account_manager import AccountManager, Account, OtpRecord
+
 
 @pytest.fixture
 def account_manager():
@@ -70,8 +71,8 @@ class TestAccountManager:
         # Create Account objects
         acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
         acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account("Github", "Personal", "secret_2")
-        account_manager.save_new_account("Boggle", "Work", "secret_1")
+        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
+        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
         # Backup these existing accounts
         account_manager.backup_accounts("/tmp/backup_test1.json")
         # assert that file exists with non-zero size
@@ -100,8 +101,8 @@ class TestAccountManager:
         # Create Account objects
         acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
         acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account("Github", "Personal", "secret_2")
-        account_manager.save_new_account("Boggle", "Work", "secret_1")
+        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
+        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test2.json")
         # assert that file exists with non-zero size
@@ -141,8 +142,8 @@ class TestAccountManager:
         # Create Account objects
         acct1 = Account("Boggle", "Work", "secret_1", "2024-01-14 10:00")
         acct2 = Account("Github", "Personal", "secret_2", "2024-01-14 10:00")
-        account_manager.save_new_account("Github", "Personal", "secret_2")
-        account_manager.save_new_account("Boggle", "Work", "secret_1")
+        account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
+        account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test3.json")
         # Remove accounts for the test - so we can verify that preview doesn't touch the vault.

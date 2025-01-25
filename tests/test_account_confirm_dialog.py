@@ -3,6 +3,8 @@ from unittest.mock import MagicMock, patch
 from PyQt5.QtWidgets import QApplication
 from account_confirm_dialog import ConfirmAccountDialog
 from unittest.mock import Mock
+from account_manager import OtpRecord
+
 class TestConfirmAccountDialog(unittest.TestCase):
     # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.
     @classmethod
@@ -48,7 +50,7 @@ class TestConfirmAccountDialog(unittest.TestCase):
 
         # Verify save_new_account is called once with correct arguments
         MockAccountManager.save_new_account.assert_called_once_with(
-            "Test Provider", "Test Label", "AB34"
+            OtpRecord("Test Provider", "Test Label", "AB34")
         )
         mockmsgbox.assert_not_called()
         dialog.accept.assert_called_once()

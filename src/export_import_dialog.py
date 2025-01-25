@@ -100,6 +100,17 @@ class ExportImportDialog(QDialog):
                 QMessageBox.critical(self, "Error", f"Failed to export accounts: {e}")
         self.close()
 
+    def build_provider_sample(self, account_list):
+        """ build a string with names of first few providers to be imported """
+        confirm_count = len(account_list)
+        sample_msg = ""
+        limit = 3
+        if confirm_count < limit:
+            limit = confirm_count
+        for idx in range(limit):
+            sample_msg += account_list[idx].issuer + ", "
+        return sample_msg, confirm_count - limit
+
     def importer(self):
         app_name= "EasyAuth"
         options = QFileDialog.Options()
@@ -109,18 +120,13 @@ class ExportImportDialog(QDialog):
                 # Since import is destructive, get confirmation
                 account_list = self.account_manager.import_preview(file_path)
                 if account_list is None or len(account_list) == 0:
-                    QMessageBox.information(self,"Information","The selected import file is empty, no action taken.")
+                    QMessageBox.information(self,"Information","The selected import file is empty or invalid, no action taken.")
                     self.close()
                     return
-                confirm_count = len(account_list)
+                sample_msg, remainder = self.build_provider_sample(account_list)
                 confirm_msg = f"WARNING: Import will overwrite your current vault.\n"
                 confirm_msg += "Do you really want to import "
-                limit = 3
-                if confirm_count < limit:
-                    limit = confirm_count
-                for idx in range(limit):
-                    confirm_msg += account_list[idx].provider + ", "
-                confirm_msg += f"and {confirm_count - limit} others?"
+                confirm_msg += sample_msg + f"and {remainder} others?"
                 reply = QMessageBox.question(self, "Confirm import to vault", confirm_msg)
                 if reply == QMessageBox.Yes:
                     self.account_manager.import_accounts(file_path)

@@ -113,18 +113,6 @@ class AddAccountDialog(AccountEntryDialog):
         all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
         self.save_button.setEnabled(all_filled)
 
-    def save_fields(self):
-        issuer = self.provider_entry.text()
-        label = self.label_entry.text()
-        secret = self.secret_entry.text()
-        # Validate secret key
-        if is_valid_secretkey(secret):
-            if self.account_manager.save_new_account(issuer, label, secret):
-                self.accept()
-            else:
-                 QMessageBox.information(self,"Warning","Account with same provider and label already exists")
-        else:
-            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
     # Set values into fields (used by auto qr code scanning)
     def set_account(self, account):

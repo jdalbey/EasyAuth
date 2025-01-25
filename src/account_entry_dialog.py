@@ -1,8 +1,11 @@
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QFrame, QSizePolicy, QGridLayout, QToolButton, QPushButton, \
-    QDialog, QApplication
+    QDialog, QApplication, QMessageBox
+
+import otp_funcs
 from provider_search_dialog import ProviderSearchDialog
+from account_manager import OtpRecord
 
 help_style = """
     QToolButton {
@@ -97,6 +100,20 @@ class AccountEntryDialog(QDialog):
         # if len(account.issuer) > 0:
         #     tmplabel = self.providers.get_provider_icon(account.issuer)
         #     self.favicon.setPixmap(tmplabel.pixmap())
+
+    def save_fields(self):
+        issuer = self.provider_entry.text()
+        label = self.label_entry.text()
+        secret = self.secret_entry.text()
+        otp_record = OtpRecord(issuer, label, secret)
+        # Validate secret key
+        if otp_funcs.is_valid_secretkey(secret):
+            if self.account_manager.save_new_account(otp_record):
+                self.accept()
+            else:
+                 QMessageBox.information(self,"Warning","Account with same provider and user already exists")
+        else:
+            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
     # disable the secret key so it can't be altered while QR code is revealed.
     def disable_fields(self):

@@ -7,7 +7,7 @@ import tempfile
 from unittest.mock import Mock, patch
 
 import cipher_funcs
-from account_manager import AccountManager, Account
+from account_manager import AccountManager, Account, OtpRecord
 
 @pytest.fixture
 def account_manager():
@@ -141,10 +141,10 @@ class TestAccountManager:
         account_manager.accounts = []
         # Save the new account
         try:
-            account_manager.save_new_account(
+            account_manager.save_new_account(OtpRecord(
                 issuer="Test",
                 label="TestLabel",
-                secret="test_secret"
+                secret="test_secret")
             )
         except Exception as e:
             print(f"Exception during save: {e}")
@@ -168,10 +168,10 @@ class TestAccountManager:
         account_manager.accounts = []
         # Save the new account
         try:
-            account_manager.save_new_account(
+            account_manager.save_new_account(OtpRecord(
                 issuer="Test",
                 label="TestLabel",
-                secret="test_secret"
+                secret="test_secret")
             )
         except Exception as e:
             print(f"Exception during save: {e}")
@@ -204,7 +204,7 @@ class TestAccountManager:
 
         # Save the new account
         try:
-            retcode = account_manager.save_new_account("Foobar",'Barfoo',"encrypted_test_secret")
+            retcode = account_manager.save_new_account(OtpRecord("Foobar",'Barfoo',"encrypted_test_secret"))
             assert retcode
         except Exception as e:
             print(f"Exception during save: {e}")
@@ -228,11 +228,9 @@ class TestAccountManager:
         account_manager.accounts = [Account(**sample_accounts[0])]
 
         # create a new account from the components of the existing one.
-        retcode = account_manager.save_new_account(
-            issuer=sample_accounts[0]["issuer"],
-            label=sample_accounts[0]["label"],
-            secret="new_secret"
-        )
+        rec = OtpRecord(sample_accounts[0]["issuer"],sample_accounts[0]["label"],
+                secret = "new_secret")
+        retcode = account_manager.save_new_account(rec)
         assert not retcode
 
     def test_handle_external_modification(self, account_manager, sample_accounts):

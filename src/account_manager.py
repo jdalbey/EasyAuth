@@ -32,13 +32,6 @@ class Account:
         if self.secret == "":
             raise ValueError("Secret cannot be empty")
 
-    # Override __eq__ to compare only issuer and label
-    # used by account_manager.save_new_account
-    def __eq__(self, other):
-        if isinstance(other, Account):
-            return self.issuer == other.issuer and self.label == other.label
-        return NotImplemented
-
 @dataclass(frozen=True)
 class OtpRecord:
     issuer: str
@@ -172,28 +165,28 @@ class AccountManager:
 
         return False
 
-    def save_new_account(self, issuer: str, label: str, secret: str) -> bool:
+    def save_new_account(self, otp_record) -> bool:
         """Save new account with duplicate checking."""
         try:
             # Check for duplicates
             if any(
-                acc.issuer == issuer and acc.label == label
+                acc.issuer == otp_record.issuer and acc.label == otp_record.label
                 for acc in self.accounts
             ):
                 #raise ValueError("Account with same provider and label already exists")
                 return False
 
-            encrypted_secret = cipher_funcs.encrypt(secret)
+            encrypted_secret = cipher_funcs.encrypt(otp_record.secret)
             account = Account(
-                issuer=issuer,
-                label=label,
+                issuer=otp_record.issuer,
+                label=otp_record.label,
                 secret=encrypted_secret,
                 last_used=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
 
             self.accounts.insert(0, account)
             if self.save_accounts():
-                self.logger.info(f"Successfully saved new account: {issuer} ({label})")
+                self.logger.info(f"Successfully saved new account: {otp_record.issuer} ({otp_record.label})")
             else:
                 raise RuntimeError("Failed to save account to vault")
 

@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5.QtWidgets import QApplication
 from account_add_dialog import AddAccountDialog
 from unittest.mock import Mock
-
-from account_manager import Account
+from account_manager import Account, OtpRecord
 
 
 class TestManualAddAccountDialog(unittest.TestCase):
@@ -44,7 +43,7 @@ class TestManualAddAccountDialog(unittest.TestCase):
 
         # Verify save_new_account is called once with correct arguments
         mock_account_manager.save_new_account.assert_called_once_with(
-            "Woogle", "me@woogle.com", "AB34"
+            OtpRecord("Woogle", "me@woogle.com", "AB34")
         )
 
 

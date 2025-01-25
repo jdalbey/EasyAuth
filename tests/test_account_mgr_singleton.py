@@ -3,8 +3,7 @@ import threading
 import os
 import json
 from unittest.mock import patch, mock_open
-from account_manager import AccountManager, Account
-
+from account_manager import AccountManager, Account, OtpRecord
 
 @pytest.fixture
 def sample_accounts():
@@ -57,7 +56,7 @@ def test_typical_use():
     instance = AccountManager("/tmp/testvault.json")
     assert len(instance.accounts) == 2
     # Add a new item
-    instance.save_new_account("Woogle","me@woogle.com","ABC234")
+    instance.save_new_account(OtpRecord("Woogle","me@woogle.com","ABC234"))
     assert len(instance.accounts) == 3
     assert instance.accounts[0].issuer == "Woogle"
     # Update an existing item
