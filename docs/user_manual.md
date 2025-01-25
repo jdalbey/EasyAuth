@@ -19,44 +19,39 @@ To the right of the file menu is a button with the label "add account".
 To the right of the button is a text field for entering a search term. 
 To the right of the text field is a search icon (a magnifying glass). 
 To the right of the search icon is the Filter icon. 
-Pressing the filter button presents a menu with four options. 
-The first is "provider A-Z". 
-The next is "label A-Z". 
-The next is "last used ^v". 
-The next is "usage count ^v". 
+
+The Sort by menu has two options: alphabetically and recently used. 
+
+## Add Account Dialog
 In the center of the window is a message that says "no entries found. 
 start adding entries by clicking 'Add account'". 
 Then there is a hyperlink that says "Learn more". 
 Clicking the Add Account button causes a form to appear. 
 The title of the form is "new account". 
 At the top of the form a message says "Create a New Account from:" and then it lists three options vertically, each with a bullet point. 
-The first is "QR code" and a button labeled "find". 
-The second is "QR image" and a button labeled "open file". 
-The third is "enter the data manually". 
-Beneath the three options is a hyperlink "help me choose". 
- The form then shows three fields. 
+The first is a button "Use QR code". 
+The second is a button "Open QR image". 
+The third is "enter the data manually".
+
+ 
+The form then shows three fields. 
 The first is labeled "provider", the second is labeled "user", and the third is labeled "secret key". 
-Beneath this is a save button. 
-The provider field is an auto complete field for the user to enter  the name of the service that issued the secret key. 
-As the user types a dropdown list presents options that match the users text entry. 
- Next to each of the labels on the fields of this form is a small button with a question mark. 
-Clicking the question mark will cause a small pop up dialog to appear with explanation of what value needs to be entered into the field. 
+The provider field is for the name of the service that issued the secret key.  A "Lookup" button will open a dialog 
+with a list of providers to choose from.  This reference is a helpful aid to recalling spelling of different websites. 
+The user field is for a username, email address, or other identifier to distinguish this account from others with
+the same website.
+The secret key field is for entering the shared secret key provided by the website.
 
-
-If the user chooses to create a new account from a QR code by clicking the "find" button the application will search the screen for a visible QR code. 
+Clicking the "Use QR code" button the application will search the screen for a visible QR code. 
 If it doesn't find one it will present a dialog that says "check that a browser window is open with a QR code visible", and then two buttons that say "try again" or "cancel". 
-If the application finds a QR code it will insert the values into the three fields on the form. 
-The text at the top of the form will be replaced with a message that says "a QR code was found with these values". 
-Save and Cancel buttons are at the bottom of the form. 
-when the user clicks Save the application will look in the provider list for the name in the provider field. 
-If it can be found, the website URL is retrieved from the provider list and used to scrape the site for the Favicon. 
-A new entry will appear in the account list on the main page. 
+If the application finds a QR code it will open a confirmation dialog with the three fields on the form prefilled. 
+The dialog offers Accept and Decline buttons at the bottom of the form. 
+When the user clicks Accept a new account is created and appears at the top of the account list in the main window.
+If the provider name exists in the provider list the favicon for the website will be placed next to the account. 
 
 
 The account list on the main page has a row for each entry. 
 Each row contains six fields. 
-The first field is the icon for the provider. 
-If a favorite icon is not found from scraping the website, it presents a large single letter that is the first letter in the name of the provider. 
 The second field has two strings, one above the other. 
 The first is the provider name. 
 The second is the label for this account. 
@@ -116,8 +111,12 @@ When this button is pressed, a QR code is displayed that has embedded the provid
 When clicked the reveal QR code button text changes to "hide". 
 In the same way the show secret key button also changes to hide once it has been clicked. 
 The bottom of the form presents save, delete and Cancel buttons. 
-The delete button presents a confirmation message, asking if the user will confirm deleting the account. 
-If they choose okay to the confirmation message, the account is removed from the account list.
+
+## Deleting an account
+An account can be deleted from the Edit Account page by using the Delete button. 
+This action is not reversible and should be used with caution.  Deleting an account will delete the secret key used to authenticate
+with the provider website.  In most cases this means you won't be able to login.  If you haven't saved the recover codes provided
+when you setup two-factor authentication you may lose access to the website.
 
 From the File menu, choosing the backup restore option presents a new dialog with two panels, one labeled backup and the other labeled restore. 
 Each panel will have a set of radio buttons that indicate the different formats in which data can be backup or restored from. 

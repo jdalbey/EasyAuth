@@ -9,17 +9,14 @@ import platform
 from typing import List, Optional
 
 import cryptography
-
 import cipher_funcs
 from dataclasses import dataclass
-
-# TODO: Disambiguate - sometimes secret is used as the shared key and sometimes as the encrypted key.
 from appconfig import AppConfig
-
 
 @dataclass
 class Account:
-    issuer: str
+    """ The information that authenticates someone with a provider. """
+    issuer: str  # Referred to as "provider" in the GUI.
     label: str
     secret: str # encrypted secret key
     last_used: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -34,6 +31,7 @@ class Account:
 
 @dataclass(frozen=True)
 class OtpRecord:
+    """ An OTP record as received from the provider with plain-text secret key """
     issuer: str
     label: str
     secret: str  # plain-text secret key
