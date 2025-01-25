@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
     QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton, QApplication
 
 import otp_funcs
-from account_entry_dialog import AccountEntryDialog, help_style
+from account_entry_dialog import AccountEntryDialog, info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
 
@@ -84,7 +84,7 @@ class EditAccountDialog(AccountEntryDialog):
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        user_info_btn.setStyleSheet(help_style)
+        user_info_btn.setStyleSheet(info_btn_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         last_used_layout.addWidget(user_info_btn, 1, 2, Qt.AlignCenter)
         self.bottom_layout.addWidget(last_used_frame)
@@ -155,19 +155,6 @@ class EditAccountDialog(AccountEntryDialog):
         else:
             QMessageBox.information(self,"Error",f'The secret key is invalid')
 
-    def confirm_delete(self):
-        reply = QMessageBox.question(
-            self,
-            'Confirm Delete',
-            f'Are you sure you want to delete this account?\n\n{self.account.issuer} ({self.account.label})\n\n'+
-            f"You will lose access to {self.account.issuer} unless you have saved the restore codes. (Learn more)",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
-        if reply == QMessageBox.Yes:
-            self.account_manager.delete_account(self.account)
-            self.accept()
-
     def confirm_delete_account(self):
         # Create the message box
         msg = QMessageBox()
@@ -185,6 +172,8 @@ class EditAccountDialog(AccountEntryDialog):
 
         # Display the message box
         reply = msg.exec_()
+
+        # If reply is yes, proceed with deletion
         if reply == QMessageBox.Yes:
             self.account_manager.delete_account(self.account)
             self.accept()

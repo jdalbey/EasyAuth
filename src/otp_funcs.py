@@ -21,15 +21,9 @@ def generate_otp(secret):
     result = totp.now()
     return result
 
-def otpauth_uri_from_account(account):
-    decrypted_secret = cipher_funcs.decrypt(account.secret)
-    totp = pyotp.TOTP(decrypted_secret)
-    uri = totp.provisioning_uri(name=account.label, issuer_name=account.issuer)
-    logging.debug (f"otp_funcs: created uri from account info: {uri}")
-    return uri
 
 def generate_qr_image(account):
-    uri = otpauth_uri_from_account(account)
+    uri = account.get_otp_auth_uri()
     qr = qrcode.QRCode()
     qr.add_data(uri)
     qr.make(fit=True)

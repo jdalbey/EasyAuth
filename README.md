@@ -4,12 +4,13 @@ Focus on ease of use for beginners using TOTP authentication.
 
 ## Features
  - Stores your secret keys encrypted in a vault on your local machine (doesn't rely on third-party cloud services).
+ - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
+ - QR codes can be read from an image file.
  - Generates Time-based One-time Passwords from your secret keys.
  - Accounts are displayed in a scrollable list with a search feature.
  - The list can be sorted alphabetically or by most recently used.
  - The list can be manually reordered to achieve a custom ordering. 
- - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
- - QR codes can be read from an image file.
+ - Vault entries can be displayed as QR codes for migration to other applications.
  - Export and Import vault to plain-text JSON file.
  - Familiar easy-to-navigate desktop GUI.
  - Automatically finds favicons for many sites that offer TOTP verification.
@@ -59,18 +60,14 @@ qdarktheme
 ---
 ## Installation
 
-### Prerequisites
+#### Prerequisites
 
 - Currently this program only runs on Linux systems.
 - Ensure you have Python 3.5+ installed on your system.
 
-### Step 1: Fork or Download the Repository
 
-#### Fork the Repository
 
-1. Click the "Fork" button at the top-right corner of the page to create a copy of the repository under your GitHub account.
-
-#### Download the Repository
+#### 1. Download the Repository
 
 1. Click the "Code" button and select "Download ZIP".
 2. Extract the downloaded ZIP file to a directory of your choice.
@@ -82,37 +79,32 @@ git clone https://github.com/jdalbey/EasyAuth.git
 cd EasyAuth
 ```
 
-### Step 2: Create a Virtual Environment
-
-It is recommended to create a virtual environment to manage dependencies. Run the following commands in your terminal:
+#### 2: Create a Virtual Environment
 
 ```bash
 python -m venv venv
 source venv/bin/activate  
 ```
 
-### Step 3: Install Dependencies
-
-Install the required dependencies using `pip`:
+#### 3: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Launch the Application
+#### 4: Launch the Application
 
-Run the application using the following command:
 
 ```bash
 python src/main.py
 ```
 
-### Additional Information
+#### Additional Information
 
 - **Logging**: The application uses logging to provide debug information. You can configure the logging settings in the `main.py` file.
 - **HiDPI Support**: The application uses `qdarktheme` to enable HiDPI support.
 
-### Troubleshooting
+#### Troubleshooting
 
 If you encounter any issues, please check the following:
 
@@ -133,3 +125,6 @@ Practice storing a new secret key using the sample QR code below.
 4. Observe the new account in the main window.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
+
+
+A Quick Start guide is available in the docs folder.

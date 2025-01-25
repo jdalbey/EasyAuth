@@ -7,7 +7,8 @@ import otp_funcs
 from provider_search_dialog import ProviderSearchDialog
 from account_manager import OtpRecord
 
-help_style = """
+# Info button: Make square button invisible so only circular icon shows
+info_btn_style = """
     QToolButton {
         border: none;       /* Remove border */
         background: none;   /* Remove background */
@@ -38,7 +39,7 @@ class AccountEntryDialog(QDialog):
         provider_info_btn.setIcon(info_icon)
         provider_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        provider_info_btn.setStyleSheet(help_style)
+        provider_info_btn.setStyleSheet(info_btn_style)
         #provider_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(provider_info_btn, 1, 3)
 
@@ -60,7 +61,7 @@ class AccountEntryDialog(QDialog):
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        user_info_btn.setStyleSheet(help_style)
+        user_info_btn.setStyleSheet(info_btn_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(user_info_btn, 2, 3)
 
@@ -75,7 +76,7 @@ class AccountEntryDialog(QDialog):
         secret_info_btn.setIcon(info_icon)
         secret_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
-        secret_info_btn.setStyleSheet(help_style)
+        secret_info_btn.setStyleSheet(info_btn_style)
         #secret_info_btn.setPopupMode(QToolButton.InstantPopup)
         self.form_layout.addWidget(secret_info_btn, 3, 3)
 

@@ -104,7 +104,7 @@ class TestAccountManager:
         account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
         account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
         # Export these existing accounts
-        account_manager.export_accounts("/tmp/backup_test2.json")
+        account_manager.export_accounts("/tmp/backup_test2.json",'json')
         # assert that file exists with non-zero size
         assert os.path.isfile("/tmp/backup_test2.json")
         # open the export file and read the secret - assert plaintext
@@ -145,7 +145,7 @@ class TestAccountManager:
         account_manager.save_new_account(OtpRecord("Github", "Personal", "secret_2"))
         account_manager.save_new_account(OtpRecord("Boggle", "Work", "secret_1"))
         # Export these existing accounts
-        account_manager.export_accounts("/tmp/backup_test3.json")
+        account_manager.export_accounts("/tmp/backup_test3.json",'json')
         # Remove accounts for the test - so we can verify that preview doesn't touch the vault.
         account_manager.accounts = []
         # Import from exported file
@@ -160,3 +160,42 @@ class TestAccountManager:
         assert cipher_funcs.decrypt(account_list[0].secret) == acct1.secret
         assert cipher_funcs.decrypt(account_list[1].secret) == acct2.secret
         os.remove("/tmp/backup_test3.json")
+
+
+    def test_export_and_import_uri(self,account_manager, sample_accounts):
+        # Erase accounts for a clean fixture
+        account_manager.accounts = []
+        # Create Account objects
+        acct1 = Account("Boggle", "Work", "AB23", "2024-01-14 10:00")
+        acct2 = Account("Github", "Personal", "BC34", "2024-01-14 10:00")
+        account_manager.save_new_account(OtpRecord("Github", "Personal", "BC34"))
+        account_manager.save_new_account(OtpRecord("Boggle", "Work", "AB23"))
+        # Export these existing accounts
+        account_manager.export_accounts("/tmp/backup_test4.txt","uri")
+        # assert that file exists with non-zero size
+        assert os.path.isfile("/tmp/backup_test4.txt")
+        # open the export file and read the secret - assert plaintext
+        try:
+            with open("/tmp/backup_test4.txt", 'r') as f:
+                otp1 = f.readline()
+                assert otp1.startswith("otp")
+        except (OSError, IOError) as e:
+            print(f"Failed to read file /tmp/backup_test4.txt: {e}")
+            assert False
+        # Remove accounts for the test - simulating disaster
+        account_manager.accounts = []
+
+        # Import from exported file
+        account_manager.import_accounts("/tmp/backup_test4.txt")
+        assert account_manager.accounts[0].issuer == acct1.issuer
+        assert account_manager.accounts[1].issuer == acct2.issuer
+        assert account_manager.accounts[0].label == acct1.label
+        assert account_manager.accounts[1].label == acct2.label
+        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
+        assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
+        # Also check the content of vault file
+        with open(account_manager.vault_path, 'r') as f:
+            vault_accounts = json.load(f)
+            assert vault_accounts[0]['issuer'] == "Boggle"
+        os.remove("/tmp/backup_test4.txt")
+

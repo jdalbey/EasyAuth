@@ -9,6 +9,8 @@ import platform
 from typing import List, Optional
 
 import cryptography
+import pyotp
+
 import cipher_funcs
 from dataclasses import dataclass
 from appconfig import AppConfig
@@ -23,7 +25,12 @@ class Account:
     used_frequency: int = 0
     favorite: bool = False
 
-# TODO: move otpauth_uri_from_account() here as get_otp_auth_uri()
+    def get_otp_auth_uri(self):
+        """ Convert account to otpauth URI """
+        decrypted_secret = cipher_funcs.decrypt(self.secret)
+        totp = pyotp.TOTP(decrypted_secret)
+        uri = totp.provisioning_uri(name=self.label, issuer_name=self.issuer)
+        return uri
 
     def __post_init__(self):
         if self.secret == "":
@@ -213,16 +220,22 @@ class AccountManager:
         self.save_accounts()
         self.logger.info(f"Accounts sorted by recently used.")
 
+    def sort_frequency(self):
+        self.accounts = sorted(self.accounts, key=lambda x: x.used_frequency, reverse=True)
+        self.save_accounts()
+        self.logger.info(f"Accounts sorted by used frequency.")
+
     def backup_accounts(self, file_path):
-        self.write_accounts_file(file_path, export_mode=False)
-    def export_accounts(self, file_path):
-        self.write_accounts_file(file_path, export_mode=True)
-    def write_accounts_file(self, file_path, export_mode=False):
+        self.write_accounts_file(file_path, 'json')
+    def export_accounts(self, file_path, desired_format):
+        self.write_accounts_file(file_path, desired_format, export_mode=True)
+    def write_accounts_file(self, file_path, desired_format='json', export_mode=False):
         """Store the accounts as JSON in the given file_path with an encrypted secret.
           Accounts in the vault are encrypted.
             1. For backup they need no special treatment before writing.
             2. for export, they need to be decrypted before writing.
          @param file_path location of file
+         @param desired_format 'json' or 'uri'
          @param export_mode decrypt the keys before writing accounts to the file."""
         target = "Backup"
         if export_mode:
@@ -236,8 +249,11 @@ class AccountManager:
             return
 
         # Convert accounts to plaintext
+        uri_list = ""
         for account in self.accounts:
             try:
+                uri_list += account.get_otp_auth_uri() + "\n" # convert to URI and append to string
+                # turn the Account object into a dictionary so it can be serialized by json.dump
                 vault_account = account.__dict__.copy()
                 if export_mode:
                     vault_account['secret'] = cipher_funcs.decrypt(account.secret)
@@ -258,11 +274,16 @@ class AccountManager:
             self.logger.error("File is read-only.")
             raise OSError(8675309,"File is read-only.")
 
-        # Dump the accounts to a json file
+        # Convert accounts to string
+        if desired_format == 'json':
+            result = json.dumps(vault_accounts, indent=4)
+        else:
+            result = uri_list
+
+        # Dump the string to a file
         try:
             with open(file_path, 'w') as f:
-                # Use JSON pretty printing for readability
-                json.dump(vault_accounts, f, indent=4)
+                f.write(result)
             self.logger.info(f"Successful {target} of {len(vault_accounts)} accounts to {file_path}")
         except (OSError, IOError) as e:
             self.logger.error(f"{target} failed to write to {file_path}: {e}")
@@ -275,6 +296,60 @@ class AccountManager:
         self.read_accounts_file(file_path, import_mode=True)
     def import_preview(self, file_path):
         return self.read_accounts_file(file_path, import_mode=True, preview=True)
+    # def read_accounts_file(self, file_path, import_mode=False, preview=False):
+    #     """Read the accounts from the given file_path.
+    #       Accounts in the vault are encrypted.
+    #         1. for restore, the accounts from the file need no encryption.
+    #         2. for import, the accounts from the file need to be encrypted.
+    #      @param file_path location of file
+    #      @param import_mode encrypt the keys before rebuilding the accounts."""
+    #     self.logger.debug("Starting read_accounts_file")
+    #     target = "Restore"
+    #     if import_mode:
+    #         target = "Import"
+    #
+    #     if not os.path.isfile(file_path):
+    #         self.logger.error(f"{target} file {file_path} does not exist.")
+    #         return
+    #
+    #     try:
+    #         with open(file_path, 'r') as f:
+    #             json_accounts = json.load(f)
+    #     except (OSError, IOError) as e:
+    #         self.logger.error(f"Failed to read {target} file {file_path}: {e}")
+    #         return
+    #     except json.JSONDecodeError as e:
+    #         self.logger.error(f"Failed to decode JSON from {target} file {file_path}: {e}")
+    #         return
+    #
+    #     # Validate and restore each account
+    #     restored_accounts = []
+    #     for json_account in json_accounts:
+    #         try:
+    #             # Assuming decrypted_account has the same structure as the original account
+    #             # Restore will leave the secret encrypted
+    #             # An Imported file has plaintext keys that must be encrypted before constructing the accounts
+    #             secret_key = json_account['secret']
+    #             if import_mode:
+    #                 secret_key = cipher_funcs.encrypt(json_account['secret'])
+    #             restored_account = Account(json_account['issuer'],json_account['label'],secret_key,json_account['last_used'])
+    #
+    #             restored_accounts.append(restored_account)
+    #
+    #         except KeyError as e:
+    #             self.logger.error(f"Missing expected key in account data: {e}")
+    #         except Exception as e:
+    #             self.logger.error(f"Failed to read account from data {json_account}: {e}")
+    #
+    #     if preview:
+    #         return restored_accounts
+    #     # Assuming self.accounts is where you want to store the restored accounts
+    #     self.accounts = restored_accounts
+    #     self.logger.debug(f"Read these accounts: {self.accounts}")
+    #     self.save_accounts()
+    #     self.logger.info(f"Read completed for  {len(restored_accounts)} accounts from {file_path}")
+    #     self.logger.info(self.accounts)
+
     def read_accounts_file(self, file_path, import_mode=False, preview=False):
         """Read the accounts from the given file_path.
           Accounts in the vault are encrypted.
@@ -293,17 +368,57 @@ class AccountManager:
 
         try:
             with open(file_path, 'r') as f:
-                json_accounts = json.load(f)
-        except (OSError, IOError) as e:
-            self.logger.error(f"Failed to read {target} file {file_path}: {e}")
-            return
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Failed to decode JSON from {target} file {file_path}: {e}")
-            return
+                first_line = f.readline().strip()
+                f.seek(0)  # Reset file pointer to the beginning
 
-        # Validate and restore each account
+                if first_line.startswith('otpauth'):
+                    # Parse URIs
+                    uris = f.readlines()
+                    accounts = self.parse_uris(uris)
+                else:
+                    # Parse JSON
+                    accounts_data = json.load(f)
+                    accounts = self.parse_json(accounts_data, import_mode)
+
+            if preview:
+                return accounts
+
+            # Update the active accounts from the restored data
+            self.accounts = accounts
+            self.logger.debug(f"Read these accounts: {self.accounts}")
+            self.save_accounts()
+            self.logger.info(f"Read completed for  {len(accounts)} accounts from {file_path}")
+            self.logger.info(self.accounts)
+
+            self.logger.info(f"Successful {target} of accounts from {file_path}")
+
+        except (OSError, IOError) as e:
+            self.logger.error(f"{target} failed to read from {file_path}: {e}")
+        except json.JSONDecodeError as e:
+            self.logger.error(f"{target} failed to parse JSON from {file_path}: {e}")
+        except Exception as e:
+            self.logger.error(f"Unexpected error during {target}: {e}")
+
+    def parse_uris(self, uris):
+        # parse URIs and return account objects
+        accounts = []
+        for uri in uris:
+            # Parse each URI and create account objects
+            try:
+                totp_obj = pyotp.parse_uri(uri.strip())
+            except ValueError as e:
+                self.logger.warning(f"URI parsing failure during import.  Item {uri.strip()}.  Error {e}")
+                #TODO: handle this error somehow.  Report count of parse failures?  Stop import?
+                continue  # skip invalid URI's
+            encrypted_secret = cipher_funcs.encrypt(totp_obj.secret)
+            account = Account(totp_obj.issuer, totp_obj.name, encrypted_secret)
+            accounts.append(account)
+        return accounts
+
+    def parse_json(self, accounts_data, import_mode):
+        # parse JSON data and return account objects
         restored_accounts = []
-        for json_account in json_accounts:
+        for json_account in accounts_data:
             try:
                 # Assuming decrypted_account has the same structure as the original account
                 # Restore will leave the secret encrypted
@@ -319,15 +434,9 @@ class AccountManager:
                 self.logger.error(f"Missing expected key in account data: {e}")
             except Exception as e:
                 self.logger.error(f"Failed to read account from data {json_account}: {e}")
+        return restored_accounts
 
-        if preview:
-            return restored_accounts
-        # Assuming self.accounts is where you want to store the restored accounts
-        self.accounts = restored_accounts
-        self.logger.debug(f"Read these accounts: {self.accounts}")
-        self.save_accounts()
-        self.logger.info(f"Read completed for  {len(restored_accounts)} accounts from {file_path}")
-        self.logger.info(self.accounts)
+
 
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""
