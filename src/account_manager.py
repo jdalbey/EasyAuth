@@ -310,65 +310,12 @@ class AccountManager:
     def restore_accounts(self, file_path):
         self.read_accounts_file(file_path, import_mode=False)
     def import_accounts(self, file_path):
-        self.read_accounts_file(file_path, import_mode=True)
+        return self.read_accounts_file(file_path, import_mode=True)
     def import_preview(self, file_path):
         return self.read_accounts_file(file_path, import_mode=True, preview=True)
-    # def read_accounts_file(self, file_path, import_mode=False, preview=False):
-    #     """Read the accounts from the given file_path.
-    #       Accounts in the vault are encrypted.
-    #         1. for restore, the accounts from the file need no encryption.
-    #         2. for import, the accounts from the file need to be encrypted.
-    #      @param file_path location of file
-    #      @param import_mode encrypt the keys before rebuilding the accounts."""
-    #     self.logger.debug("Starting read_accounts_file")
-    #     target = "Restore"
-    #     if import_mode:
-    #         target = "Import"
-    #
-    #     if not os.path.isfile(file_path):
-    #         self.logger.error(f"{target} file {file_path} does not exist.")
-    #         return
-    #
-    #     try:
-    #         with open(file_path, 'r') as f:
-    #             json_accounts = json.load(f)
-    #     except (OSError, IOError) as e:
-    #         self.logger.error(f"Failed to read {target} file {file_path}: {e}")
-    #         return
-    #     except json.JSONDecodeError as e:
-    #         self.logger.error(f"Failed to decode JSON from {target} file {file_path}: {e}")
-    #         return
-    #
-    #     # Validate and restore each account
-    #     restored_accounts = []
-    #     for json_account in json_accounts:
-    #         try:
-    #             # Assuming decrypted_account has the same structure as the original account
-    #             # Restore will leave the secret encrypted
-    #             # An Imported file has plaintext keys that must be encrypted before constructing the accounts
-    #             secret_key = json_account['secret']
-    #             if import_mode:
-    #                 secret_key = cipher_funcs.encrypt(json_account['secret'])
-    #             restored_account = Account(json_account['issuer'],json_account['label'],secret_key,json_account['last_used'])
-    #
-    #             restored_accounts.append(restored_account)
-    #
-    #         except KeyError as e:
-    #             self.logger.error(f"Missing expected key in account data: {e}")
-    #         except Exception as e:
-    #             self.logger.error(f"Failed to read account from data {json_account}: {e}")
-    #
-    #     if preview:
-    #         return restored_accounts
-    #     # Assuming self.accounts is where you want to store the restored accounts
-    #     self.accounts = restored_accounts
-    #     self.logger.debug(f"Read these accounts: {self.accounts}")
-    #     self.save_accounts()
-    #     self.logger.info(f"Read completed for  {len(restored_accounts)} accounts from {file_path}")
-    #     self.logger.info(self.accounts)
 
     def read_accounts_file(self, file_path, import_mode=False, preview=False):
-        """Read the accounts from the given file_path.
+        """Read the accounts from the given file_path. Autodetect file type.
           Accounts in the vault are encrypted.
             1. for restore, the accounts from the file need no encryption.
             2. for import, the accounts from the file need to be encrypted.
@@ -381,7 +328,7 @@ class AccountManager:
 
         if not os.path.isfile(file_path):
             self.logger.error(f"{target} file {file_path} does not exist.")
-            return
+            return -1
 
         try:
             with open(file_path, 'r') as f:
@@ -411,10 +358,16 @@ class AccountManager:
 
         except (OSError, IOError) as e:
             self.logger.error(f"{target} failed to read from {file_path}: {e}")
+            return -2
         except json.JSONDecodeError as e:
             self.logger.error(f"{target} failed to parse JSON from {file_path}: {e}")
+            return -3
+        except ValueError as e:
+            self.logger.error(f"{target} failed to parse URI data from {file_path}: {e}")
+            return -4
         except Exception as e:
             self.logger.error(f"Unexpected error during {target}: {e}")
+            return -5
 
     def parse_uris(self, uris):
         # parse URIs and return account objects
@@ -425,8 +378,7 @@ class AccountManager:
                 totp_obj = pyotp.parse_uri(uri.strip())
             except ValueError as e:
                 self.logger.warning(f"URI parsing failure during import.  Item {uri.strip()}.  Error {e}")
-                #TODO: handle this error somehow.  Report count of parse failures?  Stop import?
-                continue  # skip invalid URI's
+                raise e  # abort on parse error
             encrypted_secret = cipher_funcs.encrypt(totp_obj.secret)
             account = Account(totp_obj.issuer, totp_obj.name, encrypted_secret)
             accounts.append(account)

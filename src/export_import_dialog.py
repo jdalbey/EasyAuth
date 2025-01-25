@@ -81,6 +81,9 @@ class ExportImportDialog(QDialog):
         import_label = QLabel("Import")
         import_label.setFont(QFont("Sans-serif",12))
         layout.addWidget(import_label)
+        notify_label = QLabel("File format will be auto-detected.")
+        notify_label.setFont(QFont("Sans-serif",8))
+        layout.addWidget(notify_label)
 
         import_easy_auth_btn = QPushButton("Choose import file")
         import_easy_auth_btn.setEnabled(True)
@@ -93,24 +96,24 @@ class ExportImportDialog(QDialog):
 
     def export(self, ):
         # Find out which radio button is selected
-        selected_button = self.button_group.checkedButton()
-        export_file_type = selected_button.text()
-        filetype_id = self.button_group.checkedId()
-        print (f"Export called: {export_file_type} id={filetype_id}")
+        export_file_types = ['json','uri']
+        # Oddly checkedId is -2 or -3, so map to 0,1
+        file_format = export_file_types[(self.button_group.checkedId() * -1) -2]
+
         options = QFileDialog.Options()
-        if filetype_id == -2:
-            file_path, _ = QFileDialog.getSaveFileName(self, f"Export to {export_file_type} format", "", "JSON Files (*.json);;All Files (*)", options=options)
+        if file_format == 'json':
+            file_path, _ = QFileDialog.getSaveFileName(self, f"Export to {file_format} format", "", "JSON Files (*.json);;All Files (*)", options=options)
         else:
-            file_path, _ = QFileDialog.getSaveFileName(self, f"Export to {export_file_type} format", "",
+            file_path, _ = QFileDialog.getSaveFileName(self, f"Export to {file_format} format", "",
                                                        "TXT Files (*.txt);;All Files (*)", options=options)
         if file_path:
-            if filetype_id == -2 and not file_path.endswith(".json"):
+            if file_format == 'json' and not file_path.endswith(".json"):
                 file_path += ".json"
-            if filetype_id == -3 and not file_path.endswith(".txt"):
+            if file_format == 'uri' and not file_path.endswith(".txt"):
                 file_path += ".txt"
 
             try:
-                self.account_manager.export_accounts(file_path,export_file_type)
+                self.account_manager.export_accounts(file_path,file_format)
                 QMessageBox.information(self, "Success", f"Accounts successfully exported up to {file_path}")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to export accounts: {e}")
@@ -130,12 +133,12 @@ class ExportImportDialog(QDialog):
     def importer(self):
         app_name= "EasyAuth"
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, f"Import {app_name} Accounts", "", "JSON Files (*.json);;TXT Files (*.txt);;All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, f"Import {app_name} Accounts", "", "All Files (*)", options=options)
         if file_path:
             try:
                 # Since import is destructive, get confirmation
                 account_list = self.account_manager.import_preview(file_path)
-                if account_list is None or len(account_list) == 0:
+                if isinstance(account_list,int) or account_list is None or len(account_list) == 0:
                     QMessageBox.information(self,"Information","The selected import file is empty or invalid, no action taken.")
                     self.close()
                     return
@@ -145,6 +148,7 @@ class ExportImportDialog(QDialog):
                 confirm_msg += sample_msg + f"and {remainder} others?"
                 reply = QMessageBox.question(self, "Confirm import to vault", confirm_msg)
                 if reply == QMessageBox.Yes:
+                    # Don't need to check result code here because it was checked during preview above
                     self.account_manager.import_accounts(file_path)
                     QMessageBox.information(self, "Success", f"Accounts successfully imported from  {file_path}")
                     self.close()

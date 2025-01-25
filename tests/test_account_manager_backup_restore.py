@@ -200,3 +200,18 @@ class TestAccountManager:
             assert vault_accounts[0]['issuer'] == "Boggle"
         os.remove("/tmp/backup_test4.txt")
 
+    def test_import_uri_fail(self,account_manager):
+        # Erase accounts for a clean fixture
+        account_manager.accounts = []
+        assert -1 == account_manager.import_accounts("/tmp/notexist")
+
+        with open("/tmp/bad_uris.txt", 'w') as file:
+            file.write("otpauth//")
+        result = account_manager.import_accounts("/tmp/bad_uris.txt")
+        assert result == -4
+
+        with open("/tmp/bad_json.txt", 'w') as file:
+            file.write("{'provider'")
+        result = account_manager.import_accounts("/tmp/bad_json.txt")
+        assert result == -3
+
