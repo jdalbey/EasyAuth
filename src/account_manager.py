@@ -264,16 +264,14 @@ class AccountManager:
         # Convert accounts to plaintext
         uri_list = ""
         for account in self.accounts:
+            # Expects encrypted keys that it converts to plain URI
+            uri_list += account.get_otp_auth_uri() + "\n"  # convert to URI and append to string
             try:
                 # turn the Account object into a dictionary so it can be serialized by json.dump
                 vault_account = account.__dict__.copy()
                 # Export mode wants plain-text keys
                 if not use_encrypted_keys:
                     vault_account['secret'] = cipher_funcs.decrypt(account.secret)
-                    if desired_format == 'uri':
-                        # Convert account to URI and append to string
-                        # Expects encrypted keys that it converts to plain URI
-                        uri_list += account.get_otp_auth_uri() + "\n"  # convert to URI and append to string
                 vault_accounts.append(vault_account)
             except AttributeError as e:
                 self.logger.error(f"Error processing account {account}: Missing required attribute - {e}")

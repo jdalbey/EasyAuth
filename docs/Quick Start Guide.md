@@ -16,7 +16,7 @@ The quide will show how to store shared keys in your EasyAuth vault and use Time
    
 3. Verify that the correct provider is shown.  You may change the value of the User field to any label that reminds you which online account this entry is associated with (usually username or email address).  
 
-4. Click "Save." The dialog closes and the main window appears with the new account listed at the top.   The Provider and User fields are shown on the left and on the right is the TOTP.  
+4. Click "Accept." The dialog closes and the main window appears with the new account listed at the top.   The Provider and User fields are shown on the left and on the right is the TOTP.  
 <img src="images/Main-Window.png" alt="Main-Window" border="0">  
 
 

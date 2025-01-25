@@ -11,11 +11,11 @@ Focus on ease of use for beginners using TOTP authentication.
  - The list can be sorted alphabetically or by most recently used.
  - The list can be manually reordered to achieve a custom ordering. 
  - Vault entries can be displayed as QR codes for migration to other applications.
- - Export and Import vault to plain-text JSON file.
+ - Export and Import vault to plain-text JSON file or otpauth URI format.
  - Familiar easy-to-navigate desktop GUI.
  - Automatically finds favicons for many sites that offer TOTP verification.
  - GUI includes light and dark themes.
- - Preferences dialog has some customization settings.
+ - Preferences dialog has useful customization settings.
  - Verifying with TOTP in three easy steps: 
    1. Open the application.  
    2. Click the TOTP code for the account you are logging in to. 
