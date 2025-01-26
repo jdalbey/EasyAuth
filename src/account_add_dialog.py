@@ -16,6 +16,7 @@ from otp_funcs import is_valid_secretkey
 from account_entry_dialog import AccountEntryDialog
 
 class AddAccountDialog(AccountEntryDialog):
+    """ Dialog to create a new account """
     def __init__(self, parent=None, ):
         super(AddAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
