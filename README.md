@@ -8,7 +8,7 @@ Focus on ease of use for beginners using TOTP authentication.
  - QR codes can be read from an image file.
  - Generates Time-based One-time Passwords from your secret keys.
  - Accounts are displayed in a scrollable list with a search feature.
- - The list can be sorted alphabetically or by most recently used.
+ - The list can be sorted alphabetically, by usage frequency, or by most recently used.
  - The list can be manually reordered to achieve a custom ordering. 
  - Vault entries can be displayed as QR codes for migration to other applications.
  - Export and Import vault to plain-text JSON file or otpauth URI format.
@@ -121,7 +121,7 @@ For further assistance, you can open an Issue here.
 Practice storing a new secret key using the sample QR code below.
 1. Launch the application.
 2. Make sure the QR code below is visible on the screen. Click 'Add Account".
-3. The "Confirm New Account" dialog appears with the fields filled from the data in the QR code. Click "Accept".
+3. The form fields are filled automatically with the data from the QR code. Click "Save".
 4. Observe the new account in the main window.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
