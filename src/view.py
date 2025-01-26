@@ -227,15 +227,6 @@ class AppView(QMainWindow):
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
                     provider_label.setFont(QFont("Verdana", 12))
-                    # provider_label.setStyleSheet("""
-                    #     QLabel {
-                    #         border: 1px;
-                    #         background: transparent;
-                    #         color: black;
-                    #         font-size: 16px;
-                    #         text-align: left;
-                    #     }
-                    # """)
 
                     edit_btn = QPushButton()
                     edit_btn.setObjectName("editButton")

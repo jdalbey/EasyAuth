@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import QMessageBox, QDialog
 from account_manager import Account, OtpRecord
 from account_add_dialog import AddAccountDialog
 
-class TestQRHunting(unittest.TestCase):
+class TestProcessQRcodes(unittest.TestCase):
+    """ Test static methods in AddAccountDialog """
 
     @patch("account_add_dialog.QMessageBox.information")
     @patch("account_add_dialog.ConfirmAccountDialog")

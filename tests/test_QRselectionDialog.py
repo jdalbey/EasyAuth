@@ -25,6 +25,7 @@ def test_dialog_noselection_OK(qtbot):
 
     # Verify the dialog was accepted
     assert dialog.result() == QDialog.Accepted, "Failed: Dialog was not accepted"
+    # Nobody was selected
     assert dialog.get_selected_account() == None
 
 def test_dialog_selection(qtbot):
@@ -47,4 +48,5 @@ def test_dialog_selection(qtbot):
 
     # Verify the dialog was accepted
     assert dialog.result() == QDialog.Accepted, "Failed: Dialog was not accepted"
+    # Woogle was selected
     assert dialog.get_selected_account().issuer == "Woogle"
