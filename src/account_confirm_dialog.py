@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayo
 
 
 class ConfirmAccountDialog(AccountEntryDialog):
+    """ Dialog to confirm the values obtained from a QR code. """
     def __init__(self, parent=None):
         super(ConfirmAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
