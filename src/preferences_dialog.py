@@ -39,6 +39,10 @@ class PreferencesDialog(QDialog):
         self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
 
+        # Animate form fill
+        self.animate_form_fill = QCheckBox("Animate typing during auto form fill")
+        layout.addWidget(self.animate_form_fill)
+
         # Display website favicons
         self.display_favicons = QCheckBox("Display provider favicons")
         self.display_favicons.setEnabled(True)
@@ -92,6 +96,7 @@ class PreferencesDialog(QDialog):
     def load_settings(self):
         self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
         self.minimize_during_qr_search.setChecked(self.app_config.is_minimize_during_qr_search())
+        self.animate_form_fill.setChecked(self.app_config.is_animate_form_fill())
         self.display_favicons.setChecked(self.app_config.is_display_favicons())
         self.secret_key_hidden.setChecked(self.app_config.is_secret_key_hidden())
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
@@ -100,6 +105,7 @@ class PreferencesDialog(QDialog):
     def save_settings(self):
         self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
         self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
+        self.app_config.set_animate_form_fill(self.animate_form_fill.isChecked())
         self.app_config.set_display_favicons(self.display_favicons.isChecked())
         self.app_config.set_secret_key_hidden(self.secret_key_hidden.isChecked())
         self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())

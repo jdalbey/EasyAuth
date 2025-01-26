@@ -296,20 +296,12 @@ class AppView(QMainWindow):
     def show_add_account_form(self):
         """ User clicked Add Account button """
         self.logger.debug("Starting Show_add_account_form")
-        # Are we in auto_find mode?
         add_dialog = AddAccountDialog()
+        add_dialog.show()
+        # Are we in auto_find mode?
         if self.app_config.is_auto_find_qr_enabled():
-            result_code = False
-            if AddAccountDialog.process_qr_codes(False):
-                result_code = True
-                # confirm returned True
-                self.logger.debug("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
-            # if process returned True we should skip exec_
-            # if process returned False we should show the Add dialog
-            if not result_code:
-                add_dialog.exec_()
-        else:
-            add_dialog.exec_()
+            add_dialog.obtain_qr_codes(False)
+        add_dialog.exec_()
 
         # Refresh the display
         self.display_accounts()

@@ -158,7 +158,7 @@ class EditAccountDialog(AccountEntryDialog):
 
     def confirm_delete_account(self):
         # Create the message box to be a question with Yes and No buttons
-        msg = QMessageBox()
+        msg = QMessageBox(self)
         msg.setWindowTitle("Confirm Account Delete")
         msg.setTextFormat(Qt.RichText)  # Use rich text for HTML links
         msg.setIcon(QMessageBox.Question)
@@ -174,8 +174,6 @@ class EditAccountDialog(AccountEntryDialog):
         if reply == QMessageBox.Yes:
             self.account_manager.delete_account(self.account)
             self.accept()
-        else:
-            self.reject()
 
     def handle_QR_reveal(self):
         if not self.is_qr_visible:

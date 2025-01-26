@@ -36,7 +36,7 @@ class TestManualAddAccountDialog(unittest.TestCase):
         dialog.account_manager = mock_account_manager
         # populate fields
         account = OtpRecord("Woogle", "me@woogle.com", "AB34")
-        dialog.set_account(account)
+        dialog.set_fields(account)
 
         # Simulate pressing the Accept button
         dialog.save_button.click()
@@ -60,7 +60,7 @@ class TestManualAddAccountDialog(unittest.TestCase):
         assert dialog.save_button.isEnabled() == False
         # populate fields
         account = OtpRecord("Woogle", "me@woogle.com", "AB34")
-        dialog.set_account(account)
+        dialog.set_fields(account)
         assert dialog.save_button.isEnabled() == True
 
         # Simulate pressing the Decline button

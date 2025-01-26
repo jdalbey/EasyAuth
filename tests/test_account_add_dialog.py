@@ -1,15 +1,46 @@
 import unittest
 from unittest.mock import patch, Mock
-from PyQt5.QtWidgets import QApplication
+
+from PyQt5.QtWidgets import QApplication, QDialog
 from account_add_dialog import AddAccountDialog
-from account_manager import Account, OtpRecord
+from account_manager import AccountManager, OtpRecord
 
 class TestAddAccountDialog(unittest.TestCase):
+    # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.
+    @classmethod
+    def setUpClass(cls):
+        # QApplication is created once for the entire test suite
+        cls.app = QApplication([])
+
+    @classmethod
+    def tearDownClass(cls):
+        # Ensure QApplication is properly cleaned up after all tests
+        cls.app.quit()
+
+    def setUp(self):
+        # No need to create QApplication here; it's already done in setUpClass
+        pass
+
+    def tearDown(self):
+        # Clean up dialog and other resources
+        pass
+
+    @patch.object(AddAccountDialog, "obtain_qr_codes")
+    def test_qr_code_btn(self, mock_obtain):
+        # Create the dialog instance
+        dialog = AddAccountDialog()
+        dialog.accept = Mock()  # Mock the accept method of the dialog
+
+        # Act
+        dialog.find_qr_btn.click()
+
+        # Assert
+        mock_obtain.assert_called_once_with(True)
+
+        # TODO: Assert that trying to add a duplicate shows a messagebox
 
     @patch("account_add_dialog.AccountManager")
     def test_add_account(self, MockAccountManager):
-        app = QApplication([])  # Create a QApplication instance
-
         # Create a mock for the AccountManager
         mock_account_manager = MockAccountManager.return_value
 
@@ -36,7 +67,5 @@ class TestAddAccountDialog(unittest.TestCase):
         expected_account = OtpRecord("TestProvider", "test@example.com", "testsecret")
         dialog.account_manager.save_new_account.assert_called_once_with(expected_account)
 
-        app.quit()  # Clean up the QApplication instance
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

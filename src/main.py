@@ -1,6 +1,7 @@
 import sys, logging
 from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
+from view import AppView
 from pathlib import Path # Python 3.5+
 import qdarktheme
 def main():
@@ -12,15 +13,18 @@ def main():
     """When you use basicConfig to specify the format option, it sets the format for the root logger """
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s - %(name)s - %(message)s')
     logger = logging.getLogger(__name__)
+    logging.getLogger('PIL').setLevel(logging.WARNING) # suppress debug messages from PIL
 
     logger.debug("Application starting with default config")
-    logger.debug("Application starting with default config")
-    from view import AppView
+    AppConfig()
+
+    # Display the main window
     view = AppView(app)
+    view.show()
 
     # Start the application
-    view.show()
     sys.exit(app.exec_())
+
 if __name__ == '__main__':
     main()
 

@@ -96,6 +96,7 @@ class AccountEntryDialog(QDialog):
         pass
 
     def set_fields(self, otp_record):
+        """ Convenience method for children """
         self.provider_entry.setText(otp_record.issuer)
         self.label_entry.setText(otp_record.label)
         self.secret_entry.setText(otp_record.secret)

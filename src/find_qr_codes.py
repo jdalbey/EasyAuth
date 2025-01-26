@@ -16,6 +16,7 @@ def scan_screen_for_qr_codes():
 
     # Convert screenshot to a format usable by pyzbar
     screenshot = screenshot.convert('RGB')
+    #screenshot.save("/tmp/screenshotqrcodes.png")
 
     # Detect and decode QR codes
     qr_codes = decode(screenshot)
@@ -27,7 +28,8 @@ def scan_screen_for_qr_codes():
 
 """ Reference: 2FA QR generator: https://stefansundin.github.io/2fa-qr/ """
 if __name__ == '__main__':
-    url = scan_screen_for_qr_codes()
-    print (url)
+    urls = scan_screen_for_qr_codes()
+    for url in urls:
+        print(url)
     #url = 'otpauth://totp/PayPal:steve@dottotech.com?secret=DITATUPFVUIJK7X7&issuer=PayPal'
     #url = 'otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com'

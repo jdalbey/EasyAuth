@@ -88,6 +88,12 @@ class AppConfig:
     def set_display_favicons(self, value):
         self.set('Settings', 'display_favicons', 'True' if value else 'False')
 
+    def is_animate_form_fill(self):
+        return self.get('Settings', 'animate_form_fill', fallback='True') == 'True'
+
+    def set_animate_form_fill(self, value):
+        self.set('Settings', 'animate_form_fill', 'True' if value else 'False')
+
     def is_secret_key_hidden(self):
         return self.get('Settings', 'secret_key_hidden', fallback='False') == 'True'
 
@@ -146,6 +152,7 @@ class AppConfig:
         self.set_auto_find_qr_enabled(True)
         self.set_minimize_after_copy(False)
         self.set_minimize_during_qr_search(False)
+        self.set_animate_form_fill(True)
         self.set_display_favicons(True)
         self.set_secret_key_hidden(False)
         self.set_language('English')
