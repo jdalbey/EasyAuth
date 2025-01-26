@@ -16,6 +16,7 @@ info_btn_style = """
     }
     """
 class AccountEntryDialog(QDialog):
+    """ Form containing three input fields for Provider, User, Secret Key. """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)

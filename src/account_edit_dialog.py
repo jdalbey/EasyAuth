@@ -11,6 +11,7 @@ from account_manager import Account, AccountManager
 import cipher_funcs
 
 class EditAccountDialog(AccountEntryDialog):
+    """ Dialog to edit/update an existing account. """
     def __init__(self, parent, index, account):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
