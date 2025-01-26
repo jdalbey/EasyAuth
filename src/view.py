@@ -20,7 +20,7 @@ from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
 from export_import_dialog import ExportImportDialog
 from appconfig import AppConfig
-from account_manager import AccountManager
+from account_manager import AccountManager, Account
 from account_edit_dialog import EditAccountDialog
 from reorder_dialog import ReorderDialog
 from styles import dark_qss, light_qss
@@ -82,10 +82,13 @@ class AppView(QMainWindow):
         sort_menu = tools_menu.addMenu('Sort Accounts')
         alpha_sort_action = QAction("Alphabetically", self)
         recency_action = QAction("Recently Used", self)
+        frequency_action = QAction("Used Frequency", self)
         alpha_sort_action.triggered.connect(self.do_alpha_sort_action)
         recency_action.triggered.connect(self.do_recency_sort_action)
+        frequency_action.triggered.connect(self.do_frequency_sort_action)
         sort_menu.addAction(alpha_sort_action)
         sort_menu.addAction(recency_action)
+        sort_menu.addAction(frequency_action)
 
         # Help menu
         help_menu = menubar.addMenu('Help')
@@ -272,6 +275,7 @@ class AppView(QMainWindow):
         now = datetime.datetime.now()
         # update last used time
         account.last_used = now.strftime("%Y-%m-%d %H:%M:%S")
+        account.used_frequency += 1
         self.account_manager.update_account(idx,account)
         self.logger.debug(f"Updated last_used time for: {idx} {account.issuer} ({account.label})")
 
@@ -342,6 +346,11 @@ class AppView(QMainWindow):
 
     def do_recency_sort_action(self):
         self.account_manager.sort_recency()
+        self.accounts = self.account_manager.accounts
+        self.display_accounts()
+
+    def do_frequency_sort_action(self):
+        self.account_manager.sort_frequency()
         self.accounts = self.account_manager.accounts
         self.display_accounts()
 
