@@ -12,8 +12,8 @@ import pyotp
 import time, datetime
 import pyperclip
 import qdarktheme
+
 from provider_map import Providers
-from qr_hunting import fetch_qr_code
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
 from quick_start_dialog import QuickStartDialog
@@ -306,17 +306,20 @@ class AppView(QMainWindow):
         """ User clicked Add Account button """
         self.logger.debug("Starting Show_add_account_form")
         # Are we in auto_find mode?
+        add_dialog = AddAccountDialog()
         if self.app_config.is_auto_find_qr_enabled():
-            result_code = fetch_qr_code()
+            result_code = False
+            if AddAccountDialog.process_qr_codes(False):
+                result_code = True
+                # confirm returned True
+                self.logger.debug("# We haven't opened the dialog yet but got a confirmed code so we can just bail out.")
             # if process returned True we should skip exec_
-            #result_code = QDialog.result(self.current_dialog)
-            self.logger.debug (f"AddAccountDialog closed with result code: {result_code}")
+            # if process returned False we should show the Add dialog
             if not result_code:
-                self.current_dialog = AddAccountDialog()
-                self.current_dialog.exec_()
+                add_dialog.exec_()
         else:
-            self.current_dialog = AddAccountDialog()
-            self.current_dialog.exec_()
+            add_dialog.exec_()
+
         # Refresh the display
         self.display_accounts()
 

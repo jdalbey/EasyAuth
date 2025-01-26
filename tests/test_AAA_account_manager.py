@@ -51,6 +51,12 @@ class TestAccountManager:
         manager2 = AccountManager()
         assert manager1 is manager2
 
+    def test_otpauth_uri_from_account(self):
+        account = Account("Woogle","me@woogle.com","gAAAAABngpqkACjKleIWZa3xdgSjtAagXkdaAjRuMCpqHCcXAKbtZ6RpB9mKeHdToEn1TOIkhqmEXSiyfX0MgYekjYbU79k0TA==","2001-01-01 12:01")
+        uri = account.get_otp_auth_uri()
+        expected = "otpauth://totp/Woogle:me%40woogle.com?secret=ABC234&issuer=Woogle"
+        assert uri == expected
+
     def test_load_accounts_empty_vault(self, account_manager):
         """Test loading accounts when vault doesn't exist."""
         print (f"Vault path: {account_manager.vault_path}")

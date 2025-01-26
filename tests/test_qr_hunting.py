@@ -3,14 +3,15 @@ from unittest.mock import Mock, patch, MagicMock
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
 from account_manager import Account, OtpRecord
-from qr_hunting import confirm_account, process_qr_codes
+from account_add_dialog import AddAccountDialog
 
 class TestQRHunting(unittest.TestCase):
 
-    @patch("qr_hunting.QMessageBox.information")
-    @patch("qr_hunting.ConfirmAccountDialog")
-    @patch("qr_hunting.is_valid_secretkey")
+    @patch("account_add_dialog.QMessageBox.information")
+    @patch("account_add_dialog.ConfirmAccountDialog")
+    @patch("account_add_dialog.is_valid_secretkey")
     def test_confirm_account_ok(self, mock_is_valid_secretkey, mock_ConfirmAccountDialog, mock_information):
+        
         # Mock a valid secret key
         mock_is_valid_secretkey.return_value = True
 
@@ -23,7 +24,7 @@ class TestQRHunting(unittest.TestCase):
         account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="ValidSecret")
 
         # Call the function
-        result = confirm_account(account)
+        result = AddAccountDialog.confirm_account(account)
 
         # Assert that the dialog was displayed and accepted
         mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
@@ -32,10 +33,11 @@ class TestQRHunting(unittest.TestCase):
         mock_dialog_instance.exec_.assert_called_once()  # Dialog exec_ was called
         self.assertTrue(result)
 
-    @patch("qr_hunting.QMessageBox.information")
-    @patch("qr_hunting.ConfirmAccountDialog")
-    @patch("qr_hunting.is_valid_secretkey")
+    @patch("account_add_dialog.QMessageBox.information")
+    @patch("account_add_dialog.ConfirmAccountDialog")
+    @patch("account_add_dialog.is_valid_secretkey")
     def test_confirm_account_cancel(self, mock_is_valid_secretkey, mock_ConfirmAccountDialog, mock_information):
+        
         # Mock a valid secret key
         mock_is_valid_secretkey.return_value = True
 
@@ -48,15 +50,15 @@ class TestQRHunting(unittest.TestCase):
         account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="ValidSecret")
 
         # Call the function
-        result = confirm_account(account)
+        result = AddAccountDialog.confirm_account(account)
 
         # Assert that the dialog was displayed and canceled
         mock_is_valid_secretkey.assert_called_once_with("ValidSecret")
         mock_dialog_instance.set_account.assert_called_once()
         self.assertFalse(result)
 
-    @patch("qr_hunting.QMessageBox.information")
-    @patch("qr_hunting.is_valid_secretkey")
+    @patch("account_add_dialog.QMessageBox.information")
+    @patch("account_add_dialog.is_valid_secretkey")
     def test_confirm_account_invalid_secret(self, mock_is_valid_secretkey, mock_information):
         # Mock an invalid secret key
         mock_is_valid_secretkey.return_value = False
@@ -65,7 +67,7 @@ class TestQRHunting(unittest.TestCase):
         account = OtpRecord(issuer="TestProvider", label="TestLabel", secret="InvalidSecret")
 
         # Call the function
-        result = confirm_account(account)
+        result = AddAccountDialog.confirm_account(account)
 
         mock_is_valid_secretkey.assert_called_once_with('InvalidSecret')
 
@@ -79,7 +81,7 @@ class TestQRHunting(unittest.TestCase):
         mock_scan_screen_for_qr_codes.return_value = []
 
         # Call the function
-        result = process_qr_codes(False)
+        result = AddAccountDialog.process_qr_codes(False)
 
         # Assertions when no urls found
         mock_scan_screen_for_qr_codes.assert_called_once_with()
@@ -87,13 +89,13 @@ class TestQRHunting(unittest.TestCase):
         self.assertFalse(result)
 
     @patch("find_qr_codes.scan_screen_for_qr_codes")
-    @patch("qr_hunting.QMessageBox")
+    @patch("account_add_dialog.QMessageBox")
     def test_process_qr_codes_valid_zero_from_find(self, MockQMessageBox, mock_scan_screen_for_qr_codes):
         mock_message_box = Mock()
         MockQMessageBox.information.return_value = mock_message_box
 
         # Call the function
-        result = process_qr_codes(True)
+        result = AddAccountDialog.process_qr_codes(True)
         # if zero valid urls expect return False
         self.assertFalse(result)
 
@@ -108,18 +110,18 @@ class TestQRHunting(unittest.TestCase):
         assert MockQMessageBox.information.call_args[0][2].startswith('No QR code found.')
 
     @patch("find_qr_codes.scan_screen_for_qr_codes")
-    @patch("qr_hunting.confirm_account")
+    @patch.object(AddAccountDialog, "confirm_account")
     def test_process_qr_codes_valid_one(self, mock_confirm_account, mock_scan_screen_for_qr_codes):
         # Mock dependencies
         mock_scan_screen_for_qr_codes.return_value = ['otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com','badurl']
         mock_confirm_account.return_value = True
         # Call the function
-        result = process_qr_codes(False)
+        result = AddAccountDialog.process_qr_codes(False)
         self.assertTrue(result)
         # Assertions when 1 url found and Accepted
         mock_scan_screen_for_qr_codes.assert_called_once_with()
 
         mock_confirm_account.return_value = False
-        result = process_qr_codes(False)
+        result = AddAccountDialog.process_qr_codes(False)
         self.assertFalse(result)
 

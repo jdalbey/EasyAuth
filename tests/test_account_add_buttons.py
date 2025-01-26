@@ -24,7 +24,7 @@ class TestAddAccountDialog(unittest.TestCase):
         # Clean up dialog and other resources
         pass
 
-    @patch("account_add_dialog.process_qr_codes")  # Correct module path for process
+    @patch.object(AddAccountDialog, "process_qr_codes")
     def test_qr_code_btn_success(self, mock_process):
         # Arrange
         mock_process.return_value = True  # Simulate a successful QR code processing
@@ -42,7 +42,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
         # TODO: Assert that trying to add a duplicate shows a messagebox
 
-    @patch("account_add_dialog.process_qr_codes")  # Correct module path for processbv
+    @patch.object(AddAccountDialog, "process_qr_codes")
     def test_qr_code_btn_reject(self, mock_process):
         # Arrange
         mock_process.return_value = False  # Simulate a failed QR code processing
