@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
     QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton, QApplication
 
+import account_manager
 import otp_funcs
 from account_entry_dialog import AccountEntryDialog, info_btn_style
 from account_manager import Account, AccountManager
@@ -205,7 +206,7 @@ class EditAccountDialog(AccountEntryDialog):
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
-    acct = Account("A","B","AB34","2000-01-01 00:00:00")
-    acct.secret = cipher_funcs.encrypt("AB34")
+    rec = account_manager.OtpRecord("A","B","AB34")
+    acct = rec.toAccount()
     dialog = EditAccountDialog(None, 1, acct)
     dialog.exec()
