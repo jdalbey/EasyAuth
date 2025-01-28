@@ -4,14 +4,17 @@ from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
     QVBoxLayout, QLineEdit, QHBoxLayout, QToolButton, QApplication
+from PyQt5.uic import loadUi
 
 import account_manager
 import otp_funcs
-from account_entry_dialog import AccountEntryDialog, info_btn_style
+from styles import info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
+from provider_search_dialog import ProviderSearchDialog
 
-class EditAccountDialog(AccountEntryDialog):
+
+class EditAccountDialog(QDialog):
     """ Dialog to edit/update an existing account. """
     def __init__(self, parent, index, account):
         super().__init__(parent)
@@ -26,48 +29,39 @@ class EditAccountDialog(AccountEntryDialog):
         self.initial_size = None
 
         self.setWindowTitle("Edit Account")
-        self.setMinimumWidth(500)
+        self.setMinimumWidth(300)
 
-        # Frame for the edit dialog features
-        dialog_frame = QFrame()
-        dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.bottom_layout = QVBoxLayout(dialog_frame)
+        loadUi("assets/EditAccountForm.ui", self)  #loads directions_frame
 
-        # Declare save button here so we can add it to Form
-        self.save_btn = QPushButton("Save")
-        self.save_btn.clicked.connect(
-            lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
-        self.save_btn.setEnabled(False)
-        self.save_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # Make the Delete button visible on this form
+        self.btn_Delete.setVisible(True)
+        self.btn_Delete.setEnabled(True)
 
-        # Add shared fields
-        #self.shared_fields = AccountEntryDialog(self.save_btn)
-        #layout.addWidget(self.shared_fields)
+        # Setup actions to be taken
+        self.btn_Lookup.clicked.connect(self.provider_lookup)
+        self.btn_Save.clicked.connect(self.save_fields)
+        self.btn_Delete.clicked.connect(self.confirm_delete_account)
+        self.btn_Cancel.clicked.connect(self.reject)
+        self.provider_entry.textChanged.connect(self.validate_form)
+        self.label_entry.textChanged.connect(self.validate_form)
+        self.secret_entry.textChanged.connect(self.validate_form)
+        #self.set_tab_order()
 
         # Place current account data into fields for updating
         editable_account = copy.deepcopy(account)
         editable_account.secret = cipher_funcs.decrypt(account.secret)
         self.set_fields(editable_account)
 
-        # Button section
-        button_frame = QWidget()
-        button_layout = QHBoxLayout(button_frame)
-        button_layout.addStretch()
-        self.delete_btn = QPushButton("Delete")
-        self.delete_btn.clicked.connect(lambda: self.confirm_delete_account())
-        self.delete_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        cancel_btn = QPushButton("Cancel")
-        cancel_btn.clicked.connect(self.reject)
-        cancel_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        button_layout.addWidget(self.save_btn)
-        button_layout.addWidget(self.delete_btn)
-        button_layout.addWidget(cancel_btn)
-        self.bottom_layout.addWidget(button_frame)
+
+        # Frame for the edit dialog features
+        dialog_frame = QFrame()
+        dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.bottom_layout = QVBoxLayout()
 
         # Last Used section
         last_used_frame = QFrame()
         last_used_frame.setFrameStyle(QFrame.StyledPanel)
-        last_used_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        last_used_frame.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         last_used_layout = QGridLayout(last_used_frame)
 
         # Last Used Label
@@ -89,39 +83,15 @@ class EditAccountDialog(AccountEntryDialog):
         user_info_btn.setStyleSheet(info_btn_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
         last_used_layout.addWidget(user_info_btn, 1, 2, Qt.AlignCenter)
-        self.bottom_layout.addWidget(last_used_frame)
+        self.bottom_layout.addWidget(last_used_frame,alignment=Qt.AlignCenter)
 
         # Add spacer to push buttons toward top
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.bottom_layout.addWidget(spacer)
-
-        self.form_layout.addWidget(dialog_frame,4,1)
-
-        # Set tab order for subclass fields, maintaining parent order
-        # First clear any existing tab order by setting all widgets to NoFocus
-        for child in self.findChildren(QWidget):
-            child.setFocusPolicy(Qt.NoFocus)
-
-        # Now explicitly set focus policy for just the widgets we want in our cycle
-        self.provider_entry.setFocusPolicy(Qt.StrongFocus)
-        self.label_entry.setFocusPolicy(Qt.StrongFocus)
-        self.secret_entry.setFocusPolicy(Qt.StrongFocus)
-        self.save_btn.setFocusPolicy(Qt.StrongFocus)
-        self.delete_btn.setFocusPolicy(Qt.StrongFocus)
-        cancel_btn.setFocusPolicy(Qt.StrongFocus)
-        self.reveal_qr_button.setFocusPolicy(Qt.StrongFocus)
-        # Create closed tab cycle among specific widgets
-        self.setTabOrder(self.provider_entry, self.label_entry)  # Start with parent class fields
-        self.setTabOrder(self.label_entry, self.secret_entry)
-        self.setTabOrder(self.secret_entry, self.save_btn)
-        self.setTabOrder(self.save_btn, self.delete_btn)
-        self.setTabOrder(self.delete_btn, cancel_btn)
-        self.setTabOrder(cancel_btn, self.reveal_qr_button)
-        self.setTabOrder(self.reveal_qr_button, self.provider_entry)  # Complete the cycle
-
-        # Disable tab focus for any other widgets you want to skip
-        user_info_btn.setFocusPolicy(Qt.NoFocus)
+        # Locate the form's layout so we can add the bottom fields
+        form_layout = self.findChild(QVBoxLayout, "verticalLayout")
+        form_layout.addLayout(self.bottom_layout)
 
 
     def showEvent(self, event):
@@ -135,7 +105,17 @@ class EditAccountDialog(AccountEntryDialog):
         """ Ensure all fields have values before enabling the save button."""
         # Check if all fields are filled
         all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
-        self.save_btn.setEnabled(all_filled)
+        self.btn_Save.setEnabled(all_filled)
+
+    def provider_lookup(self):
+        # Create and show the search page
+        search_page = ProviderSearchDialog()
+        search_page.load_data()
+        search_page.lower()
+        # Show the dialog and get the result
+        if search_page.exec_() == QDialog.Accepted:
+            selected = search_page.get_selected_provider()
+            self.provider_entry.setText(selected)
 
     def update_qr_button_text(self):
         """Update button text based on QR code visibility state"""
@@ -176,6 +156,13 @@ class EditAccountDialog(AccountEntryDialog):
             self.account_manager.delete_account(self.account)
             self.accept()
 
+    # disable the secret key so it can't be altered while QR code is revealed.
+    def disable_fields(self):
+        self.secret_entry.setDisabled(True)
+
+    def enable_fields(self):
+        self.secret_entry.setEnabled(True)
+
     def handle_QR_reveal(self):
         if not self.is_qr_visible:
             # Show QR code
@@ -184,7 +171,7 @@ class EditAccountDialog(AccountEntryDialog):
             pixmap.loadFromData(qr_code_image)
             self.qr_code_label = QLabel()
             self.qr_code_label.setPixmap(pixmap)
-            self.form_layout.addWidget(self.qr_code_label,5,1)
+            self.bottom_layout.addWidget(self.qr_code_label,alignment=Qt.AlignCenter)
             self.reveal_qr_button.setText("Hide QR code")
             self.disable_fields()
             self.is_qr_visible = True
@@ -201,6 +188,26 @@ class EditAccountDialog(AccountEntryDialog):
                 QTimer.singleShot(0, lambda: self.resize(self.initial_size))
 
         self.update_qr_button_text()
+
+    def set_fields(self, otp_record):
+        """ Convenience method for children """
+        self.provider_entry.setText(otp_record.issuer)
+        self.label_entry.setText(otp_record.label)
+        self.secret_entry.setText(otp_record.secret)
+
+    def save_fields(self):
+        issuer = self.provider_entry.text()
+        label = self.label_entry.text()
+        secret = self.secret_entry.text()
+        otp_record = account_manager.OtpRecord(issuer, label, secret)
+        # Validate secret key
+        if otp_funcs.is_valid_secretkey(secret):
+            if self.account_manager.save_new_account(otp_record):
+                self.accept()
+            else:
+                 QMessageBox.information(self,"Warning","Account with same provider and user already exists")
+        else:
+            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
 # Local main for unit testing
 if __name__ == '__main__':

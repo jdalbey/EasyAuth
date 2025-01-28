@@ -90,3 +90,12 @@ QToolTip#timerLabel {
     border: 1px solid black;
 }
 """
+
+# Info button: Make square button invisible so only circular icon shows
+info_btn_style = """
+    QToolButton {
+        border: none;       /* Remove border */
+        background: none;   /* Remove background */
+        padding: 0px;       /* Remove padding */
+    }
+    """

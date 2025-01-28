@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QRadioButton, \
     QButtonGroup, QToolButton, QHBoxLayout, QSizePolicy
 
-from account_entry_dialog import info_btn_style
+from styles import info_btn_style
 from account_manager import AccountManager
 """ Reference: Gnome-Authenticator backup JSON format
   {

@@ -32,7 +32,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.accept = Mock()  # Mock the accept method of the dialog
 
         # Act
-        dialog.find_qr_btn.click()
+        dialog.btn_scanQR.click()
 
         # Assert
         mock_obtain.assert_called_once_with(True)
@@ -53,15 +53,15 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.label_entry.setText("test@example.com")
 
         # Save button should be disabled until all fields are filled
-        assert not dialog.save_button.isEnabled()
+        assert not dialog.btn_Save.isEnabled()
         dialog.secret_entry.setText("testsecret")
-        assert dialog.save_button.isEnabled()
+        assert dialog.btn_Save.isEnabled()
 
         # Mock the save_new_account method
         dialog.account_manager.save_new_account = Mock()
 
         # Click the Save button
-        dialog.save_button.click()
+        dialog.btn_Save.click()
 
         # Verify that save_new_account was called with the correct values
         expected_account = OtpRecord("TestProvider", "test@example.com", "testsecret")

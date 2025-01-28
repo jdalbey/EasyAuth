@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 from PyQt5.QtWidgets import QMessageBox, QApplication
-from account_edit_dialog import EditAccountDialog
+from dev_archive.account_edit_dialog import EditAccountDialog
 from account_manager import Account
 class TestEditDialogButtons(unittest.TestCase):
 

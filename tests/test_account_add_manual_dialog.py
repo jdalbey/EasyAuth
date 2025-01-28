@@ -1,9 +1,8 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from PyQt5.QtWidgets import QApplication
-from account_add_dialog import AddAccountDialog
-from unittest.mock import Mock
-from account_manager import Account, OtpRecord
+from dev_archive.account_add_dialog import AddAccountDialog
+from account_manager import OtpRecord
 
 
 class TestManualAddAccountDialog(unittest.TestCase):
@@ -39,7 +38,7 @@ class TestManualAddAccountDialog(unittest.TestCase):
         dialog.set_fields(account)
 
         # Simulate pressing the Accept button
-        dialog.save_button.click()
+        dialog.btn_Save.click()
 
         # Verify save_new_account is called once with correct arguments
         mock_account_manager.save_new_account.assert_called_once_with(
@@ -57,11 +56,11 @@ class TestManualAddAccountDialog(unittest.TestCase):
         dialog.account_manager = dialog_manager
 
         # Verify save button is disabled until fields are populated
-        assert dialog.save_button.isEnabled() == False
+        assert dialog.btn_Save.isEnabled() == False
         # populate fields
         account = OtpRecord("Woogle", "me@woogle.com", "AB34")
         dialog.set_fields(account)
-        assert dialog.save_button.isEnabled() == True
+        assert dialog.btn_Save.isEnabled() == True
 
         # Simulate pressing the Decline button
         dialog.cancel_button.click()

@@ -6,92 +6,58 @@ from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication, QFileDialog, QFrame, QWidget, QGridLayout
+    QApplication, QFileDialog, QFrame, QWidget, QGridLayout, QLayout
 
 import find_qr_codes
+import otp_funcs
 from QRselectionDialog import QRselectionDialog
 from appconfig import AppConfig
 from account_manager import Account, AccountManager, OtpRecord
-from account_entry_dialog import AccountEntryDialog
+#from account_entry_panel import AccountEntryPanel
+from PyQt5.uic import loadUi
 
-class AddAccountDialog(AccountEntryDialog):
+from provider_search_dialog import ProviderSearchDialog
+
+
+class AddAccountDialog(QDialog):
     """ Dialog to create a new account """
+    """
+Select the location of the QR code:
+The form will be completed using data from:
+Let EasyAuth find the needed data from:
+Complete the form using data collected automatically from:
+Let EasyAuth complete the form using:"""
     def __init__(self, parent=None, ):
         super(AddAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
         self.app_config = AppConfig() # Get the global AppConfig instance
-        self.setWindowTitle("Add Account")
-        self.setGeometry(100, 100, 400, 300)
         self.logger = logging.getLogger(__name__)
-        self.create_form()
+        #self.dialog_layout = QVBoxLayout(self)
 
-    def create_form(self):
-        # Frame for the dialog features
-        directions_frame = QFrame()
-        directions_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.layout = QGridLayout(directions_frame)
-        self.layout.setVerticalSpacing(15)
+        # Frame for the add dialog features
+        #dialog_frame = QFrame(self)
+        #dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        #self.bottom_layout = QVBoxLayout(dialog_frame)
 
-        header_label = QLabel("Choose how to create a new account:")
-        self.layout.addWidget(header_label, 0,0,1,2)
-        # choices section
+        loadUi("assets/AddAccountForm.ui", self)  #loads directions_frame
+        # Access the frame loaded from the .ui file
+        self.btn_Delete.setVisible(False)
 
-        self.find_qr_btn = QPushButton("Use QR code")
-        self.find_qr_btn.setShortcut('Ctrl+U')
-        self.find_qr_btn.clicked.connect(lambda: self.get_qr_code())
-        self.find_qr_btn.setContentsMargins(40, 0, 0, 0)
-        self.find_qr_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.layout.addWidget(self.find_qr_btn, 1,0, alignment=Qt.AlignRight)
-        qr_screen_label = QLabel("Automatically obtain the data from a QR code on the screen.")
-        qr_screen_label.setContentsMargins(5, 0, 0, 0)
-        self.layout.addWidget(qr_screen_label,1,1, alignment=Qt.AlignLeft)
+        # Setup actions to be taken
+        self.label_LearnMore.setOpenExternalLinks(True)# Make the link clickable
+        self.btn_scanQR.clicked.connect(lambda: self.scan_qr_code())
+        self.btn_Lookup.clicked.connect(self.provider_lookup)
+        self.btn_Save.clicked.connect(self.save_fields)
+        self.btn_Cancel.clicked.connect(self.reject)
+        self.provider_entry.textChanged.connect(self.validate_form)
+        self.label_entry.textChanged.connect(self.validate_form)
+        self.secret_entry.textChanged.connect(self.validate_form)
+        self.set_tab_order()
 
-        open_file_btn = QPushButton("Open QR image")
-        open_file_btn.clicked.connect(self.open_qr_image)
-        open_file_btn.setContentsMargins(40, 0, 0, 0)
-        open_file_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.layout.addWidget(open_file_btn, 2,0)
-        qr_file_label = QLabel("Automatically obtain the data from a QR image in a file.")  # •
-        qr_file_label.setContentsMargins(5, 0, 0, 0)
-        self.layout.addWidget(qr_file_label, 2,1)
+        self.setGeometry(100, 100, 600, 450)
+        self.setWindowTitle("Add Account")
 
-        ellipsis_label = QLabel("...")
-        ellipsis_label.setFont(QFont('monospaced',16))
-        ellipsis_label.setContentsMargins(40, 0, 0, 10)
-        self.layout.addWidget(ellipsis_label,3,0, alignment=Qt.AlignRight)
-
-        manual_label = QLabel("Manually enter the data in the following fields.")
-        """Enter the data manually"""
-        manual_label.setContentsMargins(5, 0, 0, 0)
-        self.layout.addWidget(manual_label,3,1)
-
-        self.form_layout.addWidget(directions_frame, 0,0,1,3 )
-
-        # Declare the button frame
-        button_frame = QFrame()
-        button_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.button_layout = QHBoxLayout(button_frame)
-
-        # Declare the save button here so we can pass it to the Form
-        self.button_layout.addStretch()
-
-        self.save_button = QPushButton("Save")
-        self.save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.save_button.clicked.connect(self.save_fields)
-        self.save_button.setEnabled(False)
-
-        # Add the save button to the layout here
-        self.button_layout.addWidget(self.save_button)
-
-        self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.cancel_button.clicked.connect(self.close)
-        self.button_layout.addWidget(self.cancel_button)
-
-        #self.layout.addLayout(self.button_layout)
-        self.form_layout.addWidget(button_frame, 4, 1)
-        #self.setLayout(self.layout)
-
+    def set_tab_order(self):
         # Set tab order for subclass fields, maintaining parent order
         # First clear any existing tab order by setting all widgets to NoFocus
         for child in self.findChildren(QWidget):
@@ -101,20 +67,36 @@ class AddAccountDialog(AccountEntryDialog):
         self.provider_entry.setFocusPolicy(Qt.StrongFocus)
         self.label_entry.setFocusPolicy(Qt.StrongFocus)
         self.secret_entry.setFocusPolicy(Qt.StrongFocus)
-        self.save_button.setFocusPolicy(Qt.StrongFocus)
-        self.cancel_button.setFocusPolicy(Qt.StrongFocus)
+        self.btn_Save.setFocusPolicy(Qt.StrongFocus)
+        self.btn_Cancel.setFocusPolicy(Qt.StrongFocus)
         # Create closed tab cycle among specific widgets
         self.setTabOrder(self.provider_entry, self.label_entry)  # Start with parent class fields
         self.setTabOrder(self.label_entry, self.secret_entry)
-        self.setTabOrder(self.secret_entry, self.save_button)
-        self.setTabOrder(self.save_button, self.cancel_button)
-        self.setTabOrder(self.cancel_button, self.provider_entry)  # Complete the cycle
+        self.setTabOrder(self.secret_entry, self.btn_Save)
+        self.setTabOrder(self.btn_Save, self.btn_Cancel)
+        self.setTabOrder(self.btn_Cancel, self.provider_entry)  # Complete the cycle
 
     def validate_form(self):
         """ Ensure all fields have values before enabling the save button."""
         # Check if all fields are filled
         all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
-        self.save_button.setEnabled(all_filled)
+        self.btn_Save.setEnabled(all_filled)
+
+    def provider_lookup(self):
+        # Create and show the search page
+        search_page = ProviderSearchDialog()
+        search_page.load_data()
+        search_page.lower()
+        # Show the dialog and get the result
+        if search_page.exec_() == QDialog.Accepted:
+            selected = search_page.get_selected_provider()
+            self.provider_entry.setText(selected)
+
+    def scan_qr_code(self):
+        if self.radioBtnScreen.isChecked():
+            self.get_qr_code()
+        else:
+            self.open_qr_image()
 
     def get_qr_code(self):
         """ User clicked User QR code """
@@ -182,6 +164,8 @@ class AddAccountDialog(AccountEntryDialog):
         popup.setStyleSheet("QLabel#qr_code_found {font-size:16px; background-color: #dff0d8; color: #3c763d; padding: 5px; border: 1px solid #d6e9c6;}")
         popup.resize(150, 50)
         # Calculate position just above the field
+
+        #button_geometry = self.entry_panel.mapToGlobal(self.entry_panel.provider_entry.geometry().topLeft())
         button_geometry = self.provider_entry.parent().mapToGlobal(self.provider_entry.geometry().topLeft())
         button_center_x = button_geometry.x() + self.provider_entry.width() // 2
         popup_x = button_center_x - popup.width() // 2
@@ -248,7 +232,19 @@ class AddAccountDialog(AccountEntryDialog):
                     logging.debug(f"QRselectionDialog returned: {selected_account.issuer} - {selected_account.label}")
                     self.fill_form_fields(selected_account)
 
-
+    def save_fields(self):
+        issuer = self.provider_entry.text()
+        label = self.label_entry.text()
+        secret = self.secret_entry.text()
+        otp_record = OtpRecord(issuer, label, secret)
+        # Validate secret key
+        if otp_funcs.is_valid_secretkey(secret):
+            if self.account_manager.save_new_account(otp_record):
+                self.accept()
+            else:
+                 QMessageBox.information(self,"Warning","Account with same provider and user already exists")
+        else:
+            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
 
 
