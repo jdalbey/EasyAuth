@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 import find_qr_codes
 import otp_funcs
+from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
 from QRselectionDialog import QRselectionDialog
 from appconfig import AppConfig
 from account_manager import Account, AccountManager, OtpRecord
@@ -38,61 +39,25 @@ Let EasyAuth complete the form using:"""
         #dialog_frame = QFrame(self)
         #dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         #self.bottom_layout = QVBoxLayout(dialog_frame)
+        self.setGeometry(100, 100, 600, 450)
 
         loadUi("assets/AddAccountForm.ui", self)  #loads directions_frame
-        # Access the frame loaded from the .ui file
-        self.btn_Delete.setVisible(False)
+        self.setWindowTitle("Add Account")
 
         # Setup actions to be taken
         self.label_LearnMore.setOpenExternalLinks(True)# Make the link clickable
         self.btn_scanQR.clicked.connect(lambda: self.scan_qr_code())
-        self.btn_Lookup.clicked.connect(self.provider_lookup)
-        self.btn_Save.clicked.connect(self.save_fields)
+        self.btn_Lookup.clicked.connect(lambda: provider_lookup(self))
+        self.btn_Save.clicked.connect(lambda: save_fields(self))
         self.btn_Cancel.clicked.connect(self.reject)
-        self.provider_entry.textChanged.connect(self.validate_form)
-        self.label_entry.textChanged.connect(self.validate_form)
-        self.secret_entry.textChanged.connect(self.validate_form)
-        self.set_tab_order()
+        self.provider_entry.textChanged.connect(lambda: validate_form(self))
+        self.label_entry.textChanged.connect(lambda: validate_form(self))
+        self.secret_entry.textChanged.connect(lambda: validate_form(self))
+        set_tab_order(self)
 
-        self.setGeometry(100, 100, 600, 450)
-        self.setWindowTitle("Add Account")
-
-    def set_tab_order(self):
-        # Set tab order for subclass fields, maintaining parent order
-        # First clear any existing tab order by setting all widgets to NoFocus
-        for child in self.findChildren(QWidget):
-            child.setFocusPolicy(Qt.NoFocus)
-
-        # Now explicitly set focus policy for just the widgets we want in our cycle
-        self.provider_entry.setFocusPolicy(Qt.StrongFocus)
-        self.label_entry.setFocusPolicy(Qt.StrongFocus)
-        self.secret_entry.setFocusPolicy(Qt.StrongFocus)
-        self.btn_Save.setFocusPolicy(Qt.StrongFocus)
-        self.btn_Cancel.setFocusPolicy(Qt.StrongFocus)
-        # Create closed tab cycle among specific widgets
-        self.setTabOrder(self.provider_entry, self.label_entry)  # Start with parent class fields
-        self.setTabOrder(self.label_entry, self.secret_entry)
-        self.setTabOrder(self.secret_entry, self.btn_Save)
-        self.setTabOrder(self.btn_Save, self.btn_Cancel)
-        self.setTabOrder(self.btn_Cancel, self.provider_entry)  # Complete the cycle
-
-    def validate_form(self):
-        """ Ensure all fields have values before enabling the save button."""
-        # Check if all fields are filled
-        all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
-        self.btn_Save.setEnabled(all_filled)
-
-    def provider_lookup(self):
-        # Create and show the search page
-        search_page = ProviderSearchDialog()
-        search_page.load_data()
-        search_page.lower()
-        # Show the dialog and get the result
-        if search_page.exec_() == QDialog.Accepted:
-            selected = search_page.get_selected_provider()
-            self.provider_entry.setText(selected)
 
     def scan_qr_code(self):
+        """ Determine source for scan: screen or file """
         if self.radioBtnScreen.isChecked():
             self.get_qr_code()
         else:
@@ -232,19 +197,6 @@ Let EasyAuth complete the form using:"""
                     logging.debug(f"QRselectionDialog returned: {selected_account.issuer} - {selected_account.label}")
                     self.fill_form_fields(selected_account)
 
-    def save_fields(self):
-        issuer = self.provider_entry.text()
-        label = self.label_entry.text()
-        secret = self.secret_entry.text()
-        otp_record = OtpRecord(issuer, label, secret)
-        # Validate secret key
-        if otp_funcs.is_valid_secretkey(secret):
-            if self.account_manager.save_new_account(otp_record):
-                self.accept()
-            else:
-                 QMessageBox.information(self,"Warning","Account with same provider and user already exists")
-        else:
-            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
 
 

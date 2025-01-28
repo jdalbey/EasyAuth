@@ -7,10 +7,12 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
 from PyQt5.uic import loadUi
 
 import account_manager
-import otp_funcs
+import common_dialog_funcs
 from styles import info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
+import otp_funcs
+from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
 from provider_search_dialog import ProviderSearchDialog
 
 
@@ -28,30 +30,30 @@ class EditAccountDialog(QDialog):
         # Store initial size - gets set in showEvent()
         self.initial_size = None
 
-        self.setWindowTitle("Edit Account")
         self.setMinimumWidth(300)
 
         loadUi("assets/EditAccountForm.ui", self)  #loads directions_frame
+        self.setWindowTitle("Edit Account")
 
         # Make the Delete button visible on this form
-        self.btn_Delete.setVisible(True)
-        self.btn_Delete.setEnabled(True)
+        self.btn_Delete = QPushButton("Delete")
+        self.btn_Delete.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.buttonLayout.insertWidget(2,self.btn_Delete)
 
         # Setup actions to be taken
-        self.btn_Lookup.clicked.connect(self.provider_lookup)
-        self.btn_Save.clicked.connect(self.save_fields)
+        self.btn_Lookup.clicked.connect(lambda: provider_lookup(self))
+        self.btn_Save.clicked.connect(lambda: save_fields(self))
         self.btn_Delete.clicked.connect(self.confirm_delete_account)
         self.btn_Cancel.clicked.connect(self.reject)
-        self.provider_entry.textChanged.connect(self.validate_form)
-        self.label_entry.textChanged.connect(self.validate_form)
-        self.secret_entry.textChanged.connect(self.validate_form)
-        #self.set_tab_order()
+        self.provider_entry.textChanged.connect(lambda: validate_form(self))
+        self.label_entry.textChanged.connect(lambda: validate_form(self))
+        self.secret_entry.textChanged.connect(lambda: validate_form(self))
+        set_tab_order(self)
 
         # Place current account data into fields for updating
         editable_account = copy.deepcopy(account)
         editable_account.secret = cipher_funcs.decrypt(account.secret)
         self.set_fields(editable_account)
-
 
         # Frame for the edit dialog features
         dialog_frame = QFrame()
@@ -68,12 +70,16 @@ class EditAccountDialog(QDialog):
         last_used_layout.addWidget(QLabel("Last Used:"), 0, 0, Qt.AlignRight)
         self.last_used_label = QLabel(account.last_used)
         last_used_layout.addWidget(self.last_used_label, 0, 1)
+        # Usage Count Label
+        last_used_layout.addWidget(QLabel("Usage Count:"), 1, 0, Qt.AlignRight)
+        self.usage_count_label = QLabel(str(account.used_frequency))
+        last_used_layout.addWidget(self.usage_count_label, 1, 1)
 
         # Reveal QR Code Button
         self.reveal_qr_button = QPushButton("Reveal QR code")
         self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
-        last_used_layout.addWidget(self.reveal_qr_button, 1, 0, 1, 2, Qt.AlignCenter)
+        last_used_layout.addWidget(self.reveal_qr_button, 2, 0, 1, 2, Qt.AlignCenter)
         user_info_btn = QToolButton()
         user_info_btn.setToolTip("This QR code can be used to import this account in another application.")
         info_icon = QIcon("images/question_mark_icon_16.png")
@@ -82,7 +88,7 @@ class EditAccountDialog(QDialog):
         # Make square button invisible so only circular icon shows
         user_info_btn.setStyleSheet(info_btn_style)
         #user_info_btn.setPopupMode(QToolButton.InstantPopup)
-        last_used_layout.addWidget(user_info_btn, 1, 2, Qt.AlignCenter)
+        last_used_layout.addWidget(user_info_btn, 2, 2, Qt.AlignCenter)
         self.bottom_layout.addWidget(last_used_frame,alignment=Qt.AlignCenter)
 
         # Add spacer to push buttons toward top
@@ -93,29 +99,14 @@ class EditAccountDialog(QDialog):
         form_layout = self.findChild(QVBoxLayout, "verticalLayout")
         form_layout.addLayout(self.bottom_layout)
 
-
-    def showEvent(self, event):
+    def showEventHandler(self, event):
         super().showEvent(event)
         # Store the initial size when the dialog is first shown
         if self.initial_size is None:
             self.initial_size = self.size()
             self.setFixedWidth(self.size().width())
 
-    def validate_form(self):
-        """ Ensure all fields have values before enabling the save button."""
-        # Check if all fields are filled
-        all_filled = len(self.provider_entry.text()) > 0 and len(self.label_entry.text()) > 0 and len(self.secret_entry.text()) > 0
-        self.btn_Save.setEnabled(all_filled)
 
-    def provider_lookup(self):
-        # Create and show the search page
-        search_page = ProviderSearchDialog()
-        search_page.load_data()
-        search_page.lower()
-        # Show the dialog and get the result
-        if search_page.exec_() == QDialog.Accepted:
-            selected = search_page.get_selected_provider()
-            self.provider_entry.setText(selected)
 
     def update_qr_button_text(self):
         """Update button text based on QR code visibility state"""
@@ -194,20 +185,6 @@ class EditAccountDialog(QDialog):
         self.provider_entry.setText(otp_record.issuer)
         self.label_entry.setText(otp_record.label)
         self.secret_entry.setText(otp_record.secret)
-
-    def save_fields(self):
-        issuer = self.provider_entry.text()
-        label = self.label_entry.text()
-        secret = self.secret_entry.text()
-        otp_record = account_manager.OtpRecord(issuer, label, secret)
-        # Validate secret key
-        if otp_funcs.is_valid_secretkey(secret):
-            if self.account_manager.save_new_account(otp_record):
-                self.accept()
-            else:
-                 QMessageBox.information(self,"Warning","Account with same provider and user already exists")
-        else:
-            QMessageBox.information(self,"Error",f'The secret key is invalid')
 
 # Local main for unit testing
 if __name__ == '__main__':

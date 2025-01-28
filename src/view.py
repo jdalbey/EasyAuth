@@ -12,18 +12,18 @@ import pyotp
 import time, datetime
 import pyperclip
 import qdarktheme
-
 from provider_map import Providers
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
+from account_edit_dialog import EditAccountDialog
 from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
 from export_import_dialog import ExportImportDialog
+from reorder_dialog import ReorderDialog
 from appconfig import AppConfig
 from account_manager import AccountManager, Account
-from account_edit_dialog import EditAccountDialog
-from reorder_dialog import ReorderDialog
 from styles import dark_qss, light_qss
+
 class AppView(QMainWindow):
     def __init__(self, q_app):
         super().__init__()
@@ -82,7 +82,7 @@ class AppView(QMainWindow):
         sort_menu = tools_menu.addMenu('Sort Accounts')
         alpha_sort_action = QAction("Alphabetically", self)
         recency_action = QAction("Recently Used", self)
-        frequency_action = QAction("Used Frequency", self)
+        frequency_action = QAction("Usage Count", self)
         alpha_sort_action.triggered.connect(self.do_alpha_sort_action)
         recency_action.triggered.connect(self.do_recency_sort_action)
         frequency_action.triggered.connect(self.do_frequency_sort_action)
@@ -109,7 +109,7 @@ class AppView(QMainWindow):
         self.addToolBar(toolbar)
 
         # Add quick access buttons
-        add_btn = QPushButton("Add Account")
+        add_btn = QPushButton("&Add Account")
         add_btn.setObjectName("addAccountButton")
         add_btn.clicked.connect(self.show_add_account_form)
         toolbar.addWidget(add_btn)
