@@ -13,7 +13,7 @@ class TestProviderMap(unittest.TestCase):
         # This statement is needed so log msgs from unit under test will display
         logging.getLogger().addHandler(logging.StreamHandler())
         # Verify default path
-        assert Providers.kZipPath == "../assets/favicons.zip"
+        assert Providers.kZipPath == "assets/favicons.zip"
         ret_map = Providers._build_map()
         assert ret_map is not None
         assert len(ret_map) > 0
@@ -30,7 +30,7 @@ class TestProviderMap(unittest.TestCase):
         assert ret_map is not None
         assert len(ret_map) == 0
         # Reset the correct path
-        Providers.kZipPath = "../assets/favicons.zip"
+        Providers.kZipPath = "assets/favicons.zip"
 
     def test_buildmap_providers_empty(self):
         # This statement is needed so log msgs from unit under test will display
@@ -41,7 +41,7 @@ class TestProviderMap(unittest.TestCase):
         assert ret_map is not None
         assert len(ret_map) == 0
         # Reset the correct path
-        Providers.kProvidersPath = "../assets/providers.json"
+        Providers.kProvidersPath = "assets/providers.json"
 
     def test_get_provider_icon(self):
         map = Providers()
@@ -66,7 +66,7 @@ class TestProviderMap(unittest.TestCase):
         # This statement is needed so log msgs from unit under test will display
         logging.getLogger().addHandler(logging.StreamHandler())
         # Verify default path
-        assert Providers.kZipPath == "../assets/favicons.zip"
+        assert Providers.kZipPath == "assets/favicons.zip"
         ret_dict = Providers._load_imgdict_from_zipimages()
         assert ret_dict is not None
         assert len(ret_dict) > 0
@@ -76,13 +76,13 @@ class TestProviderMap(unittest.TestCase):
         # This statement is needed so log msgs from unit under test will display
         logging.getLogger().addHandler(logging.StreamHandler())
         # Verify default path
-        assert Providers.kZipPath == "../assets/favicons.zip"
+        assert Providers.kZipPath == "assets/favicons.zip"
         #set zip path to non-existant file
         Providers.kZipPath = "/tmp/thisfiledoesntexist"
         ret_dict = Providers._load_imgdict_from_zipimages()
         assert ret_dict is not None
         assert len(ret_dict) == 0
-        Providers.kZipPath = "../assets/favicons.zip" #reset
+        Providers.kZipPath = "assets/favicons.zip" #reset
 
     # Tests of utility method
     def test_get_color_for_valid_letter(self):

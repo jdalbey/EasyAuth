@@ -25,7 +25,7 @@ class TestFind_qr_codes(unittest.TestCase):
         # Clean up dialog and other resources
         pass
 
-    image_file = 'test_find_qr_code_image.png'
+    image_file = 'tests/test_find_qr_code_image.png'
 
     def test_scan_screen_for_qrcode(self):
          # Display a QR code from a test file
