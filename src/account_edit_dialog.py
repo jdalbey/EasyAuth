@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
 from PyQt5.uic import loadUi
 
 import account_manager
-import common_dialog_funcs
 from styles import info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
@@ -42,7 +41,7 @@ class EditAccountDialog(QDialog):
 
         # Setup actions to be taken
         self.btn_Lookup.clicked.connect(lambda: provider_lookup(self))
-        self.btn_Save.clicked.connect(lambda: save_fields(self))
+        self.btn_Save.clicked.connect(lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
         self.btn_Delete.clicked.connect(self.confirm_delete_account)
         self.btn_Cancel.clicked.connect(self.reject)
         self.provider_entry.textChanged.connect(lambda: validate_form(self))
@@ -99,9 +98,12 @@ class EditAccountDialog(QDialog):
         form_layout = self.findChild(QVBoxLayout, "verticalLayout")
         form_layout.addLayout(self.bottom_layout)
 
-    def showEventHandler(self, event):
+
+    def showEvent(self, event):
+        """ Overrides showEvent: don't change method name"""
         super().showEvent(event)
         # Store the initial size when the dialog is first shown
+        # Will be used by QR hide
         if self.initial_size is None:
             self.initial_size = self.size()
             self.setFixedWidth(self.size().width())

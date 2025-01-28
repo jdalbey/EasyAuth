@@ -11,7 +11,8 @@ The quide will show how to store shared keys in your EasyAuth vault and use Time
 
 1. Open EasyAuth.  The first time it is launched a message indicates that you have an empty vault.  
 <img src="images/vault-empty.png" alt="vault-empty" border="0">
-2. Make sure the QR code is visible somewhere on the screen. Click the 'Add Account' button. The program will search for a visible QR code and the QR code data will be entered into the form fields.  
+2. Make sure the QR code is visible somewhere on the screen. Click the 'Add Account' button. 
+The program will search for a visible QR code and the QR code data will be entered into the form fields.  
 
    
 3. You may change the value of the User field to any label that reminds you which online account this entry is associated with (usually username or email address).  
