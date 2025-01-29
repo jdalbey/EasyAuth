@@ -19,18 +19,30 @@ class CustomListWidget(QListWidget):
 
     def dropEvent(self, event):
         if event.source() == self:
+            # Let the parent class handle visual reordering
+            super().dropEvent(event)
+            # Target is where the item was dropped
             target_row = self.indexAt(event.pos()).row()
             if target_row == -1:
                 target_row = self.count() - 1
 
-            # Update the underlying model
+            # In the list widget there's a dropindicator that appears BETWEEN rows,
+            # so we need to adjust the target_row depending on where the
+            # actual drop happened.
+            if self.dropIndicatorPosition() == QListWidget.BelowItem:
+                target_row += 1
+
+            # If source row < target row then subtract 1 from target row because
+            # the source is taken away, moving every one up one spot.
+            if self.dragged_row < target_row:
+                target_row -= 1
+
+            # Update the underlying model (accounts in ReorderDialog)
+            # moving the item from original spot to new spot
             parent = self.parentWidget()
             if isinstance(parent, ReorderDialog):
                 account = parent.accounts.pop(self.dragged_row)
                 parent.accounts.insert(target_row, account)
-
-            # Let the parent class handle visual reordering
-            super().dropEvent(event)
         else:
             event.ignore()
 
