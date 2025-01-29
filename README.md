@@ -121,10 +121,12 @@ For further assistance, you can open an Issue here.
 Practice storing a new secret key using the sample QR code below.
 1. Launch the application.
 2. Make sure the QR code below is visible on the screen. Click 'Add Account".
-3. The form fields are filled automatically with the data from the QR code. Click "Save".
+3. The form fields are filled automatically with the data from the QR code. Click "Add".
 4. Observe the new account in the main window.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
 
 
 A Quick Start guide is available in the docs folder.
+
+[Website](https://jdalbey.github.io/EasyAuth/) is under construction.
