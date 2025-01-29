@@ -216,18 +216,21 @@ class AppView(QMainWindow):
 
                     rowframe_layout = QHBoxLayout(row_frame)
                     rowframe_layout.setSpacing(5)  # Set horizontal spacing between widgets in the row
-                    # Assuming your_frame is inside a parent widget with a layout
-                    # Set external padding around the frame by adjusting the layout margins of the parent widget
-                    #rowframe_layout.layout().setContentsMargins(10, 10, 10, 10)
+                    # Show Favicon
                     if self.app_config.is_display_favicons():
                         icon_label = self.providers.get_provider_icon(account.issuer)
                         rowframe_layout.addWidget(icon_label)
-
+                    # Show Provider and user
                     label_string = f"{account.issuer} ({account.label})"
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
                     provider_label.setFont(QFont("Verdana", 12))
+
+                    otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
+                    otplabel.setObjectName("otpLabel")
+                    otplabel.setToolTip("Copy code to clipboard")
+                    otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
                     edit_btn = QPushButton()
                     edit_btn.setObjectName("editButton")
@@ -237,15 +240,10 @@ class AppView(QMainWindow):
                     edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
                     rowframe_layout.addWidget(edit_btn)
 
-                    otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
-                    otplabel.setObjectName("otpLabel")
-                    otplabel.setToolTip("Copy code to clipboard")
-                    otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
-
                     rowframe_layout.addWidget(provider_label)
-                    rowframe_layout.addWidget(edit_btn)
                     rowframe_layout.addStretch()
                     rowframe_layout.addWidget(otplabel)
+                    rowframe_layout.addWidget(edit_btn)
 
                     self.scroll_layout.addWidget(row_frame)
 
@@ -298,20 +296,26 @@ class AppView(QMainWindow):
     def show_add_account_form(self):
         """ User clicked Add Account button """
         self.logger.debug("Starting Show_add_account_form")
-        add_dialog = AddAccountDialog()
-        add_dialog.show()
-        # Are we in auto_find mode?
-        if self.app_config.is_auto_find_qr_enabled():
-            add_dialog.obtain_qr_codes(False)
-        add_dialog.exec_()
+        try:
+            add_dialog = AddAccountDialog()
+            add_dialog.show()
+            # Are we in auto_find mode?
+            if self.app_config.is_auto_find_qr_enabled():
+                add_dialog.obtain_qr_codes(False)
+            add_dialog.exec_()
+        except Exception as e:
+            self.logger.error("AddAccountDialog not constructed.")
 
         # Refresh the display
         self.display_accounts()
 
     def show_edit_account_form(self,index,account):
         self.logger.debug (f"entering show_edit_account_form with {index} {account.issuer}")
-        dialog_EditAcct = EditAccountDialog(self, index, account)
-        dialog_EditAcct.exec_()
+        try:
+            dialog_EditAcct = EditAccountDialog(self, index, account)
+            dialog_EditAcct.exec_()
+        except Exception as e:
+            self.logger.error("EditAccountDialog not constructed.")
         self.display_accounts()
 
     def show_preferences_dialog(self):

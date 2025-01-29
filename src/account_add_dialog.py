@@ -23,26 +23,20 @@ from provider_search_dialog import ProviderSearchDialog
 
 class AddAccountDialog(QDialog):
     """ Dialog to create a new account """
-    """
-Select the location of the QR code:
-The form will be completed using data from:
-Let EasyAuth find the needed data from:
-Complete the form using data collected automatically from:
-Let EasyAuth complete the form using:"""
     def __init__(self, parent=None, ):
         super(AddAccountDialog, self).__init__(parent)
         self.account_manager = AccountManager()
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.logger = logging.getLogger(__name__)
-        #self.dialog_layout = QVBoxLayout(self)
 
-        # Frame for the add dialog features
-        #dialog_frame = QFrame(self)
-        #dialog_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        #self.bottom_layout = QVBoxLayout(dialog_frame)
         self.setGeometry(100, 100, 600, 450)
 
-        loadUi("assets/AddAccountForm.ui", self)  #loads directions_frame
+        try:
+            loadUi("assets/AddAccountForm.ui", self)
+        except FileNotFoundError as e:
+            self.logger.error("AddAccountForm.ui not found, can't display dialog.")
+            QMessageBox.critical(self, "Error", f"Failed to load UI: {e}")
+            raise RuntimeError("Failed to load UI")  # Prevents dialog from appearing
         self.setWindowTitle("Add Account")
 
         # Setup actions to be taken
@@ -58,6 +52,7 @@ Let EasyAuth complete the form using:"""
 
 
     def scan_qr_code(self):
+        """ User clicked: Scan QR code """
         """ Determine source for scan: screen or file """
         if self.radioBtnScreen.isChecked():
             self.get_qr_code()
@@ -65,7 +60,7 @@ Let EasyAuth complete the form using:"""
             self.open_qr_image()
 
     def get_qr_code(self):
-        """ User clicked User QR code """
+        """ Get QR code from screen """
         self.obtain_qr_codes(True)  # True = called from Use QR code
         self.logger.debug(f"Exiting get_qr_code()")
 

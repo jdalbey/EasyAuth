@@ -26,12 +26,17 @@ class EditAccountDialog(QDialog):
         self.qr_code_label = None
         self.is_qr_visible = False
         #self.setFixedSize(self.size())
-        # Store initial size - gets set in showEvent()
+        # gets set in showEvent()
         self.initial_size = None
 
         self.setMinimumWidth(300)
 
-        loadUi("assets/EditAccountForm.ui", self)  #loads directions_frame
+        try:
+            loadUi("assets/EditAccountForm.ui", self)
+        except FileNotFoundError as e:
+            self.logger.error("AddAccountForm.ui not found, can't display dialog.")
+            QMessageBox.critical(self, "Error", f"Failed to load UI: {e}")
+            raise RuntimeError("Failed to load UI")  # Prevents dialog from appearing
         self.setWindowTitle("Edit Account")
 
         # Make the Delete button visible on this form

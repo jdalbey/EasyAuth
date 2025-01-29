@@ -64,8 +64,9 @@ class PreferencesDialog(QDialog):
 
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(["light","dark"])
-        self.theme_combo.currentTextChanged.connect(self.set_theme)
+        #self.theme_combo.currentTextChanged.connect(self.set_theme)
         self.theme_combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.theme_combo.setFixedSize(100,self.theme_combo.size().height())
 
         form_layout = QFormLayout()
         form_layout.addRow(theme_label, self.theme_combo)
@@ -83,12 +84,19 @@ class PreferencesDialog(QDialog):
         self.restore_defaults_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.restore_defaults_button.setFocusPolicy(Qt.NoFocus)
         button_row.addWidget(self.restore_defaults_button, alignment=Qt.AlignLeft)
+        button_row.addStretch()
+        # OK button
+        btn_OK = QPushButton("&OK")
+        btn_OK.clicked.connect(self.save_settings)
+        btn_OK.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button_row.addWidget(btn_OK, alignment=Qt.AlignRight)
 
-        # Save button
-        save_button = QPushButton("&Save")
-        save_button.clicked.connect(self.save_settings)
-        save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        button_row.addWidget(save_button, alignment=Qt.AlignRight)
+        # Apply button
+        btn_Apply = QPushButton("&Apply")
+        btn_Apply.clicked.connect(self.apply_settings)
+        btn_Apply.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button_row.addWidget(btn_Apply, alignment=Qt.AlignRight)
+
         # Cancel button
         btn_Cancel = QPushButton("&Cancel")
         btn_Cancel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -110,7 +118,7 @@ class PreferencesDialog(QDialog):
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
         self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
-    def save_settings(self):
+    def apply_settings(self):
         self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
         self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
         self.app_config.set_animate_form_fill(self.animate_form_fill.isChecked())
@@ -118,7 +126,12 @@ class PreferencesDialog(QDialog):
         self.app_config.set_secret_key_hidden(self.secret_key_hidden.isChecked())
         self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())
         self.app_config.set_theme_name(self.theme_combo.currentText())
+        self.parent().set_theme()  # set theme in application
+
+    def save_settings(self):
+        self.apply_settings()
         self.accept()
+
 
     def select_font(self):
         font, ok = QFontDialog.getFont()
