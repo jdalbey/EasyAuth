@@ -58,7 +58,6 @@ class AppView(QMainWindow):
         # File menu
         file_menu = menubar.addMenu('File')
         add_account_action = QAction('Add Account', self)
-        add_account_action.setShortcut('Ctrl+A')
         add_account_action.triggered.connect(self.show_add_account_form)
         file_menu.addAction(add_account_action)
 
@@ -69,7 +68,6 @@ class AppView(QMainWindow):
         file_menu.addAction(export_action)
 
         preferences_action = QAction('Preferences', self)
-        preferences_action.setShortcut('Ctrl+P')
         preferences_action.triggered.connect(self.show_preferences_dialog)
         file_menu.addAction(preferences_action)
 

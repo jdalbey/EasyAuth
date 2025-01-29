@@ -33,7 +33,11 @@ QLabel#timerLabel {
 # Custom additions to light theme
 light_qss = """
 QLabel {
-    /* color: green; */
+    /*color: green;*/
+}
+QCheckBox:focus {
+    background-color: #d6dfea;
+    color: #212f3c; /* near black */
 }
 QLineEdit {
     background-color: floralwhite;

@@ -25,7 +25,7 @@ class PreferencesDialog(QDialog):
         layout = QVBoxLayout(self)
 
         # Auto Find QR Code
-        self.auto_find_qr_checkbox = QCheckBox("Add Account finds QR code automatically:")
+        self.auto_find_qr_checkbox = QCheckBox("Add Account scans for QR code automatically:")
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
         layout.addWidget(self.auto_find_qr_checkbox)
 
@@ -59,20 +59,22 @@ class PreferencesDialog(QDialog):
         # self.font_button.clicked.connect(self.select_font)
         # layout.addWidget(self.font_button)
 
-        # Theme drop down box
+        # Theme label and drop down box
         theme_label = QLabel("Theme:")
-        layout.addWidget(theme_label)
+
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(["light","dark"])
         self.theme_combo.currentTextChanged.connect(self.set_theme)
-        layout.addWidget(self.theme_combo)
+        self.theme_combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        # Create a QFormLayout to align the label and line edit in a form-like style
         form_layout = QFormLayout()
         form_layout.addRow(theme_label, self.theme_combo)
 
-        # Set the form layout for the window
+        # Add the theme form layout to the window
         layout.addLayout(form_layout)
+
+        # Button row
+        button_row = QHBoxLayout()
 
         # Restore Defaults button
         self.restore_defaults_button = QPushButton("Restore Defaults")
@@ -80,18 +82,24 @@ class PreferencesDialog(QDialog):
         self.restore_defaults_button.setContentsMargins(40, 0, 0, 0)
         self.restore_defaults_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.restore_defaults_button.setFocusPolicy(Qt.NoFocus)
-        layout.addWidget(self.restore_defaults_button, alignment=Qt.AlignCenter)
+        button_row.addWidget(self.restore_defaults_button, alignment=Qt.AlignLeft)
+
+        # Save button
+        save_button = QPushButton("&Save")
+        save_button.clicked.connect(self.save_settings)
+        save_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button_row.addWidget(save_button, alignment=Qt.AlignRight)
+        # Cancel button
+        btn_Cancel = QPushButton("&Cancel")
+        btn_Cancel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        btn_Cancel.clicked.connect(self.reject)
+        button_row.addWidget(btn_Cancel, alignment=Qt.AlignRight)
+        layout.addLayout(button_row)
+
+        self.setLayout(layout)
 
         # Load settings
         self.load_settings()
-
-        # Save button
-        save_button = QPushButton("Save")
-        save_button.clicked.connect(self.save_settings)
-        save_button.setFocusPolicy(Qt.NoFocus)
-        layout.addWidget(save_button)
-
-        self.setLayout(layout)
 
     def load_settings(self):
         self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
@@ -126,3 +134,10 @@ class PreferencesDialog(QDialog):
     def restore_defaults(self):
         self.app_config.restore_defaults()
         self.load_settings()
+
+# Local main for unit testing
+if __name__ == '__main__':
+    import sys
+    app = QApplication(sys.argv)
+    dialog = PreferencesDialog(app)
+    dialog.exec()

@@ -64,8 +64,8 @@ class ReorderDialog(QDialog):
 
         # Buttons layout
         button_layout = QHBoxLayout()
-        ok_button = QPushButton("OK")
-        cancel_button = QPushButton("Cancel")
+        ok_button = QPushButton("&Save")
+        cancel_button = QPushButton("&Cancel")
         ok_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         cancel_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 

@@ -42,6 +42,7 @@ class EditAccountDialog(QDialog):
         # Setup actions to be taken
         self.btn_Lookup.clicked.connect(lambda: provider_lookup(self))
         self.btn_Save.clicked.connect(lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
+        #self.btn_Save.clicked.connect(save_fields)
         self.btn_Delete.clicked.connect(self.confirm_delete_account)
         self.btn_Cancel.clicked.connect(self.reject)
         self.provider_entry.textChanged.connect(lambda: validate_form(self))

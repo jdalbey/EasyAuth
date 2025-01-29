@@ -42,8 +42,8 @@ class ExportImportDialog(QDialog):
         export_info_btn.setIcon(info_icon)
         export_info_btn.setIconSize(QSize(16, 16))
         export_info_btn.setStyleSheet(info_btn_style)
-        export_panel.addWidget(export_info_btn)
         export_panel.addStretch()
+        export_panel.addWidget(export_info_btn,alignment=Qt.AlignRight)
         layout.addLayout(export_panel)
 
         choose_label = QLabel("Choose export file format:")
@@ -63,7 +63,7 @@ class ExportImportDialog(QDialog):
 
         layout.addSpacing(10)  # Add vertical space
 
-        file_choose_btn = QPushButton("Choose export file")
+        file_choose_btn = QPushButton("Choose &export file")
         file_choose_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         file_choose_btn.setFocusPolicy(Qt.NoFocus)
         layout.addWidget(file_choose_btn)
@@ -78,14 +78,25 @@ class ExportImportDialog(QDialog):
         layout.addWidget(separator)
 
         # Import panel
+        import_panel = QHBoxLayout()
         import_label = QLabel("Import")
         import_label.setFont(QFont("Sans-serif",12))
-        layout.addWidget(import_label)
+        import_panel.addWidget(import_label)
+        import_info_btn = QToolButton()
+        import_info_btn.setToolTip("Read an external file into the vault. Existing vault will be overwritten!")
+        info_icon = QIcon("images/question_mark_icon_16.png")
+        import_info_btn.setIcon(info_icon)
+        import_info_btn.setIconSize(QSize(16, 16))
+        import_info_btn.setStyleSheet(info_btn_style)
+        import_panel.addStretch()
+        import_panel.addWidget(import_info_btn,alignment=Qt.AlignRight)
+        layout.addLayout(import_panel)
+
         notify_label = QLabel("File format will be auto-detected.")
         notify_label.setFont(QFont("Sans-serif",8))
         layout.addWidget(notify_label)
 
-        import_easy_auth_btn = QPushButton("Choose import file")
+        import_easy_auth_btn = QPushButton("Choose &import file")
         import_easy_auth_btn.setEnabled(True)
         import_easy_auth_btn.setFocusPolicy(Qt.NoFocus)
         import_easy_auth_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)

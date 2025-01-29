@@ -45,8 +45,9 @@ class TestEditDialogButtons(unittest.TestCase):
         dialog.label_entry.setText("x@w.com")
         dialog.account_manager = MockAccountManager
         dialog.close = Mock()  # Mock the accept method of the dialog
-        # Call the method that shows the dialog
-        dialog.handle_update_request(1,account_in)
+
+        dialog.btn_Save.click()
+
         # verify results
         assert dialog.encrypted_secret.startswith('gAAAA')
         # We expect the account sent to update has the modified fields
