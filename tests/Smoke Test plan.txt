@@ -1,0 +1,55 @@
+Smoke Test Plan
+
+test_view.py
+[x] Clicking Add Account opens Dialog, calls obtain_qr_codes  test_add_btn_click()
+[x] Clicking Edit opens dialog    test_edit_btn_click(), test_show_edit_account_form()
+[x] Search filters the list    text_view.py test_search()
+
+[x] Clicking TOTP code copies to clipboard.  test_copy_to_clipboard()
+
+[x] Sort accounts reorders list    test_AAA_account_manager.py test_sort_alphabetically()
+                                test_view.py test_sort_alpha()
+[x] Reorder accounts opens dialog.  test_reorder_form()
+
+[x] Preferences menu opens dialog.  test_preferences_action()
+[x]   Changing an item, then "Apply" button updates config.ini
+
+[x] File > Export opens dialog.   text_export_action()
+[x]  Choose Export file opens file chooser dialog, call export_accounts.  test_export_dialog.py test_export_btn
+[x]   Choose Import file opens file chooser dialog, call import accounts. test_import_btn()
+
+[x] Help > QuickStart opens   test_quickstart_action()
+
+Add Account dialog   (test_add_account_dialog)
+[x]        radio buttons            test_qr_code_btn
+    Scan button
+[x]        invokes correct function    test_qr_code_btn
+[x]        from file opens chooser.     test_qr_code_btn
+[x]        correctly fills fields from scanneda image from file  test_qr_code_btn
+        obtain_qr_codes
+[x]         none                test_obtain_qr_code
+[x]         one                 test_obtain_qr_code
+            two
+[x]    Save button      test_save_new_account()
+[x]     fields validate form   test_save_new_account()
+[x]  Save catches duplicates.  test_account_manager and test_common_dialog_functions
+[x]  Cancel button             test_Cancel_button
+[x]     Provider Lookup         text_common_dialog_functions.py test_provider_lookup()
+[x]     Learn more link         test_learn_more()
+
+Edit Account dialog     test_account_edit_dialog
+[x]    Delete gives confirmation   test_confirm_delete_account_accepted
+[x]    doesn't delete if not confirmed  test_confirm_delete_account_rejected
+[x]    Save updates account.       test_handle_update_request_success
+[x]    Won't save invalid secret   test_handle_update_request_failure
+[x]    Reveal shows QR code         test_handle_QR_reveal()
+
+[x] find_qr_codes returns correct string for image
+
+Provider Search Dialog
+[x]  load_data() results list > 0    test_load_data
+QRselectionDialog   test_QRselectionDialog.py
+[x] Returns no account if none selected  test_dialog_selection
+[x] Returns account if selected radio button
+ReorderDialog    test_reorder_dialog.py
+[x] verify list is populated

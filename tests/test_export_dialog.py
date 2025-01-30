@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 import pytest
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt
 from export_import_dialog import ExportImportDialog
 from account_manager import AccountManager, Account, OtpRecord
@@ -25,6 +25,31 @@ class TestExportDialog(unittest.TestCase):
         dialog.account_manager.export_accounts.assert_called_once()
         # Verify Ack messagebox called
         mock_messagebox.assert_called_once()
+
+    @patch('export_import_dialog.QMessageBox.information')
+    @patch('export_import_dialog.QMessageBox.question')
+    @patch("export_import_dialog.AccountManager")
+    @patch.object(QFileDialog, "getOpenFileName")
+    def test_import_btn(self, mockFileDialog, mockAccountManager, mock_messagebox, mock_infobox):
+        # Create the dialog instance
+        dialog = ExportImportDialog()
+        dialog.accept = Mock()  # Mock the accept method of the dialog
+        dialog.account_manager = mockAccountManager
+
+        mockFileDialog.return_value = ("/tmp/test_import.json", "")
+        mock_messagebox.return_value = QMessageBox.Yes
+        mock_infobox.return_value = QMessageBox.Yes
+        acct = OtpRecord("Woogle","joe@gmail","CD34").toAccount()
+        dialog.account_manager.import_preview.return_value = [acct]
+        # Act
+        dialog.import_easy_auth_btn.click()
+        # Verify calling import_preview
+        dialog.account_manager.import_preview.assert_called_once()
+        # Verify Ack messagebox called
+        mock_messagebox.assert_called_once()
+        mock_infobox.assert_called_once()
+
+        dialog.account_manager.import_accounts.assert_called_once()
 
     def test_build_provider_preview(self):
 

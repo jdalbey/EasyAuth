@@ -96,12 +96,12 @@ class ExportImportDialog(QDialog):
         notify_label.setFont(QFont("Sans-serif",8))
         layout.addWidget(notify_label)
 
-        import_easy_auth_btn = QPushButton("Choose &import file")
-        import_easy_auth_btn.setEnabled(True)
-        import_easy_auth_btn.setFocusPolicy(Qt.NoFocus)
-        import_easy_auth_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        import_easy_auth_btn.clicked.connect(lambda: self.importer())
-        layout.addWidget(import_easy_auth_btn)
+        self.import_easy_auth_btn = QPushButton("Choose &import file")
+        self.import_easy_auth_btn.setEnabled(True)
+        self.import_easy_auth_btn.setFocusPolicy(Qt.NoFocus)
+        self.import_easy_auth_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.import_easy_auth_btn.clicked.connect(lambda: self.importer())
+        layout.addWidget(self.import_easy_auth_btn)
 
         self.setLayout(layout)
 
