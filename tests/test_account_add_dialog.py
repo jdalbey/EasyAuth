@@ -131,6 +131,14 @@ class TestAddAccountDialog(unittest.TestCase):
         # Verify save_new_account is called once with correct arguments
         dialog_manager.save_new_account.assert_not_called()
 
+    def test_learn_more(self):
+        """ Test link content, not that it actually opens the browser page """
+        dialog = AddAccountDialog()
+        link = dialog.label_LearnMore
+        linktext = link.text()
+        expected = '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md'
+        assert linktext.startswith(expected)
+
     # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.
     @classmethod
     def setUpClass(cls):

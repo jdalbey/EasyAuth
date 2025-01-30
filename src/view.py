@@ -96,6 +96,7 @@ class AppView(QMainWindow):
         # Help menu
         help_menu = menubar.addMenu('Help')
         quick_start_action = QAction("Quick Start",self)
+        quick_start_action.setObjectName("quickstartAction")
         quick_start_action.triggered.connect(self.show_quick_start_dialog)
         help_menu.addAction(quick_start_action)
         userManualAction = QAction("User Manual", self)
@@ -367,8 +368,7 @@ class AppView(QMainWindow):
 
     def show_quick_start_dialog(self):
         dlg = QuickStartDialog(self)
-
-    # TODO: Verify that app can be closed even if browser window remains open
+        dlg.exec_()
 
     def open_user_manual(self):
         url = QUrl("https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md")

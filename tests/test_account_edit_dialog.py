@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
-from PyQt5.QtWidgets import QMessageBox, QApplication
+from PyQt5.QtWidgets import QMessageBox, QApplication, QLabel
 from account_edit_dialog import EditAccountDialog
 from account_manager import Account
 class TestEditDialogButtons(unittest.TestCase):
@@ -94,6 +94,18 @@ class TestEditDialogButtons(unittest.TestCase):
 
         #_with(
             #None, 'Error', "The secret key is invalid", unittest.mock.ANY        )
+
+    def test_handle_QR_reveal(self):
+        """ see qr code label was created """
+        encrypted_secret = 'gAAAAABnhy9vzWtawbgygQLGLP_FC1UZ4xQsDzXS2-gH7WkEzC35YxK9qYpkRVnYYi6CXZhvoMaoTmYqMSL07j67iNkSUlJERQ=='
+        account_in = Account("Woogle", "me@woogle.com", encrypted_secret, "2000-01-01 01:01")
+        dialog = EditAccountDialog(None, 1, account_in)
+        assert dialog.qr_code_label is None
+
+        dialog.handle_QR_reveal()
+
+        # Verify that the label with pixmap was created.
+        assert dialog.qr_code_label is not None
 
 
     # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.

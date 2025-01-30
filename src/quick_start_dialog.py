@@ -30,8 +30,6 @@ class QuickStartDialog(QDialog):
 
         self.setLayout(layout)
 
-        response = self.exec()
-
     def load_quickstart_text(self):
         try:
             f = open("docs/quick_start_guide.html")

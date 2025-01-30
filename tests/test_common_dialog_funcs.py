@@ -4,9 +4,11 @@ from unittest.mock import patch, Mock, MagicMock
 
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 
+from account_add_dialog import AddAccountDialog
 from account_edit_dialog import EditAccountDialog
 from account_manager import AccountManager, OtpRecord, Account
-from common_dialog_funcs import save_fields
+import common_dialog_funcs
+import provider_search_dialog
 class TestAddAccountDialog(unittest.TestCase):
     @patch('common_dialog_funcs.QMessageBox.information')
     @patch("account_edit_dialog.AccountManager")
@@ -19,11 +21,37 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.account_manager.save_new_account = MagicMock(return_value=False)
         dialog.close = Mock()
 
-        save_fields(dialog)
+        common_dialog_funcs.save_fields(dialog)
         # Verify results
         dialog.account_manager.save_new_account.assert_called_once()
         dialog.close.assert_not_called()
         MockMessageBox.assert_called_once()
+
+    @patch('common_dialog_funcs.ProviderSearchDialog') # because that's where it is *used*
+    def test_provider_lookup(self, mockDialog):
+        """ Open ProviderSearchDialog, check that it returns selected provider
+        and places it in provider entry field """
+
+        # Create mock dialog instance
+        mock_dialog = mockDialog.return_value
+
+        # Set return value for exec_ to simulate user accepting the dialog
+        mock_dialog.exec_.return_value = QDialog.Accepted
+
+        # Set return value for get_selected_provider
+        mock_dialog.get_selected_provider.return_value = "Woogle"
+
+        # Create AddAccountDialog instance
+        add_dlg = AddAccountDialog()
+
+        # Call function that opens the dialog
+        common_dialog_funcs.provider_lookup(add_dlg)
+
+        # Ensure exec_ was called once (dialog was opened)
+        mock_dialog.exec_.assert_called_once()
+
+        # Verify that the selected provider was set correctly
+        assert add_dlg.provider_entry.text() == "Woogle"
 
     # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.
     @classmethod

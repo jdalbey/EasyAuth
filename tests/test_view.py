@@ -10,6 +10,7 @@ from account_edit_dialog import EditAccountDialog
 from account_manager import AccountManager, OtpRecord, Account
 from export_import_dialog import ExportImportDialog
 from preferences_dialog import PreferencesDialog
+from quick_start_dialog import QuickStartDialog
 from reorder_dialog import ReorderDialog
 from view import AppView
 
@@ -194,12 +195,25 @@ class TestView(unittest.TestCase):
     @patch.object(PreferencesDialog,"exec_")
     def test_preferences_action(self, mockDialog):
         view = AppView(self.app)
+        mockDialog.return_value = 1
         # Find the Reorder action by object name
         preferences_action = view.findChild(QAction, "preferencesAction")
         self.assertIsNotNone(preferences_action, "Export action not found")
 
         # Invoke the  action
         preferences_action.trigger()
+        # Assert the call was made to open the dialog
+        mockDialog.assert_called_once()
+
+    @patch.object(QuickStartDialog, "exec_")
+    def test_quickstart_action(self,mockDialog):
+        view = AppView(self.app)
+        # Find the Reorder action by object name
+        quickstart_action = view.findChild(QAction, "quickstartAction")
+        self.assertIsNotNone(quickstart_action, "Quickstart action not found")
+
+        # Invoke the  action
+        quickstart_action.trigger()
         # Assert the call was made to open the dialog
         mockDialog.assert_called_once()
 

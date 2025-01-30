@@ -169,6 +169,7 @@ class EditAccountDialog(QDialog):
             pixmap = QPixmap()
             pixmap.loadFromData(qr_code_image)
             self.qr_code_label = QLabel()
+            self.qr_code_label.setObjectName('qr_code_label')
             self.qr_code_label.setPixmap(pixmap)
             self.bottom_layout.addWidget(self.qr_code_label,alignment=Qt.AlignCenter)
             self.reveal_qr_button.setText("Hide QR code")
