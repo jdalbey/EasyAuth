@@ -15,9 +15,8 @@ See Oracle Dialog style guide.
 """
 class PreferencesDialog(QDialog):
 
-    def __init__(self, q_app, parent=None, ):
+    def __init__(self, parent=None, ):
         super(PreferencesDialog, self).__init__(parent)
-        self.q_app = q_app
         self.app_config = AppConfig()
         self.setWindowTitle("Preferences")
         self.setMinimumWidth(400)

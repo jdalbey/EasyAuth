@@ -64,10 +64,12 @@ class AppView(QMainWindow):
         file_menu.addSeparator()
 
         export_action = QAction('Export/Import', self)
+        export_action.setObjectName("exportAction")
         export_action.triggered.connect(self.show_export_import_dialog)
         file_menu.addAction(export_action)
 
         preferences_action = QAction('Preferences', self)
+        preferences_action.setObjectName('preferencesAction')
         preferences_action.triggered.connect(self.show_preferences_dialog)
         file_menu.addAction(preferences_action)
 
@@ -75,6 +77,7 @@ class AppView(QMainWindow):
         tools_menu = menubar.addMenu('Tools')
         tools_menu.setObjectName('tools_menu')
         reorder_action = QAction('Reorder Accounts', self)
+        reorder_action.setObjectName("reorderAction")
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
 
@@ -322,7 +325,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_preferences_dialog(self):
-        dialog = PreferencesDialog(self.q_app, parent=self)
+        dialog = PreferencesDialog(parent=self)
         dialog.exec_()
         self.display_accounts()
 
@@ -335,7 +338,7 @@ class AppView(QMainWindow):
     def show_reorder_dialog(self):
         account_list = self.account_manager.accounts
         dialog = ReorderDialog(account_list, self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
+        if dialog.exec_() == QDialog.DialogCode.Accepted:
             self.accounts = dialog.get_ordered_accounts()
             # save back to model
             account_dicts = [asdict(account) for account in self.accounts]
