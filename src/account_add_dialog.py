@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 import find_qr_codes
 import otp_funcs
 from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
-from QRselectionDialog import QRselectionDialog
+from qr_selection_dialog import QRselectionDialog
 from appconfig import AppConfig
 from account_manager import Account, AccountManager, OtpRecord
 #from account_entry_panel import AccountEntryPanel
@@ -95,9 +95,7 @@ class AddAccountDialog(QDialog):
                 # copy the retrieved attributes into the form fields
                 otp_record = OtpRecord(totp_obj.issuer, totp_obj.name, totp_obj.secret)
                 self.fill_form_fields(otp_record)
-                # self.provider_entry.setText(totp_obj.issuer)
-                # self.label_entry.setText(totp_obj.name)
-                # self.secret_entry.setText(totp_obj.secret)
+
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to read QR image: {e}")
 
@@ -109,14 +107,7 @@ class AddAccountDialog(QDialog):
             QApplication.processEvents()  # Allow UI to update
             QThread.msleep(30)  # Non-CPU blocking sleep
 
-    def fill_form_fields(self, account):
-        # check selection has valid secret key.
-        # I think we can omit this ... assuming that QR codes always have valid secret keys.
-        # if not is_valid_secretkey(account.secret):
-        #     logging.debug ("QR code invalid key")
-        #     # if not valid secret key show message box then return to blank account_add form.
-        #     reply = QMessageBox.information (None, 'Info', "QR code has invalid secret key.",QMessageBox.Ok)
-        # else:
+    def show_popup(self):
         # Show a floating message relative to the form fields
         popup = QLabel("QR code found!", self)
         popup.setObjectName("qr_code_found")
@@ -136,6 +127,8 @@ class AddAccountDialog(QDialog):
         popup.show()
         QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
 
+    def fill_form_fields(self, account):
+        self.show_popup()
         # Clear the form fields
         self.provider_entry.setText("")
         self.label_entry.setText("")
@@ -187,11 +180,11 @@ class AddAccountDialog(QDialog):
             dialog = QRselectionDialog(display_list, self)
             # The dialog.exec_() call will block execution until the dialog is closed
             if dialog.exec_() == QDialog.Accepted:
-                selected_account = dialog.get_selected_account()
+                self.selected_account = dialog.get_selected_account()
                 # If user made a selection,
-                if selected_account:
-                    logging.debug(f"QRselectionDialog returned: {selected_account.issuer} - {selected_account.label}")
-                    self.fill_form_fields(selected_account)
+                if self.selected_account:
+                    logging.debug(f"QRselectionDialog returned: {self.selected_account.issuer} - {self.selected_account.label}")
+                    self.fill_form_fields(self.selected_account)
 
 
 

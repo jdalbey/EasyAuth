@@ -16,7 +16,7 @@ def scan_screen_for_qr_codes():
 
     # Convert screenshot to a format usable by pyzbar
     screenshot = screenshot.convert('RGB')
-    #screenshot.save("/tmp/screenshotqrcodes.png")
+    #screenshot.save("/tmp/screenshotqrcodes.png")  # diagnostic: save the image to a file
 
     # Detect and decode QR codes
     qr_codes = decode(screenshot)

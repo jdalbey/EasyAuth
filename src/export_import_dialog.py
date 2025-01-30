@@ -23,9 +23,9 @@ from account_manager import AccountManager
 """
 
 class ExportImportDialog(QDialog):
-    def __init__(self, account_manager: AccountManager, parent=None):
+    def __init__(self, parent=None):
         super(ExportImportDialog, self).__init__(parent)
-        self.account_manager = account_manager
+        self.account_manager = AccountManager()
         self.setWindowTitle("Export/Import")
         self.setGeometry(100, 100, 250, 300)
 
@@ -63,11 +63,11 @@ class ExportImportDialog(QDialog):
 
         layout.addSpacing(10)  # Add vertical space
 
-        file_choose_btn = QPushButton("Choose &export file")
-        file_choose_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        file_choose_btn.setFocusPolicy(Qt.NoFocus)
-        layout.addWidget(file_choose_btn)
-        file_choose_btn.clicked.connect(lambda: self.export())
+        self.file_choose_btn = QPushButton("Choose &export file")
+        self.file_choose_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.file_choose_btn.setFocusPolicy(Qt.NoFocus)
+        layout.addWidget(self.file_choose_btn)
+        self.file_choose_btn.clicked.connect(lambda: self.export())
 
         self.setLayout(layout)
 
@@ -105,7 +105,7 @@ class ExportImportDialog(QDialog):
 
         self.setLayout(layout)
 
-    def export(self, ):
+    def export(self):
         # Find out which radio button is selected
         export_file_types = ['json','uri']
         # Oddly checkedId is -2 or -3, so map to 0,1
@@ -130,7 +130,7 @@ class ExportImportDialog(QDialog):
                 QMessageBox.critical(self, "Error", f"Failed to export accounts: {e}")
         self.close()
 
-    def build_provider_sample(self, account_list):
+    def build_provider_preview(self, account_list):
         """ build a string with names of first few providers to be imported """
         confirm_count = len(account_list)
         sample_msg = ""
@@ -153,7 +153,7 @@ class ExportImportDialog(QDialog):
                     QMessageBox.information(self,"Information","The selected import file is empty or invalid, no action taken.")
                     self.close()
                     return
-                sample_msg, remainder = self.build_provider_sample(account_list)
+                sample_msg, remainder = self.build_provider_preview(account_list)
                 confirm_msg = f"WARNING: Import will overwrite your current vault.\n"
                 confirm_msg += "Do you really want to import "
                 confirm_msg += sample_msg + f"and {remainder} others?"

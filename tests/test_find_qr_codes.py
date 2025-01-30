@@ -25,23 +25,23 @@ class TestFind_qr_codes(unittest.TestCase):
         # Clean up dialog and other resources
         pass
 
-    image_file = 'tests/test_find_qr_code_image.png'
+    image_file = 'tests/img_qr_code_single.png'
 
     def test_scan_screen_for_qrcode(self):
-         # Display a QR code from a test file
-        pixmap = QPixmap(self.image_file)
-        label = QLabel()
-        label.setPixmap(pixmap)
-        label.show()
-
         # Schedule a function to close the window after 1 second
         def close_window():
             # Look for the image
             results = find_qr_codes.scan_screen_for_qr_codes()
             # Verify that we got some results
             assert len(results) > 0
+            assert results[0] == 'otpauth://totp/boogum%40badmail.com?secret=bogus&issuer=Bogus'
             label.close()
 
+        # Display a QR code from a test file
+        pixmap = QPixmap(self.image_file)
+        label = QLabel()
+        label.setPixmap(pixmap)
+        label.show()
         # Create a QTimer to close the window after 1 second
         timer = QTimer()
         timer.timeout.connect(close_window)

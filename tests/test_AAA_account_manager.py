@@ -160,6 +160,19 @@ class TestAccountManager:
         assert new_account.label == "TestLabel"
         assert new_account.secret == encrypted_secret
 
+        # Assert that trying to add a duplicate doesn't succeed
+        try:
+            # Add the same account
+            result = account_manager.save_new_account(OtpRecord(
+                issuer="Test",
+                label="TestLabel",
+                secret="test_secret")
+            )
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            raise
+        assert result == False
+
     @patch('cipher_funcs.encrypt')
     def test_update_account(self, mock_encrypt, account_manager):
 
@@ -238,6 +251,13 @@ class TestAccountManager:
                 secret = "new_secret")
         retcode = account_manager.save_new_account(rec)
         assert not retcode
+
+    def test_sort_alphabetically(self, account_manager, sample_accounts):
+        # Put 2 sample accounts into the list, Google and Github
+        account_objs = [Account(**acc) for acc in sample_accounts]
+        account_manager.accounts = account_objs
+        account_manager.sort_alphabetically()
+        assert account_manager.accounts[0] == account_objs[1]
 
     def test_handle_external_modification(self, account_manager, sample_accounts):
         """Test handling of external modifications to vault file."""

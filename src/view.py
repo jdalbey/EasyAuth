@@ -73,12 +73,14 @@ class AppView(QMainWindow):
 
         # Tools menu
         tools_menu = menubar.addMenu('Tools')
+        tools_menu.setObjectName('tools_menu')
         reorder_action = QAction('Reorder Accounts', self)
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
 
         sort_menu = tools_menu.addMenu('Sort Accounts')
         alpha_sort_action = QAction("Alphabetically", self)
+        alpha_sort_action.setObjectName("sortAlphaAction")
         recency_action = QAction("Recently Used", self)
         frequency_action = QAction("Usage Count", self)
         alpha_sort_action.triggered.connect(self.do_alpha_sort_action)
@@ -107,10 +109,10 @@ class AppView(QMainWindow):
         self.addToolBar(toolbar)
 
         # Add quick access buttons
-        add_btn = QPushButton("&Add Account")
-        add_btn.setObjectName("addAccountButton")
-        add_btn.clicked.connect(self.show_add_account_form)
-        toolbar.addWidget(add_btn)
+        self.add_btn = QPushButton("&Add Account")
+        self.add_btn.setObjectName("addAccountButton")
+        self.add_btn.clicked.connect(self.show_add_account_form)
+        toolbar.addWidget(self.add_btn)
 
         # Add spacer to push search to the right
         spacer = QWidget()
@@ -225,6 +227,7 @@ class AppView(QMainWindow):
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
                     provider_label = QLabel(label_string)
+                    provider_label.setObjectName("providerLabel")
                     provider_label.setFont(QFont("Verdana", 12))
 
                     otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
@@ -324,7 +327,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_export_import_dialog(self):
-        dialog = ExportImportDialog(self.account_manager, self)
+        dialog = ExportImportDialog(self)
         dialog.exec_()
         # After restore, reload display
         self.display_accounts()
