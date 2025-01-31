@@ -306,7 +306,7 @@ class AppView(QMainWindow):
         """ User clicked Add Account button """
         self.logger.debug("Starting Show_add_account_form")
         try:
-            add_dialog = AddAccountDialog()
+            add_dialog = AddAccountDialog(self)
             add_dialog.show()
             # Are we in auto_find mode?
             if self.app_config.is_auto_find_qr_enabled():

@@ -23,13 +23,14 @@ from provider_search_dialog import ProviderSearchDialog
 
 class AddAccountDialog(QDialog):
     """ Dialog to create a new account """
-    def __init__(self, parent=None, ):
-        super(AddAccountDialog, self).__init__(parent)
+    def __init__(self, parent ):
+        #super(AddAccountDialog, self).__init__(parent)
+        super().__init__(parent)
         self.account_manager = AccountManager()
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.logger = logging.getLogger(__name__)
 
-        self.setGeometry(100, 100, 600, 450)
+        self.setMinimumSize(600, 450)
 
         try:
             loadUi("assets/AddAccountForm.ui", self)
