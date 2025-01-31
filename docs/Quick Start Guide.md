@@ -17,7 +17,7 @@ The program will search for a visible QR code and the QR code data will be enter
    
 3. You may change the value of the User field to any label that reminds you which online account this entry is associated with (usually username or email address).  
 
-4. Click "Addd." The dialog closes and the main window appears with the new account listed at the top.   The Provider and User fields are shown on the left and on the right is the TOTP.  
+4. Click "Add." The dialog closes and the main window appears with the new account listed at the top.   The Provider and User fields are shown on the left and on the right is the TOTP.  
 <img src="images/Main-Window.png" alt="Main-Window" border="0">  
 
 
