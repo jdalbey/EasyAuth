@@ -368,7 +368,8 @@ class AppView(QMainWindow):
 
     def show_quick_start_dialog(self):
         dlg = QuickStartDialog(self)
-        dlg.exec_()
+        #dlg.exec_()
+        dlg.show()
 
     def open_user_manual(self):
         url = QUrl("https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md")

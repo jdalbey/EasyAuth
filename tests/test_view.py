@@ -205,7 +205,7 @@ class TestView(unittest.TestCase):
         # Assert the call was made to open the dialog
         mockDialog.assert_called_once()
 
-    @patch.object(QuickStartDialog, "exec_")
+    @patch.object(QuickStartDialog, "show")
     def test_quickstart_action(self,mockDialog):
         view = AppView(self.app)
         # Find the Reorder action by object name

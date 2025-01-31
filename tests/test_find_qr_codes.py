@@ -32,10 +32,15 @@ class TestFind_qr_codes(unittest.TestCase):
         def close_window():
             # Look for the image
             results = find_qr_codes.scan_screen_for_qr_codes()
+            label.close()
             # Verify that we got some results
             assert len(results) > 0
-            assert results[0] == 'otpauth://totp/boogum%40badmail.com?secret=bogus&issuer=Bogus'
-            label.close()
+            # Examine each visible QR code
+            for result in results:
+                if result == 'otpauth://totp/boogum%40badmail.com?secret=bogus&issuer=Bogus':
+                    return
+            assert False,  "we didn't find the target QR code"
+
 
         # Display a QR code from a test file
         pixmap = QPixmap(self.image_file)
