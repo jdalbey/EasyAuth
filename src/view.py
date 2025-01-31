@@ -35,6 +35,8 @@ class AppView(QMainWindow):
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
         self.current_dialog = None
+        self.quick_start_dialog = None  # Quick start is not showing
+
         self.setWindowTitle("Easy Auth")
         self.setGeometry(100, 100, 550, 600)
 
@@ -367,9 +369,12 @@ class AppView(QMainWindow):
     #     reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
 
     def show_quick_start_dialog(self):
-        dlg = QuickStartDialog(self)
-        #dlg.exec_()
-        dlg.show()
+        if self.quick_start_dialog is None or not self.quick_start_dialog.isVisible():
+            self.quick_start_dialog = QuickStartDialog(self)
+            self.quick_start_dialog.show()
+        else:
+            self.quick_start_dialog.raise_()
+            self.quick_start_dialog.activateWindow()
 
     def open_user_manual(self):
         url = QUrl("https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md")
