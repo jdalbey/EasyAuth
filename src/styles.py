@@ -18,6 +18,10 @@ QPushButton#otpLabel {
     font-family: "DejaVu Sans Mono";
     font-size: 16px;
 }
+QPushButton#otpLabel:hover {
+    text-decoration: underline;
+    color: blue;
+    }
 QListView::item
 {
     border : 1px white;
