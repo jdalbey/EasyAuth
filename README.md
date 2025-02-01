@@ -25,10 +25,8 @@ Focus on ease of use for beginners using TOTP authentication.
 
 
 ### Status
-All features above are implemented.
-Developer is "eating his own dog food" by using the program to login to Github to maintain this project repository.
-Error handling implemented for core data model classes.
-Approximately 2000 lines of code.  67 automated unit tests for are passing.  
+First production release is available for download (Linux only).  All features above are implemented.
+
 [Website](https://jdalbey.github.io/EasyAuth/) is under construction.
 
 ### Download

@@ -3,7 +3,8 @@
 ### Under construction.  This is a very early draft and no longer accurate.
 
 This is the user manual for the EasyAuth application. 
-EasyAuth is a desktop linux application for managing one time passwords. 
+EasyAuth is a desktop linux application for managing one-time passwords.
+
 The application has a graphical user interface. 
 When the application is started a main window appears. 
 The title bar shows the name of the application. 

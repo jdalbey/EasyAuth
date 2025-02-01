@@ -403,6 +403,22 @@ class AppView(QMainWindow):
             f"Vault directory: " + self.app_config.get_os_data_dir(),
             QMessageBox.Ok
         )
+        """ TO add build date to About, 
+        echo $(date) > build_date.txt
+        pyinstaller --onefile --add-data "build_date.txt:asset" src/install_me.py
+        Then read the file in this method:
+        import sys
+
+        if getattr(sys, '_MEIPASS', False):
+            build_date_path = os.path.join(sys._MEIPASS, "assets/build_date.txt")
+        else:
+            build_date_path = "assets/build_date.txt"  # Development mode
+    
+        if os.path.exists(build_date_path):
+            with open(build_date_path, "r") as f:
+                return f.read().strip()
+        return "Unknown"
+"""
 
     def closeEvent(self, event):
         geometry = self.geometry()
