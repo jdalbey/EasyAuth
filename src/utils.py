@@ -2,8 +2,9 @@ import os
 import sys
 
 """ Utility functions """
+
 def assets_dir():
-    """ Return the current folder to project assets, depending on development or production environment. """
+    """ Return the current path to project assets, depending on development or production environment. """
     base_dir = ""
     # Are we in production mode?
     if getattr(sys, 'frozen', False):
