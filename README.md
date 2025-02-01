@@ -31,6 +31,10 @@ Error handling implemented for core data model classes.
 Approximately 2000 lines of code.  67 automated unit tests for are passing.  
 [Website](https://jdalbey.github.io/EasyAuth/) is under construction.
 
+### Download
+
+Binary for Linux is available under [Releases](https://github.com/jdalbey/EasyAuth/releases).
+
 ### Screenshots
  
 ![Main Window](https://i.ibb.co/XxhTr1dx/Account-List.png)
@@ -50,7 +54,22 @@ As with any form of two-factor authentication, if the second-factor is compromis
 you may lose access to your online accounts unless you have saved the recover codes you were issued initially. 
 This software is issued with no guarantee.  There is a risk of data loss, including loss of your secret keys.
 
-### Dependencies
+## Usage
+Practice storing a new secret key using the sample QR code below.
+1. Launch the application.
+2. Make sure the QR code below is visible on the screen. Click 'Add Account".
+3. The form fields are filled automatically with the data from the QR code. Click "Add".
+4. Observe the new account in the main window.
+
+<img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
+
+A Quick Start guide is available in the docs folder.
+
+
+---
+## Installation from Source
+
+#### Dependencies
 Python 3.5+
 
 PyQt5  
@@ -60,9 +79,6 @@ pyzbar
 cryptography  
 qrcode  
 qdarktheme
-
----
-## Installation
 
 #### Prerequisites
 
@@ -121,14 +137,3 @@ For further assistance, you can open an Issue here.
 
 
 
-## Usage
-Practice storing a new secret key using the sample QR code below.
-1. Launch the application.
-2. Make sure the QR code below is visible on the screen. Click 'Add Account".
-3. The form fields are filled automatically with the data from the QR code. Click "Add".
-4. Observe the new account in the main window.
-
-<img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
-
-
-A Quick Start guide is available in the docs folder.
