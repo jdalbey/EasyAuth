@@ -28,6 +28,15 @@ class PreferencesDialog(QDialog):
         self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
         layout.addWidget(self.auto_find_qr_checkbox)
 
+        # Animate form fill
+        self.animate_form_fill = QCheckBox("Animate typing during auto form fill")
+        layout.addWidget(self.animate_form_fill)
+
+        # Display website favicons
+        self.display_favicons = QCheckBox("Display provider favicons")
+        self.display_favicons.setEnabled(True)
+        layout.addWidget(self.display_favicons)
+
         # Minimize application after TOTP copy to clipboard
         self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
         self.minimize_after_copy.setEnabled(False)
@@ -37,15 +46,6 @@ class PreferencesDialog(QDialog):
         self.minimize_during_qr_search = QCheckBox("Minimize during QR code search")
         self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
-
-        # Animate form fill
-        self.animate_form_fill = QCheckBox("Animate typing during auto form fill")
-        layout.addWidget(self.animate_form_fill)
-
-        # Display website favicons
-        self.display_favicons = QCheckBox("Display provider favicons")
-        self.display_favicons.setEnabled(True)
-        layout.addWidget(self.display_favicons)
 
         # Secret key initially hidden with asterisks in Edit dialog
         self.secret_key_hidden = QCheckBox("Secret key initially hidden with asterisks in Edit dialog")
@@ -126,6 +126,7 @@ class PreferencesDialog(QDialog):
         self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.parent().set_theme()  # set theme in application
+        self.parent().display_accounts() # redisplay accounts
 
     def save_settings(self):
         self.apply_settings()
