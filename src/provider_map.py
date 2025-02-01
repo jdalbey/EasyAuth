@@ -9,20 +9,21 @@ from PyQt5.QtGui import QPixmap, QIcon, QImage
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtWidgets import QLabel, QApplication, QMessageBox
 from appconfig import AppConfig
+from utils import assets_dir
 
 class Providers:
     logwriter = logging.getLogger(__name__)
-    # Initialize class constants (used by static methods)
-    kZipPath = os.path.join(AppConfig().get("System", "assets_dir", ""), "favicons.zip")
-    kProvidersPath = os.path.join(AppConfig().get("System", "assets_dir", ""), "providers.json")
 
     def __init__(self):
         self.appconfig = AppConfig()
-        # Initialize the map of providers
-        self.provider_map = Providers._build_map()
+        # Initialize constants
 
-    @staticmethod
-    def _load_imgdict_from_zipimages():
+        self.kZipPath = os.path.join(assets_dir(), "favicons.zip")
+        self.kProvidersPath = os.path.join(assets_dir(), "providers.json")
+        # Initialize the map of providers
+        self.provider_map = self._build_map()
+
+    def _load_imgdict_from_zipimages(self):
         """
         Loads images from a ZIP file into a dictionary where the key is the file name
         and the value is a QPixmap.
@@ -33,18 +34,17 @@ class Providers:
         image_dict = {}
 
         try:
-            with zipfile.ZipFile(Providers.kZipPath, 'r') as z:
+            with zipfile.ZipFile(self.kZipPath, 'r') as z:
                 for name in z.namelist():
                     # process each item in the zip file
                     with z.open(name) as file:
                         # Read image data into a QByteArray
                         image_dict[name] = file.read()
         except FileNotFoundError:
-            Providers.logwriter.warning(f"Missing favicons.zip file {Providers.kZipPath}- no favicons will be displayed.")
+            Providers.logwriter.warning(f"Missing favicons.zip file {self.kZipPath}- no favicons will be displayed.")
         return image_dict
 
-    @staticmethod
-    def _build_map():
+    def _build_map(self):
         """
         Build a map with provider_name as key and (domain,raw_image) as value.
         This facilitates looking up a favicon given the provider name
@@ -53,16 +53,16 @@ class Providers:
         provider_map = {}
 
         # Retrieve the dictionary of images
-        img_dict = Providers._load_imgdict_from_zipimages()
+        img_dict = self._load_imgdict_from_zipimages()
         # If no images were retrieved, return empty map
         if len(img_dict) == 0:
             return {}
 
         # Populate the dictionary with provider_name as key and domain,raw_image as value
         try:
-            f = open(Providers.kProvidersPath, 'r')
+            f = open(self.kProvidersPath, 'r')
         except FileNotFoundError:
-            Providers.logwriter.warning(f"Missing providers.json file {Providers.kProvidersPath}- no favicons will be displayed.")
+            Providers.logwriter.warning(f"Missing providers.json file {self.kProvidersPath}- no favicons will be displayed.")
             return {}
         json_data = json.load(f)
         # Sort the data dictionary by 'provider_name'

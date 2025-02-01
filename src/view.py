@@ -406,9 +406,17 @@ class AppView(QMainWindow):
 
     def closeEvent(self, event):
         geometry = self.geometry()
-        print("Current window geometry:", QRect(geometry))
-        print("Current window position:", self.pos().x(), " x ", self.pos().y())
+        # TODO Save window geometry and position for next startup
+        self.logger.debug(f"Current window geometry:  {QRect(geometry)}")
+        self.logger.debug(f"Current window position: {self.pos().x()} x {self.pos().y()}")
+        # Note that upon startup geometry says 100,100 but pos says 100,68.
         super().closeEvent(event)
+
+"""    def showEvent(self, event):
+        super().showEvent(event)
+        # Store the initial size when the dialog is first shown
+        if self.initial_size is None:
+            self.initial_size = self.size()"""
 
 # local main for unit testing
 if __name__ == '__main__':

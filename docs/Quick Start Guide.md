@@ -10,21 +10,20 @@ The quide will show how to store shared keys in your EasyAuth vault and use Time
 ### Step 1: Create an account in EasyAuth
 
 1. Open EasyAuth.  The first time it is launched a message indicates that you have an empty vault.  
-<img src="images/vault-empty.png" alt="vault-empty" border="0">
+![Empty vault screenshot](https://i.ibb.co/NdZ7g6Qv/vault-empty.png)
 2. Make sure the QR code is visible somewhere on the screen. Click the 'Add Account' button. 
 The program will search for a visible QR code and the QR code data will be entered into the form fields.  
-<img src="images/AddAccountForm.png" alt="Add Account form" border="0">   
+![Add Account Form screenshot](https://i.ibb.co/8gCSrhcw/Add-Account-Form.png)
 3. You may change the value of the User field to any label that reminds you which online account this entry is associated with (usually username or email address).  
 4. Click "Add." The dialog closes and the main window appears with the new account listed at the top.   The Provider and User fields are shown on the left and on the right is the TOTP.  
-<img src="images/Main-Window.png" alt="Main-Window" border="0">  
+![Main Window screenshot](https://i.ibb.co/1t35DGdJ/Main-Window.png)
 
 
 
 ### Step 2: Verifying with the TOTP code.
 
 1. Now that EasyAuth has created an account for the desired website, it  will display a six-digit One-Time Password (TOTP) for the account that  changes every 30 seconds. The seconds timer indicates how much  time remains for the displayed TOTP to be active.  
-<img src="images/TOTP-code.png" alt="TOTP-code" border="0">
-
+![TOTP code](https://i.ibb.co/W4gGx8Hf/TOTP-code.png)
 2. Click the 6-digit TOTP code to copy it to the clipboard.
 
 3. Complete the setup process on the website by pasting this code into the verify field in your browser. 

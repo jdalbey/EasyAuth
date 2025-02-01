@@ -19,6 +19,7 @@ from account_manager import Account, AccountManager, OtpRecord
 from PyQt5.uic import loadUi
 
 from provider_search_dialog import ProviderSearchDialog
+from utils import assets_dir
 
 
 class AddAccountDialog(QDialog):
@@ -33,7 +34,7 @@ class AddAccountDialog(QDialog):
         self.setMinimumSize(600, 450)
 
         try:
-            filepath = os.path.join(self.appconfig.get("System", "assets_dir", ""), "AddAccountForm.ui")
+            filepath = os.path.join(assets_dir(), "AddAccountForm.ui")
             loadUi(filepath, self)
             self.logger.debug("AddAccountForm.ui loaded.")
         except FileNotFoundError as e:

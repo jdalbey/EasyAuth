@@ -3,7 +3,6 @@ import os, logging
 from pathlib import Path
 import platform
 
-
 class AppConfig:
     """Application configuration settings (Preferences)"""
     _instance = None  # Use singleton pattern
@@ -167,5 +166,3 @@ class AppConfig:
         self.set('System', 'win_data_dir', dirpath)
         dirpath = str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data")
         self.set('System', 'linux_data_dir', dirpath)
-        """ the path to the assets folder """
-        self.set("System", 'assets_dir', "assets")

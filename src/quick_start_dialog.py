@@ -1,3 +1,6 @@
+import os
+import sys
+
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
 
 
@@ -31,8 +34,15 @@ class QuickStartDialog(QDialog):
         self.setLayout(layout)
 
     def load_quickstart_text(self):
+        dir_path = "docs"
+        # Are we in production mode?
+        if getattr(sys, 'frozen', False):
+            # PyInstaller bundled case - prefix the temp directory path
+            base_dir = sys._MEIPASS  # type: ignore   #--keep PyCharm happy
+            dir_path = os.path.join(base_dir, "assets")
+        self.file_path = os.path.join(dir_path, 'quick_start_guide.html')
         try:
-            f = open("docs/quick_start_guide.html")
+            f = open(self.file_path)
             text = f.read()
             f.close()
         except FileNotFoundError as e:

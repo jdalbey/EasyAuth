@@ -16,6 +16,7 @@ import cipher_funcs
 import otp_funcs
 from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
 from provider_search_dialog import ProviderSearchDialog
+from utils import assets_dir
 
 
 class EditAccountDialog(QDialog):
@@ -36,7 +37,7 @@ class EditAccountDialog(QDialog):
         self.setMinimumWidth(300)
 
         try:
-            filepath = os.path.join(self.appconfig.get("System", "assets_dir", ""), "EditAccountForm.ui")
+            filepath = os.path.join(assets_dir(), "EditAccountForm.ui")
             loadUi(filepath, self)
         except FileNotFoundError as e:
             self.logger.error("AddAccountForm.ui not found, can't display dialog.")

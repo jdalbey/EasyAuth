@@ -39,7 +39,7 @@ class ProviderSearchDialog(QDialog):
         self.setup_ui()
         self.resize(600, 400)
         self.setWindowTitle("Provider Search")
-        self.logger.info("init complete")
+        self.logger.debug("init complete")
 
     def setup_ui(self):
         layout = QVBoxLayout(self)

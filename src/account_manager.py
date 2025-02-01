@@ -106,19 +106,19 @@ class AccountManager:
         content = json.loads(account_string)
         self.accounts = [Account(**acc) for acc in content]
         self.save_accounts()
-        self.logger.info(f"Saved accounts : {account_string} ")
+        self.logger.debug(f"Saved accounts : {account_string} ")
 
     def load_accounts(self) -> List['Account']:
         """Load accounts from vault with validation and backup recovery."""
         try:
             if not self.vault_path.exists():
-                self.logger.warning(f"Vault file not found at {self.vault_path}")
+                self.logger.info(f"Vault file not found at {self.vault_path}")
                 return []
 
             # Check for external modifications
             current_mtime = os.path.getmtime(self.vault_path)
             if self._last_modified_time and current_mtime != self._last_modified_time:
-                self.logger.warning("Detected external modifications to vault file")
+                self.logger.info("Detected external modifications to vault file")
                 self._handle_external_modification()
 
             # Read and validate primary vault
@@ -159,7 +159,7 @@ class AccountManager:
             os.replace(temp_path, self.vault_path)
             self._last_modified_time = os.path.getmtime(self.vault_path)
             
-            self.logger.info("Successfully saved accounts")
+            self.logger.debug("Successfully saved accounts")
             return True
 
         except (PermissionError, OSError) as e:
@@ -203,7 +203,7 @@ class AccountManager:
 
             self.accounts.insert(0, account)
             if self.save_accounts():
-                self.logger.info(f"Successfully saved new account: {otp_record.issuer} ({otp_record.label})")
+                self.logger.debug(f"Successfully saved new account: {otp_record.issuer} ({otp_record.label})")
             else:
                 raise RuntimeError("Failed to save account to vault")
 
@@ -215,27 +215,27 @@ class AccountManager:
     def update_account(self, index, account):
         self.accounts[index] = account
         self.save_accounts()
-        self.logger.info(f"Updated account: {account.issuer} ({account.label})")
+        self.logger.debug(f"Updated account: {account.issuer} ({account.label})")
 
     def delete_account(self, account):
         self.accounts.remove(account)
         self.save_accounts()
-        self.logger.info(f"Deleted account: {account.issuer} ({account.label})")
+        self.logger.debug(f"Deleted account: {account.issuer} ({account.label})")
 
     def sort_alphabetically(self):
         self.accounts = sorted(self.accounts, key=lambda x: x.issuer)
         self.save_accounts()
-        self.logger.info(f"Accounts sorted alphabetically.")
+        self.logger.debug(f"Accounts sorted alphabetically.")
 
     def sort_recency(self):
         self.accounts = sorted(self.accounts, key=lambda x: x.last_used, reverse=True)
         self.save_accounts()
-        self.logger.info(f"Accounts sorted by recently used.")
+        self.logger.debug(f"Accounts sorted by recently used.")
 
     def sort_frequency(self):
         self.accounts = sorted(self.accounts, key=lambda x: x.used_frequency, reverse=True)
         self.save_accounts()
-        self.logger.info(f"Accounts sorted by used frequency.")
+        self.logger.debug(f"Accounts sorted by used frequency.")
 
     def backup_accounts(self, file_path):
         self.write_accounts_file(file_path, 'json')
@@ -299,7 +299,7 @@ class AccountManager:
         try:
             with open(file_path, 'w') as f:
                 f.write(result)
-            self.logger.info(f"Successful {target_label} of {len(vault_accounts)} accounts to {file_path}")
+            self.logger.debug(f"Successful {target_label} of {len(vault_accounts)} accounts to {file_path}")
         except (OSError, IOError) as e:
             self.logger.error(f"{target_label} failed to write to {file_path}: {e}")
         except Exception as e:
@@ -349,10 +349,10 @@ class AccountManager:
             self.accounts = accounts
             self.logger.debug(f"Read these accounts: {self.accounts}")
             self.save_accounts()
-            self.logger.info(f"Read completed for  {len(accounts)} accounts from {file_path}")
-            self.logger.info(self.accounts)
+            self.logger.debug(f"Read completed for  {len(accounts)} accounts from {file_path}")
+            self.logger.debug(self.accounts)
 
-            self.logger.info(f"Successful {target} of accounts from {file_path}")
+            self.logger.debug(f"Successful {target} of accounts from {file_path}")
 
         except (OSError, IOError) as e:
             self.logger.error(f"{target} failed to read from {file_path}: {e}")
@@ -407,7 +407,7 @@ class AccountManager:
 
     def _handle_external_modification(self):
         """Handle detected external modifications to the vault file."""
-        self.logger.warning("Attempting to merge external changes")
+        self.logger.info("Attempting to merge external changes")
         try:
             # Load both current memory state and disk state
             with open(self.vault_path, 'r') as f:
@@ -425,7 +425,7 @@ class AccountManager:
             # Merge changes, preferring memory state for conflicts
             merged = {**disk_accounts, **memory_accounts}
             self.accounts = list(merged.values())
-            self.logger.info("Successfully merged external changes")
+            self.logger.debug("Successfully merged external changes")
 
         except Exception as e:
             self.logger.error(f"Failed to handle external modifications: {str(e)}")
@@ -433,13 +433,13 @@ class AccountManager:
 
     def _recover_from_backup(self) -> List['Account']:
         """Attempt to recover accounts from backup file."""
-        self.logger.info("Attempting recovery from backup")
+        self.logger.debug("Attempting recovery from backup")
         try:
             if self.backup_path.exists():
                 with open(self.backup_path, 'r') as f:
                     content = json.load(f)
                     if self._validate_account_data(content):
-                        self.logger.info("Successfully recovered from backup")
+                        self.logger.debug("Successfully recovered from backup")
                         return [Account(**acc) for acc in content]
 
             self.logger.error("No valid backup found for recovery")
