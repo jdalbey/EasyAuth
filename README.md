@@ -29,12 +29,16 @@ All features above are implemented.
 Developer is "eating his own dog food" by using the program to login to Github to maintain this project repository.
 Error handling implemented for core data model classes.
 Approximately 2000 lines of code.  67 automated unit tests for are passing.  
+[Website](https://jdalbey.github.io/EasyAuth/) is under construction.
 
 ### Screenshots
  
-<a href="https://ibb.co/M5FwMGb"><img src="https://i.ibb.co/93QKsVJ/Main-Window.png" alt="Main-Window" border="0"></a>
+![Main Window](https://i.ibb.co/XxhTr1dx/Account-List.png)
 
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/kM9b2Tb/Edit-Account-Dialog.png" alt="Edit-Account-Dialog" border="0"></a>
+![Add Account](https://i.ibb.co/HTP9SGwJ/Add-Account.png)
+
+![Edit Account](https://i.ibb.co/WWf6bcgQ/Edit-Account.png)
+
 ### Limitations
 
 Currently targets Linux OS.
@@ -128,5 +132,3 @@ Practice storing a new secret key using the sample QR code below.
 
 
 A Quick Start guide is available in the docs folder.
-
-[Website](https://jdalbey.github.io/EasyAuth/) is under construction.
