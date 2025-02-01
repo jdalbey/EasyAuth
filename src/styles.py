@@ -9,10 +9,7 @@ QPushButton {
     border-width: 2px;
 }
 QPushButton#editButton {
-    qproperty-icon: url("images/edit_icon_dark.png");
-}
-QPushButton#copyButton {
-    qproperty-icon: url("images/copy_icon_dark.png");
+    qproperty-icon: url("assets/edit_icon_dark.png");
 }
 QPushButton#otpLabel {
     font-family: "DejaVu Sans Mono";
@@ -54,7 +51,7 @@ QPushButton#addAccountButton:hover { background-color: #d6dfea; }
 QPushButton#addAccountButton:pressed { background-color: #b9cee9; }
 
 QPushButton#editButton {
-    qproperty-icon: url("images/edit_icon_light.png");
+    qproperty-icon: url("assets/edit_icon_light.png");
 }
 QPushButton#otpLabel {
     font-family: "DejaVu Sans Mono";

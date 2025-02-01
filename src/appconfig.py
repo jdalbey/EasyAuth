@@ -134,7 +134,7 @@ class AppConfig:
         """
         Get the alternate id.
         """
-        alt_id_string = self.config.get('Settings', 'alt_id', fallback="")
+        alt_id_string = self.config.get('System', 'alt_id', fallback="")
         if alt_id_string == "":
             return None
         else:
@@ -143,9 +143,9 @@ class AppConfig:
     def get_os_data_dir(self):
         """ Determine the appropriate path to the database based on the OS """
         if platform.system() == "Windows":
-            return self.config.get('Settings','win_data_dir',fallback=str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data"))
+            return self.config.get('System','win_data_dir',fallback=str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data"))
         else:  # Default to Linux or Unix-like systems
-            return self.config.get('Settings','linux_data_dir', fallback=str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data"))
+            return self.config.get('System','linux_data_dir', fallback=str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data"))
 
     def restore_defaults(self):
         """ restore and write defaults """
@@ -161,9 +161,11 @@ class AppConfig:
         # 'Hidden' settings are not listed in the Preferences dialog and don't have public setter methods
         """ Alternate machine id.  If you want to use a vault created on a different machine you need to
            use the machine id the vault was created on.  """
-        self.set('Settings', 'alt_id', "")
+        self.set('System', 'alt_id', "")
         """ the path to the application data directory (for vault and logs). """
         dirpath = str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data")
-        self.set('Settings', 'win_data_dir', dirpath)
+        self.set('System', 'win_data_dir', dirpath)
         dirpath = str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data")
-        self.set('Settings', 'linux_data_dir', dirpath)
+        self.set('System', 'linux_data_dir', dirpath)
+        """ the path to the assets folder """
+        self.set("System", 'assets_dir', "assets")

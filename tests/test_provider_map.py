@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QLabel
+
+from appconfig import AppConfig
 from provider_map import get_color_for_letter
 from provider_map import Providers
 import logging, unittest
@@ -98,6 +100,7 @@ class TestProviderMap(unittest.TestCase):
     def setUpClass(cls):
         # QApplication is created once for the entire test suite
         cls.app = QApplication([])
+        cls.appconfig = AppConfig()
 
     @classmethod
     def tearDownClass(cls):

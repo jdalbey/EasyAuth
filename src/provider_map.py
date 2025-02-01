@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import zipfile
 
 from urllib.parse import urlparse
@@ -7,14 +8,17 @@ from urllib.parse import urlparse
 from PyQt5.QtGui import QPixmap, QIcon, QImage
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtWidgets import QLabel, QApplication, QMessageBox
-
+from appconfig import AppConfig
 
 class Providers:
-    kZipPath = "assets/favicons.zip"
-    kProvidersPath = "assets/providers.json"
     logwriter = logging.getLogger(__name__)
+    # Initialize class constants (used by static methods)
+    kZipPath = os.path.join(AppConfig().get("System", "assets_dir", ""), "favicons.zip")
+    kProvidersPath = os.path.join(AppConfig().get("System", "assets_dir", ""), "providers.json")
 
     def __init__(self):
+        self.appconfig = AppConfig()
+        # Initialize the map of providers
         self.provider_map = Providers._build_map()
 
     @staticmethod
@@ -36,7 +40,7 @@ class Providers:
                         # Read image data into a QByteArray
                         image_dict[name] = file.read()
         except FileNotFoundError:
-            Providers.logwriter.warning("Missing favicons.zip file - no favicons will be displayed.")
+            Providers.logwriter.warning(f"Missing favicons.zip file {Providers.kZipPath}- no favicons will be displayed.")
         return image_dict
 
     @staticmethod
@@ -56,9 +60,9 @@ class Providers:
 
         # Populate the dictionary with provider_name as key and domain,raw_image as value
         try:
-            f = open(Providers.kProvidersPath, )
+            f = open(Providers.kProvidersPath, 'r')
         except FileNotFoundError:
-            Providers.logwriter.warning("Missing providers.json file - no favicons will be displayed.")
+            Providers.logwriter.warning(f"Missing providers.json file {Providers.kProvidersPath}- no favicons will be displayed.")
             return {}
         json_data = json.load(f)
         # Sort the data dictionary by 'provider_name'

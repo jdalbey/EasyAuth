@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QPushButton, QLa
 import pyperclip
 from account_edit_dialog import EditAccountDialog
 from account_manager import AccountManager, OtpRecord, Account
+from appconfig import AppConfig
 from export_import_dialog import ExportImportDialog
 from preferences_dialog import PreferencesDialog
 from quick_start_dialog import QuickStartDialog
@@ -222,6 +223,7 @@ class TestView(unittest.TestCase):
     def setUpClass(cls):
         # QApplication is created once for the entire test suite
         cls.app = QApplication([])
+        cls.appconfig = AppConfig()
 
     @classmethod
     def tearDownClass(cls):

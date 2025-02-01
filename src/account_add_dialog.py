@@ -27,13 +27,15 @@ class AddAccountDialog(QDialog):
         #super(AddAccountDialog, self).__init__(parent)
         super().__init__(parent)
         self.account_manager = AccountManager()
-        self.app_config = AppConfig() # Get the global AppConfig instance
+        self.appconfig = AppConfig() # Get the global AppConfig instance
         self.logger = logging.getLogger(__name__)
 
         self.setMinimumSize(600, 450)
 
         try:
-            loadUi("assets/AddAccountForm.ui", self)
+            filepath = os.path.join(self.appconfig.get("System", "assets_dir", ""), "AddAccountForm.ui")
+            loadUi(filepath, self)
+            self.logger.debug("AddAccountForm.ui loaded.")
         except FileNotFoundError as e:
             self.logger.error("AddAccountForm.ui not found, can't display dialog.")
             QMessageBox.critical(self, "Error", f"Failed to load UI: {e}")
@@ -135,7 +137,7 @@ class AddAccountDialog(QDialog):
         self.label_entry.setText("")
         self.secret_entry.setText("")
         # copy the retrieved attributes into the form fields (animate if preferences allow)
-        if self.app_config.is_animate_form_fill():
+        if self.appconfig.is_animate_form_fill():
             self._type_field_fill(self.provider_entry, account.issuer)
             self._type_field_fill(self.label_entry, account.label)
             self._type_field_fill(self.secret_entry, account.secret)
@@ -194,6 +196,6 @@ class AddAccountDialog(QDialog):
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
-    app_config = AppConfig()
+    appconfig = AppConfig()
     dialog = AddAccountDialog(None)
     dialog.exec()

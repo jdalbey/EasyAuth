@@ -9,7 +9,11 @@ from account_edit_dialog import EditAccountDialog
 from account_manager import AccountManager, OtpRecord, Account
 import common_dialog_funcs
 import provider_search_dialog
-class TestAddAccountDialog(unittest.TestCase):
+from appconfig import AppConfig
+from view import AppView
+
+
+class TestCommonDialogFunctions(unittest.TestCase):
     @patch('common_dialog_funcs.QMessageBox.information')
     @patch("account_edit_dialog.AccountManager")
     def test_save_duplicate_account(self,MockAccountManager,MockMessageBox):
@@ -42,7 +46,7 @@ class TestAddAccountDialog(unittest.TestCase):
         mock_dialog.get_selected_provider.return_value = "Woogle"
 
         # Create AddAccountDialog instance
-        add_dlg = AddAccountDialog()
+        add_dlg = AddAccountDialog(AppView(self.app))
 
         # Call function that opens the dialog
         common_dialog_funcs.provider_lookup(add_dlg)
@@ -66,7 +70,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
     def setUp(self):
         # No need to create QApplication here; it's already done in setUpClass
-        pass
+        self.appconfig = AppConfig()
 
     def tearDown(self):
         # Clean up dialog and other resources

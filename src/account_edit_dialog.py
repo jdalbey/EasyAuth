@@ -1,5 +1,7 @@
 import logging
 import copy
+import os
+
 from PyQt5.QtCore import Qt, QTimer, QSize
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QWidget, QDialog, \
@@ -7,6 +9,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayou
 from PyQt5.uic import loadUi
 
 import account_manager
+from appconfig import AppConfig
 from styles import info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
@@ -21,6 +24,7 @@ class EditAccountDialog(QDialog):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
         self.account_manager = AccountManager()
+        self.appconfig = AppConfig()
         self.account = account
         self.index = index
         self.qr_code_label = None
@@ -32,7 +36,8 @@ class EditAccountDialog(QDialog):
         self.setMinimumWidth(300)
 
         try:
-            loadUi("assets/EditAccountForm.ui", self)
+            filepath = os.path.join(self.appconfig.get("System", "assets_dir", ""), "EditAccountForm.ui")
+            loadUi(filepath, self)
         except FileNotFoundError as e:
             self.logger.error("AddAccountForm.ui not found, can't display dialog.")
             QMessageBox.critical(self, "Error", f"Failed to load UI: {e}")
@@ -87,7 +92,7 @@ class EditAccountDialog(QDialog):
         last_used_layout.addWidget(self.reveal_qr_button, 2, 0, 1, 2, Qt.AlignCenter)
         user_info_btn = QToolButton()
         user_info_btn.setToolTip("This QR code can be used to import this account in another application.")
-        info_icon = QIcon("images/question_mark_icon_16.png")
+        info_icon = QIcon("assets/question_mark_icon.png")
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows

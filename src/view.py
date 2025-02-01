@@ -1,4 +1,5 @@
 import json
+import os
 import sys, logging
 from dataclasses import asdict
 
@@ -155,6 +156,18 @@ class AppView(QMainWindow):
         self.set_theme()
 
     def set_theme(self):
+        def adjust_theme_paths():
+            """Return the correct path to images, whether in development or PyInstaller mode."""
+            global dark_qss, light_qss
+
+            base_path = ""  # development mode (relative path is okay)
+            if getattr(sys, '_MEIPASS', False):
+                base_path = sys._MEIPASS  # PyInstaller extract directory
+                adjusted_path = os.path.join(base_path, "assets/")
+                dark_qss = dark_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
+                light_qss = light_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
+
+        adjust_theme_paths()
         # Get desired theme from Configuration
         chosen_theme = self.app_config.get_theme_name()
         self.logger.debug(f"Loading theme preference: {chosen_theme}")

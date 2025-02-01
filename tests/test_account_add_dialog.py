@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 import qr_selection_dialog
 from account_add_dialog import AddAccountDialog
 from account_manager import AccountManager, OtpRecord
+from appconfig import AppConfig
+from view import AppView
+
 
 class TestAddAccountDialog(unittest.TestCase):
 
@@ -15,7 +18,7 @@ class TestAddAccountDialog(unittest.TestCase):
     #@patch.object(AddAccountDialog, "open_qr_image")
     def test_qr_code_btn(self, mock_obtain, mockFileDialog):
         # Create the dialog instance
-        dialog = AddAccountDialog()
+        dialog = AddAccountDialog(AppView(self.app))
         dialog.accept = Mock()  # Mock the accept method of the dialog
         dialog.show_popup = Mock() # Mock the popup to keep it from appearing
 
@@ -39,7 +42,7 @@ class TestAddAccountDialog(unittest.TestCase):
     @patch('account_edit_dialog.QMessageBox.information')
     @patch("find_qr_codes.scan_screen_for_qr_codes")
     def test_obtain_qr_code(self, mock_find, MockMessageBox, mock_SelectionDialog):
-        dialog = AddAccountDialog()
+        dialog = AddAccountDialog(AppView(self.app))
         dialog.accept = Mock()  # Mock the accept method of the dialog
         dialog.show_popup = Mock() # Mock the popup to keep it from appearing
 
@@ -84,7 +87,7 @@ class TestAddAccountDialog(unittest.TestCase):
         mock_account_manager = MockAccountManager.return_value
 
         # Create an instance of AddAccountDialog
-        dialog = AddAccountDialog()
+        dialog = AddAccountDialog(AppView(self.app))
         dialog.account_manager = mock_account_manager
 
         # Set values for the input fields
@@ -111,7 +114,7 @@ class TestAddAccountDialog(unittest.TestCase):
     def test_Cancel_button(self, MockAccountManager):
         # Mock the AccountManager
         dialog_manager = MockAccountManager.return_value # is the mock instance created when AccountManager() is called in ConfirmAccountDialog.
-        dialog = AddAccountDialog()
+        dialog = AddAccountDialog(AppView(self.app))
 
         # Replace account manager in dialog with the mock
         dialog.account_manager = dialog_manager
@@ -133,7 +136,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
     def test_learn_more(self):
         """ Test link content, not that it actually opens the browser page """
-        dialog = AddAccountDialog()
+        dialog = AddAccountDialog(AppView(self.app))
         link = dialog.label_LearnMore
         linktext = link.text()
         expected = '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md'
@@ -144,7 +147,7 @@ class TestAddAccountDialog(unittest.TestCase):
     def setUpClass(cls):
         # QApplication is created once for the entire test suite
         cls.app = QApplication([])
-
+        cls.appconfig = AppConfig()
 
     @classmethod
     def tearDownClass(cls):

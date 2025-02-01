@@ -1,3 +1,4 @@
+import os
 import sys, logging
 from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
@@ -14,9 +15,20 @@ def main():
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s - %(name)s - %(message)s')
     logger = logging.getLogger(__name__)
     logging.getLogger('PIL').setLevel(logging.WARNING) # suppress debug messages from PIL
-    logging.getLogger('PyQt5.uic.uiparser').setLevel(logging.WARNING) # suppress debug messages from PIL
+    logging.getLogger('PyQt5.uic.uiparser').setLevel(logging.WARNING)
+    logging.getLogger('PyQt5.uic.properties').setLevel(logging.WARNING)
     logger.debug("Application starting with default config")
-    AppConfig()
+    appconfig = AppConfig()
+
+    base_dir = ""
+    # Are we in production mode?
+    if getattr(sys, 'frozen', False):
+        # PyInstaller bundled case - prefix the temp directory path
+        base_dir = sys._MEIPASS  # type: ignore   #--keep PyCharm happy
+
+    assets_dir = os.path.join(base_dir, "assets")
+    # Add a setting for correct assets directory, dev or production
+    appconfig.set("System", "assets_dir", assets_dir)
 
     # Display the main window
     view = AppView(app)
