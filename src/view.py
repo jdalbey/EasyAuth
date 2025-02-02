@@ -394,31 +394,28 @@ class AppView(QMainWindow):
         QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):
-        reply = QMessageBox.information(
+        """ Show About dialog, including version and build date. """
+        # Find the build date
+        # If production mode, use bundled path to file created during build
+        if getattr(sys, '_MEIPASS', False):
+            build_date_path = os.path.join(sys._MEIPASS, "assets", "build_date.txt")
+            build_date = "Unknown"
+            if os.path.exists(build_date_path):
+                with open(build_date_path, "r") as f:
+                    build_date = f.read().strip()
+        else:
+            now = datetime.datetime.now()
+            build_date =  now.strftime("%Y-%m-%d %H:%M:%S")
+
+        retval = QMessageBox.information(
             self,
             'About',
             f'EasyAuth\n\n2FA authenticator\n\n' +
-            f"Version 0.0.1\n\n" +
+            f"Version 0.0.1  {build_date}\n\n" +
             "http://www.github.com/jdalbey/EasyAuth\n\n" +
             f"Vault directory: " + self.app_config.get_os_data_dir(),
             QMessageBox.Ok
         )
-        """ TO add build date to About, 
-        echo $(date) > build_date.txt
-        pyinstaller --onefile --add-data "build_date.txt:asset" src/install_me.py
-        Then read the file in this method:
-        import sys
-
-        if getattr(sys, '_MEIPASS', False):
-            build_date_path = os.path.join(sys._MEIPASS, "assets/build_date.txt")
-        else:
-            build_date_path = "assets/build_date.txt"  # Development mode
-    
-        if os.path.exists(build_date_path):
-            with open(build_date_path, "r") as f:
-                return f.read().strip()
-        return "Unknown"
-"""
 
     def closeEvent(self, event):
         geometry = self.geometry()
