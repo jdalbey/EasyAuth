@@ -8,11 +8,13 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
                              QHBoxLayout, QWidget, QMessageBox, QFrame)
 from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
-from PyQt5.QtGui import QFont, QDesktopServices
+from PyQt5.QtGui import QFont, QDesktopServices, QPixmap
 import pyotp
 import time, datetime
 import pyperclip
 import qdarktheme
+
+import utils
 from provider_map import Providers
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
@@ -406,16 +408,16 @@ class AppView(QMainWindow):
         else:
             now = datetime.datetime.now()
             build_date =  now.strftime("%Y-%m-%d %H:%M:%S")
-
-        retval = QMessageBox.information(
-            self,
-            'About',
-            f'EasyAuth\n\n2FA authenticator\n\n' +
-            f"Version 0.0.1  {build_date}\n\n" +
-            "http://www.github.com/jdalbey/EasyAuth\n\n" +
-            f"Vault directory: " + self.app_config.get_os_data_dir(),
-            QMessageBox.Ok
-        )
+        msg = QMessageBox()
+        msg.setText(f'EasyAuth\n\n2FA authenticator.\n\n' +
+             f"Version 0.1.1  {build_date}\n\n" +
+             "http://www.github.com/jdalbey/EasyAuth\n\n" +
+             f"Vault directory:\n" + self.app_config.get_os_data_dir())
+        msg.setWindowTitle("About")
+        pixmap = QPixmap(os.path.join(utils.assets_dir(), "Vault.png"))
+        msg.setIconPixmap(pixmap)
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+        retval = msg.exec()
 
     def closeEvent(self, event):
         geometry = self.geometry()
