@@ -401,16 +401,25 @@ class AppView(QMainWindow):
         # If production mode, use bundled path to file created during build
         if getattr(sys, '_MEIPASS', False):
             build_date_path = os.path.join(sys._MEIPASS, "assets", "build_date.txt")
+            version_path = os.path.join(sys._MEIPASS, "assets", "version_info.txt")
             build_date = "Unknown"
+            version_number = "0.0"
+            # Read the build date from assets folder
             if os.path.exists(build_date_path):
                 with open(build_date_path, "r") as f:
                     build_date = f.read().strip()
-        else:
+            # Read the version info from assets folder
+            if os.path.exists(version_path):
+                with open(version_path, "r") as f:
+                    version_number = f.read().strip()
+        else:  # For development version (running unbundled)
             now = datetime.datetime.now()
             build_date =  now.strftime("%Y-%m-%d %H:%M:%S")
+            version_number = "0.0"
+
         msg = QMessageBox()
         msg.setText(f'EasyAuth\n\n2FA authenticator.\n\n' +
-             f"Version 0.1.1  {build_date}\n\n" +
+             f"Version {version_number}  {build_date}\n\n" +
              "http://www.github.com/jdalbey/EasyAuth\n\n" +
              f"Vault directory:\n" + self.app_config.get_os_data_dir())
         msg.setWindowTitle("About")
