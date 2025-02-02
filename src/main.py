@@ -1,6 +1,7 @@
 import sys, logging
 from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
+from handle_args import handle_args
 from view import AppView
 
 import qdarktheme
@@ -19,7 +20,10 @@ def main():
     logging.getLogger('PyQt5.uic.uiparser').setLevel(logging.WARNING)
     logging.getLogger('PyQt5.uic.properties').setLevel(logging.WARNING)
     logger.debug("Application starting with default config")
-    AppConfig()
+    # Initialize settings
+    appconfig = AppConfig()
+    # Read the desired logging level from settings
+    logging.getLogger().setLevel(int(appconfig.get_log_level()))
 
     # Display the main window
     view = AppView(app)
@@ -29,4 +33,5 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
+    handle_args()
     main()

@@ -146,6 +146,10 @@ class AppConfig:
         else:  # Default to Linux or Unix-like systems
             return self.config.get('System','linux_data_dir', fallback=str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data"))
 
+    def get_log_level(self):
+        """ Accessor to desired logging level. """
+        return self.config.get('System', 'log_level', fallback='20')
+
     def restore_defaults(self):
         """ restore and write defaults """
         self.set_auto_find_qr_enabled(True)
@@ -166,3 +170,10 @@ class AppConfig:
         self.set('System', 'win_data_dir', dirpath)
         dirpath = str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data")
         self.set('System', 'linux_data_dir', dirpath)
+        """ The desired logging level, an integer: 
+        DEBUG = 10
+        INFO = 20
+        WARNING = 30
+        ERROR = 40"""
+        self.set('System', 'log_level', '20')
+

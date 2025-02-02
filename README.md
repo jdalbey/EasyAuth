@@ -30,8 +30,8 @@ First production release is available for download (Linux only).  All features a
 [Website](https://jdalbey.github.io/EasyAuth/) is under construction.
 
 Developer Stats:  
-Source text lines: 2392  
-Unit tests text lines: 1529  
+Source lines of code: 2392  
+Unit tests lines of code: 1529  
 Unit test cases: 83  
 
 ### Download
