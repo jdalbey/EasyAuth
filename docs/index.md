@@ -1,7 +1,7 @@
 
 ## Under construction.  
 
-![Main Window](docs/assets/Account-List.png)  
+![Main Window](/assets/Account-List.png)  
 
 [//]: # (This url won't display in PyCharm.)
 
