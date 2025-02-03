@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QRadioButton, \
@@ -38,7 +40,7 @@ class ExportImportDialog(QDialog):
         export_panel.addWidget(export_label)
         export_info_btn = QToolButton()
         export_info_btn.setToolTip("Save the vault to an external file. Secret keys are NOT encrypted!")
-        info_icon = QIcon("images/question_mark_icon.png")
+        info_icon = QIcon(os.path.join("assets", "question_mark_icon.png"))
         export_info_btn.setIcon(info_icon)
         export_info_btn.setIconSize(QSize(16, 16))
         export_info_btn.setStyleSheet(info_btn_style)
@@ -84,7 +86,7 @@ class ExportImportDialog(QDialog):
         import_panel.addWidget(import_label)
         import_info_btn = QToolButton()
         import_info_btn.setToolTip("Read an external file into the vault. Existing vault will be overwritten!")
-        info_icon = QIcon("images/question_mark_icon.png")
+        info_icon = QIcon(os.path.join("assets", "question_mark_icon.png"))
         import_info_btn.setIcon(info_icon)
         import_info_btn.setIconSize(QSize(16, 16))
         import_info_btn.setStyleSheet(info_btn_style)
