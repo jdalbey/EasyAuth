@@ -10,16 +10,20 @@ import cipher_funcs
 from account_manager import AccountManager, Account, OtpRecord
 
 @pytest.fixture
-def account_manager():
+def account_manager(request):
     """Create an AccountManager instance with a test home directory."""
-    test_vault_dir = tempfile.TemporaryDirectory().name
-    Path(test_vault_dir).mkdir()
-    test_vault_dir = test_vault_dir + "/data/"
-    Path(test_vault_dir).mkdir()
-    test_vault_path = test_vault_dir + "vault.json"
-    Path(test_vault_path).touch()
+    temp_dir = tempfile.TemporaryDirectory()
+    print(f"Setup: Creating {temp_dir.name}")  # Debugging output
+    test_vault_dir = Path(temp_dir.name) / "data"
+    test_vault_dir.mkdir()
+    test_vault_path = test_vault_dir / "vault.json"
+    test_vault_path.touch()
     manager = AccountManager(filename=test_vault_path)
-    return manager
+    yield manager  # Provide the fixture to the test
+
+    # Teardown code executes after the test
+    print(f"Teardown: Removing temporary directory {temp_dir.name}")
+    temp_dir.cleanup()
 
 @pytest.fixture
 def sample_accounts():

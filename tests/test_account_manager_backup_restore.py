@@ -5,7 +5,6 @@ from pathlib import Path
 import shutil
 import tempfile
 from unittest.mock import Mock, patch
-
 import cipher_funcs
 from account_manager import AccountManager, Account, OtpRecord
 
@@ -13,14 +12,36 @@ from account_manager import AccountManager, Account, OtpRecord
 @pytest.fixture
 def account_manager():
     """Create an AccountManager instance with a test home directory."""
-    test_vault_dir = tempfile.TemporaryDirectory().name
-    Path(test_vault_dir).mkdir()
-    test_vault_dir = test_vault_dir + "/data/"
-    Path(test_vault_dir).mkdir()
-    test_vault_path = test_vault_dir + "vault.json"
-    Path(test_vault_path).touch()
-    manager = AccountManager(filename=test_vault_path)
-    return manager
+    temp_dir = tempfile.TemporaryDirectory()
+    test_vault_dir = Path(temp_dir.name) / "data"
+    test_vault_dir.mkdir()
+    test_vault_path = test_vault_dir / "vault.json"
+    test_vault_path.touch()
+
+    manager = AccountManager(filename=str(test_vault_path))
+    yield manager  # Provide the fixture to the test
+
+    # Teardown code executes after the test
+    temp_dir.cleanup()
+
+# @pytest.fixture
+# def account_manager(request):
+#     """Create an AccountManager instance with a test home directory."""
+#     test_vault_dir = tempfile.TemporaryDirectory().name
+#     Path(test_vault_dir).mkdir()
+#     test_vault_dir = test_vault_dir + "/data/"
+#     Path(test_vault_dir).mkdir()
+#     test_vault_path = test_vault_dir + "vault.json"
+#     Path(test_vault_path).touch()
+#     manager = AccountManager(filename=test_vault_path)
+#
+#     # Teardown method to remove the temp directory
+#     def teardown():
+#         print ("Entering teardown")
+#         shutil.rmtree(test_vault_dir)
+#
+#     request.addfinalizer(teardown)
+#     return manager
 
 @pytest.fixture
 def sample_accounts():
