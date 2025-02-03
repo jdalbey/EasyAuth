@@ -149,7 +149,7 @@ class EditAccountDialog(QDialog):
         msg.setTextFormat(Qt.RichText)  # Use rich text for HTML links
         msg.setIcon(QMessageBox.Question)
         msg.setText(f'Are you sure you want to delete this account?<br>{self.account.issuer} ({self.account.label})<br>'+
-            f"You will lose access to {self.account.issuer} unless you have saved the restore codes. "+
+            f"You will lose access to {self.account.issuer} unless you have saved the recover codes. "+
             '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md#Deleting-an-account">(Learn more)</a>')
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 

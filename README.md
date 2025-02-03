@@ -1,7 +1,8 @@
 # EasyAuth
 A 2FA secrets manager and TOTP generator for Linux desktop.
-Focus on ease of use for beginners using TOTP authentication. 
-
+Focus on ease of use for beginners using TOTP authentication.  
+  
+[Download](https://github.com/jdalbey/EasyAuth/releases) ... [Website](https://jdalbey.github.io/EasyAuth/) ... [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) ... [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
 ## Features
  - Stores your secret keys encrypted in a vault on your local machine (doesn't rely on third-party cloud services).
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
@@ -66,7 +67,7 @@ Practice storing a new secret key using the sample QR code below.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
 
-A Quick Start guide is available in the docs folder.
+A [Quick Start guide](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) is available.
 
 
 ---
@@ -127,14 +128,15 @@ python src/main.py
 - **Logging**: The application uses logging to provide debug information. You can configure the logging settings in the `main.py` file.
 - **HiDPI Support**: The application uses `qdarktheme` to enable HiDPI support.
 
-#### Troubleshooting
+## Troubleshooting
 
 If you encounter any issues, please check the following:
 
 - Ensure all dependencies are installed correctly.
 - Check the console output for any error messages.
+- Turn on debugging output (See User Manual)
 
-For further assistance, you can open an Issue here.
+For further assistance, you can open an [Issue](https://github.com/jdalbey/EasyAuth/issues).
 
 ---
 
