@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 
+import markdown
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
 
 class QuickStartDialog(QDialog):
@@ -16,6 +17,7 @@ class QuickStartDialog(QDialog):
         display_window = QTextEdit(self)
         display_window.setReadOnly(True)
         display_window.setLineWrapMode(QTextEdit.WidgetWidth)
+        display_window.setStyleSheet("body {font-size: 30px}")
         content = self.load_quickstart_text()
         if len(content) > 0:
             display_window.setHtml(content)
@@ -36,49 +38,41 @@ class QuickStartDialog(QDialog):
         y = parent.geometry().y()   # use parent's y position
         self.move(self.pos().x() + 250, y)  # offset from original x position
 
-
     def load_quickstart_text(self):
+        """ Convert the markdown document to html and add style """
         dir_path = "docs"
         # Are we in production mode?
         if getattr(sys, 'frozen', False):
             # PyInstaller bundled case - prefix the temp directory path
             base_dir = sys._MEIPASS  # type: ignore   #--keep PyCharm happy
             dir_path = os.path.join(base_dir, "assets")
-        self.file_path = os.path.join(dir_path, 'quick_start_guide.html')
-        self.logger.debug(f"file_path: {self.file_path}")
+
+        self.file_path = os.path.join(dir_path, 'Quick Start Guide.md')
+        self.logger.debug(f"Quick Start Guide file_path: {self.file_path}")
         try:
-            f = open(self.file_path)
-            text = f.read()
-            f.close()
+            with open(self.file_path, "r",) as input_file:
+                markdown_text = input_file.read()
+            text = markdown.markdown(markdown_text)
+            style = """
+<head>
+<style>
+body {
+    font-family: "Open Sans",sans-serif, Verdana;
+    font-size: 16px;
+    color: rgb(51, 51, 51);
+    line-height: 1.2;
+}
+</style>
+</head>
+<body>
+            """
+            text = style + text
         except FileNotFoundError as e:
             return ""
         return text
 
-"""from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton
-# Example of creating and showing the centered dialog
 
-class YourDialog(QDialog):
-    def __init__(self, parent=None):
-        super(YourDialog, self).__init__(parent)
-        
-        layout = QVBoxLayout()
-        button = QPushButton("Close")
-        layout.addWidget(button)
-        self.setLayout(layout)
-        
-        self.setWindowTitle("Centered Dialog")
-        self.setGeometry(0, 0, 400, 300)  # Set the initial dialog size
-        
-        if parent:
-            parent_center = parent.geometry().center()
-            self_center = self.frameGeometry().center()
-            self.move(parent_center - self_center)
-
-# parent_window = YourParentWindow()
-# dialog = YourDialog(parent=parent_window)
-# dialog.exec_()"""
-
-# To include images in the guide they must be local: QTextEdit can't get remote URLs.
+# NOTE: To include images in the guide they must be local: QTextEdit can't get remote URLs.
 #display_window.setHtml(f"""
 #    <h2>Quick Start Guide</h2>
 #    <img src="file:///{image_path}" alt="TOTP code">

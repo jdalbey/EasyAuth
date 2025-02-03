@@ -67,7 +67,9 @@ Practice storing a new secret key using the sample QR code below.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
 
-A [Quick Start guide](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) is available.
+A [Quick Start guide](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) is available,
+or view the [complete User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual).
+
 
 
 ---
@@ -83,6 +85,7 @@ pyzbar
 cryptography  
 qrcode  
 qdarktheme
+Markdown
 
 #### Prerequisites
 

@@ -384,7 +384,7 @@ class AppView(QMainWindow):
         if self.quick_start_dialog is None or not self.quick_start_dialog.isVisible():
             self.quick_start_dialog = QuickStartDialog(self)
             self.quick_start_dialog.show()
-        else:
+        else:  # IF already open
             self.quick_start_dialog.raise_()
             self.quick_start_dialog.activateWindow()
 

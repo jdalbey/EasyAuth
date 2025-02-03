@@ -1,6 +1,7 @@
 ## EasyAuth Quick Start Guide
 
 The quide will show how to store shared keys in your EasyAuth vault and use Time-based One-time Passwords (TOTP) to authenticate with a website.
+
 ####  Prerequisites
 
 1. You are using a Linux desktop OS.
