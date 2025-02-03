@@ -380,9 +380,6 @@ class AppView(QMainWindow):
         self.accounts = self.account_manager.accounts
         self.display_accounts()
 
-    # def manage_providers(self):
-    #     reply = QMessageBox.information(self, "Info", f'This feature not yet implemented.')
-
     def show_quick_start_dialog(self):
         if self.quick_start_dialog is None or not self.quick_start_dialog.isVisible():
             self.quick_start_dialog = QuickStartDialog(self)
@@ -392,13 +389,13 @@ class AppView(QMainWindow):
             self.quick_start_dialog.activateWindow()
 
     def open_user_manual(self):
-        url = QUrl("https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md")
+        url = QUrl("https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual")
         QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):
         """ Show About dialog, including version and build date. """
         # Find the build date
-        # If production mode, use bundled path to file created during build
+        # If production mode, use path to bundled file created during build
         if getattr(sys, '_MEIPASS', False):
             build_date_path = os.path.join(sys._MEIPASS, "assets", "build_date.txt")
             version_path = os.path.join(sys._MEIPASS, "assets", "version_info.txt")

@@ -150,7 +150,7 @@ class EditAccountDialog(QDialog):
         msg.setIcon(QMessageBox.Question)
         msg.setText(f'Are you sure you want to delete this account?<br>{self.account.issuer} ({self.account.label})<br>'+
             f"You will lose access to {self.account.issuer} unless you have saved the recover codes. "+
-            '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md#Deleting-an-account">(Learn more)</a>')
+            '<a href="https://github.com/jdalbey/EasyAuth/wiki/User-Manual#42-deleting-an-account">(Learn more)</a>')
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 
         # Display the message box
