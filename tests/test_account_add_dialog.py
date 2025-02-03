@@ -139,7 +139,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog = AddAccountDialog(AppView(self.app))
         link = dialog.label_LearnMore
         linktext = link.text()
-        expected = '<a href="https://github.com/jdalbey/EasyAuth/blob/master/docs/user_manual.md'
+        expected = '<a href="https://github.com/jdalbey/EasyAuth/wiki'
         assert linktext.startswith(expected)
 
     # Using setUpClass and tearDownClass ensures that QApplication is created once for the entire test suite, preventing multiple instances.

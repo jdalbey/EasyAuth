@@ -29,7 +29,7 @@ class ExportImportDialog(QDialog):
         super(ExportImportDialog, self).__init__(parent)
         self.account_manager = AccountManager()
         self.setWindowTitle("Export/Import")
-        self.setGeometry(100, 100, 250, 300)
+        self.setMinimumSize(250, 300)
 
         layout = QVBoxLayout()
 
