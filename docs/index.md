@@ -1,7 +1,7 @@
 
 ## Under construction.  
 
-![Main Window](https://i.ibb.co/XxhTr1dx/Account-List.png)
+![Main Window](assets/Account-List.png)
 
 To include:
   - [Download](https://github.com/jdalbey/EasyAuth/releases)  
