@@ -3,7 +3,7 @@ The easiest (and fastest) way to 2FA verification.
 
 ![Main Window](assets/Account-List.png)  
 <h3 style="text-align: center;"> 
-[Download](https://github.com/jdalbey/EasyAuth/releases) for Linux  
+<a href="https://github.com/jdalbey/EasyAuth/releases">Download for Linux</a>  
 </h3>
 
 ### What is it?  
