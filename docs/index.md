@@ -37,7 +37,7 @@ During setup of an account it scans QR codes for you.
  [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
 
 ### Screenshot gallery
-Screenshots of the EasyAuth user interface will appear here. 
+[View Screenshots](screenshot_gallery.md)  
 
 ### Try it out
 Practice storing a new secret key using the sample QR code below.
