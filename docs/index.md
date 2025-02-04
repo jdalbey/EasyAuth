@@ -1,10 +1,12 @@
 
-## Under construction.  
+The easiest (and fastest) way to 2FA verification.
 
 ![Main Window](assets/Account-List.png)  
+<center>  
 
 ### [Download](https://github.com/jdalbey/EasyAuth/releases) for Linux  
- 
+</center>
+
 ### What is it?  
 EasyAuth is a desktop application that helps you authenticate with a website or online service that uses two-factor authentication. EasyAuth stores the secret keys that websites provide when you enroll in two-factor authentication and then generates the one-time passcodes that you use to verify your identity.
 
