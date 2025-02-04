@@ -15,7 +15,7 @@ _Dark theme._
 _Reveal QR code._
 <br><br><br>  
 ![Export Dialog](assets/ExportDialog.png)  
-_Export / Import dialog.-
+_Export / Import dialog._
 <br><br><br>  
 ![Reorder Dialog](assets/ReorderDialog.png)  
 _Reorder dialog uses drag and drop._
