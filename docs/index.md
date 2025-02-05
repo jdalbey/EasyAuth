@@ -16,6 +16,7 @@ It doesn't require manually typing verification codes.
 During setup of an account it scans QR codes for you. 
 
 ### How do I use it?  
+![copy paste demo](assets/copy-paste-demo.gif)
 * When logging into to a site you will be prompted for a verification code.
 * From EasyAuth click on the passcode button to copy it to the clipboard.
 * Paste the code into the verification form.
