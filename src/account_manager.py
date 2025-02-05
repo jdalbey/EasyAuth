@@ -73,7 +73,7 @@ class AccountManager:
             filename = str(self.data_dir.joinpath("vault.json"))
         # does vault directory exist?  If not, make it.
         if not self.data_dir.exists():
-            os.mkdir(self.data_dir)
+            os.makedirs(self.data_dir, exist_ok=True)
         # Is vault directory writeable?
         if not os.access(os.path.dirname(filename), os.W_OK):
             raise ValueError(f"The directory for the file '{filename}' is not writable.")
