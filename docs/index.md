@@ -48,7 +48,8 @@ Practice storing a new secret key using the sample QR code below.
 3. The form fields are filled automatically with the data from the QR code. Click "Add".
 4. Observe the new account in the main window.
 
-<img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
+![sample qr code](assets/img-qrcode-easyauth-demo.png)  
+
 
 [Sample 2FA Setup Page](Setup2FA_Sample.html)
 
