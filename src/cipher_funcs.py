@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 from appconfig import AppConfig
 import hashlib
 import base64
+import machineid
 
 def encrypt(secret):
     """@param secret is the shared secret key to be encrypted"""
@@ -24,10 +25,9 @@ def derive_key_from_uuid():
     if alt_id:
         uuid = alt_id
     else:
-        # TODO Make cross-platform
-        with open("/etc/machine-id", "r") as f:
-            uuid = f.read().strip()
-    # Hash the UUID to create a 32-byte key
+        # Use cross-platform machineid module
+        uuid = machineid.id()
+    # Hash the key
     key = hashlib.sha256(uuid.encode()).digest()
     # Encode the key to Base64 (required by Fernet)
     return base64.urlsafe_b64encode(key)
