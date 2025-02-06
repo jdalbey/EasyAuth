@@ -8723,7 +8723,7 @@
     "method": "TOTP"
   },
   {
-    "provider_name": "Russian Post (Почта России)",
+    "provider_name": "Russian Post",
     "website": "https://www.pochta.ru/",
     "help_url": "",
     "image_uri": "",
@@ -10439,7 +10439,7 @@
     "method": "TOTP"
   },
   {
-    "provider_name": "Госуслуги (Gosuslugi)",
+    "provider_name": "Gosuslugi",
     "website": "https://www.gosuslugi.ru/",
     "help_url": "https://www.gosuslugi.ru/help/faq/login/101923",
     "image_uri": "",
