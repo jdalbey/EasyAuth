@@ -1,5 +1,5 @@
 # EasyAuth
-A 2FA secrets manager and TOTP generator for Linux desktop.
+A 2FA secrets manager and TOTP generator for the desktop.
 Focus on ease of use for beginners using TOTP authentication.  
   
 [Download](https://github.com/jdalbey/EasyAuth/releases) ... [Website](https://jdalbey.github.io/EasyAuth/) ... [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) ... [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
@@ -26,9 +26,9 @@ Focus on ease of use for beginners using TOTP authentication.
 
 
 ### Status
-First production release is available for download (Linux only).  All features above are implemented.
+First production release is available for download.  All features above are implemented.
 
-[Website](https://jdalbey.github.io/EasyAuth/) is under construction.
+First draft of [Website](https://jdalbey.github.io/EasyAuth/) is complete.
 
 Developer Stats:  
 Source lines of code: 2392  
@@ -49,7 +49,7 @@ Binary for Linux is available under [Releases](https://github.com/jdalbey/EasyAu
 
 ### Limitations
 
-Currently targets Linux OS.
+Currently tested on Linux and Windows 10.
 
 Uses only TOTP codes with SHA1, 6-digit, 30-second parameters.
 
@@ -73,7 +73,7 @@ or view the [complete User Manual](https://github.com/jdalbey/EasyAuth/wiki/User
 
 
 ---
-## Installation from Source
+## Installation from Source (Linux)
 
 #### Dependencies
 3.8 <= Python < 3.13
@@ -90,10 +90,7 @@ py-machineid
 
 #### Prerequisites
 
-- Currently this program only runs on Linux systems.
-- Ensure you have Python 3.5+ installed on your system.
-
-
+- Ensure you have Python 3.8+ installed on your system.
 
 #### 1. Download the Repository
 
@@ -131,6 +128,39 @@ python src/main.py
 
 - **Logging**: The application uses logging to provide debug information. You can configure the logging settings in the `main.py` file.
 - **HiDPI Support**: The application uses `qdarktheme` to enable HiDPI support.
+
+## Installation from Source (Windows)
+
+#### Prerequisites
+
+- Ensure you have Python 3.8+ installed on your system.
+
+#### 1. Download the Repository
+
+1. Click the "Code" button and select "Download ZIP".
+2. Extract the downloaded ZIP file to a directory of your choice.
+3. Start Powershell
+4. cd to EasyAuth-master folder
+
+#### 2: Create a Virtual Environment
+
+```bash
+python -m venv venv
+venv \Scripts\Activate.ps1  
+```
+
+#### 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 4: Launch the Application
+
+```bash
+python src/main.py
+```
+
 
 ## Troubleshooting
 
