@@ -152,6 +152,7 @@ class EditAccountDialog(QDialog):
             f"You will lose access to {self.account.issuer} unless you have saved the recover codes. "+
             '<a href="https://github.com/jdalbey/EasyAuth/wiki/User-Manual#42-deleting-an-account">(Learn more)</a>')
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.setDefaultButton(QMessageBox.No)
 
         # Display the message box
         reply = msg.exec_()

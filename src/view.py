@@ -166,6 +166,7 @@ class AppView(QMainWindow):
             if getattr(sys, '_MEIPASS', False):
                 base_path = sys._MEIPASS  # PyInstaller extract directory
                 adjusted_path = os.path.join(base_path, "assets/")
+                adjusted_path = adjusted_path.replace("\\", "/")
                 dark_qss = dark_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
                 light_qss = light_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
 
@@ -404,7 +405,9 @@ class AppView(QMainWindow):
             # Read the build date from assets folder
             if os.path.exists(build_date_path):
                 with open(build_date_path, "r") as f:
-                    build_date = f.read().strip()
+                    date_string = f.read().strip()
+                    # Oddly, Windows date function prepends some junk, so here we skip over it by starting at [4:]
+                    build_date = date_string[4:]
             # Read the version info from assets folder
             if os.path.exists(version_path):
                 with open(version_path, "r") as f:
