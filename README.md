@@ -146,7 +146,7 @@ python src/main.py
 
 ```bash
 python -m venv venv
-venv \Scripts\Activate.ps1  
+venv\Scripts\Activate.ps1  
 ```
 
 #### 3: Install Dependencies
