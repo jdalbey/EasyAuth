@@ -76,7 +76,7 @@ or view the [complete User Manual](https://github.com/jdalbey/EasyAuth/wiki/User
 ## Installation from Source
 
 #### Dependencies
-Python 3.5+
+3.8 <= Python < 3.13
 
 PyQt5  
 pyotp  
@@ -86,6 +86,7 @@ cryptography
 qrcode  
 qdarktheme
 Markdown
+py-machineid
 
 #### Prerequisites
 
