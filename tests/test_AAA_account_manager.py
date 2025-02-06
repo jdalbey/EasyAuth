@@ -71,7 +71,7 @@ class TestAccountManager:
     def test_init_creates_directories(self, account_manager):
         """Test that AccountManager initialization creates necessary directory for logging.
         Note: AccountManager is a singleton initialized in fixture"""
-        log_dir = Path.home() / '.var' / 'app' / 'org.redpoint.EasyAuth' / 'logs'
+        log_dir = Path.home() / '.var' / 'app' / 'org.redpoint.EasyAuth' / 'data' / 'logs'
         assert log_dir.exists()
         assert log_dir.is_dir()
 

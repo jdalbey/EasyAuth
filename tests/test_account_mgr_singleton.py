@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import threading
 import os
@@ -23,6 +25,16 @@ def test_singleton_behavior():
     instance2 = AccountManager()
     assert instance1 is instance2, "AccountManager is not a singleton instance"
 
+def test_init_creates_directories():
+    """Test that AccountManager initialization creates necessary directory for logging."""
+    instance1 = AccountManager("/tmp/alpha/beta/acounts.json")
+    log_dir = Path.home() / '/tmp' / 'alpha' / 'beta' /  'logs'
+    assert log_dir.exists()
+    assert log_dir.is_dir()
+    os.remove("/tmp/alpha/beta/logs/account_manager.log")
+    os.rmdir("/tmp/alpha/beta/logs")
+    os.rmdir("/tmp/alpha/beta/")
+    os.rmdir("/tmp/alpha/")
 
 def test_thread_safety():
     instances = []
