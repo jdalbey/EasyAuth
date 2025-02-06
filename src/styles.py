@@ -12,8 +12,9 @@ QPushButton#editButton {
     qproperty-icon: url("assets/edit_icon_dark.png");
 }
 QPushButton#otpLabel {
-    font-family: "DejaVu Sans Mono, Courier New, monospace";
+    font-family: "Courier New, monospace";
     font-size: 16px;
+    font-weight: bold;
 }
 QPushButton#otpLabel:hover {
     text-decoration: underline;
@@ -54,7 +55,7 @@ QPushButton#editButton {
     qproperty-icon: url("assets/edit_icon_light.png");
 }
 QPushButton#otpLabel {
-    font-family: "DejaVu Sans Mono, Courier New, monospace";
+    font-family: "Courier New, monospace";
     font-size: 16px;
     font-weight: bold;
     /*
