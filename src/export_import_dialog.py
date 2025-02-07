@@ -30,6 +30,7 @@ class ExportImportDialog(QDialog):
         self.account_manager = AccountManager()
         self.setWindowTitle("Export/Import")
         self.setMinimumSize(250, 300)
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
 
         layout = QVBoxLayout()
 

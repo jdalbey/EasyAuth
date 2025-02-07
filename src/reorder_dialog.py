@@ -11,6 +11,7 @@ class CustomListWidget(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.dragged_row = None
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
 
     def startDrag(self, supported_actions):
         # Capture the source row

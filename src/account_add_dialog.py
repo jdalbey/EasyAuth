@@ -30,7 +30,7 @@ class AddAccountDialog(QDialog):
         self.account_manager = AccountManager()
         self.appconfig = AppConfig() # Get the global AppConfig instance
         self.logger = logging.getLogger(__name__)
-
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
         self.setMinimumSize(600, 450)
 
         try:

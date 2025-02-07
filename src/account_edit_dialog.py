@@ -30,6 +30,8 @@ class EditAccountDialog(QDialog):
         self.index = index
         self.qr_code_label = None
         self.is_qr_visible = False
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
+
         #self.setFixedSize(self.size())
         # gets set in showEvent()
         self.initial_size = None

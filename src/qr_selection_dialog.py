@@ -8,6 +8,7 @@ class QRselectionDialog(QDialog):
     def __init__(self, accounts, parent=None ):
         super().__init__(parent)
         self.setWindowTitle("Select a QR code")
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
         self.selected_otp_record = None
 
         # Layout setup

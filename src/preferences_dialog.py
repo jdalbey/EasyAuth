@@ -18,6 +18,7 @@ class PreferencesDialog(QDialog):
     def __init__(self, parent=None, ):
         super(PreferencesDialog, self).__init__(parent)
         self.app_config = AppConfig()
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
         self.setWindowTitle("Preferences")
         self.setMinimumWidth(400)
 

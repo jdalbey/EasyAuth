@@ -3,12 +3,14 @@ import sys
 import logging
 
 import markdown
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
 
 class QuickStartDialog(QDialog):
     def __init__(self,parent):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
 
         self.setWindowTitle("Quick Start Guide")
         self.resize(700,550)
