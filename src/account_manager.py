@@ -113,7 +113,18 @@ class AccountManager:
         self.logger.debug(f"Saved accounts : {account_string} ")
 
     def load_accounts(self) -> List['Account']:
-        """Load accounts from vault with validation and backup recovery."""
+        """
+        Load accounts from vault with validation and backup recovery.
+
+        This method loads accounts from the vault file into the account manager.
+
+        Returns:
+            bool: True if the accounts were loaded successfully, False otherwise.
+
+        Raises:
+            Exception: If any error occurs during the loading process.
+        """
+
         try:
             if not self.vault_path.exists():
                 self.logger.info(f"Vault file not found at {self.vault_path}")
@@ -143,7 +154,17 @@ class AccountManager:
             return []
 
     def save_accounts(self) -> bool:
-        """Save accounts with atomic write and backup creation."""
+        """
+        Save all accounts to the vault.
+
+        This method saves all accounts in the account manager to the vault file.
+
+        Returns:
+            bool: True if the accounts were saved successfully, False otherwise.
+
+        Raises:
+            Exception: If any error occurs during the saving process.
+        """
         # Create temporary file path for atomic write
         temp_path = self.vault_path.with_suffix('.tmp')
         try:
@@ -187,7 +208,22 @@ class AccountManager:
         return False
 
     def save_new_account(self, otp_record) -> bool:
-        """Save new account with duplicate checking."""
+        """
+        Save a new account with duplicate checking.
+
+        This method saves a new account to the account manager after checking for duplicates.
+        It encrypts the secret key before saving and logs the operation.
+
+        Args:
+            otp_record (OtpRecord): The OTP record containing account details to be saved.
+
+        Returns:
+            bool: True if the account was saved successfully, False if a duplicate account exists.
+
+        Raises:
+            RuntimeError: If the account could not be saved to the vault.
+            Exception: If any other error occurs during the saving process.
+        """
         try:
             # Check for duplicates
             if any(
@@ -217,34 +253,80 @@ class AccountManager:
             raise
 
     def update_account(self, index, account):
+        """
+        Update an existing account in the account manager.
+
+        This method updates an existing account with new details and saves the updated list to the vault.
+
+        Args:
+            old_account (Account): The existing account to be updated.
+            new_account (Account): The new account details to replace the old account.
+
+        Returns:
+            bool: True if the account was updated successfully, False otherwise.
+
+        Raises:
+            Exception: If any error occurs during the update process.
+        """        
         self.accounts[index] = account
         self.save_accounts()
         self.logger.debug(f"Updated account: {account.issuer} ({account.label})")
 
     def delete_account(self, account):
+        """
+        Delete an account from the account manager.
+
+        This method deletes an account from the account manager and saves the updated list to the vault.
+
+        Args:
+            account (Account): The account to be deleted.
+
+        Returns:
+            bool: True if the account was deleted successfully, False otherwise.
+
+        Raises:
+            Exception: If any error occurs during the deletion process.
+        """        
         self.accounts.remove(account)
         self.save_accounts()
         self.logger.debug(f"Deleted account: {account.issuer} ({account.label})")
 
     def sort_alphabetically(self):
+        """
+        Sort the accounts alphabetically by issuer.
+        """
         self.accounts = sorted(self.accounts, key=lambda x: x.issuer)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted alphabetically.")
 
     def sort_recency(self):
+        """
+        Sort the accounts by most recently used.
+        """
         self.accounts = sorted(self.accounts, key=lambda x: x.last_used, reverse=True)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted by recently used.")
 
     def sort_frequency(self):
+        """
+        Sort the accounts by most frequently used.
+        """
         self.accounts = sorted(self.accounts, key=lambda x: x.used_frequency, reverse=True)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted by used frequency.")
 
     def backup_accounts(self, file_path):
+        """ Store the accounts in the given file path with encrypted secret keys.
+            The file is in JSON format.
+        """
         self.write_accounts_file(file_path, 'json')
+
     def export_accounts(self, file_path, desired_format):
+        """ Store the accounts in the given file path with plain-text secret keys.
+            @param desired_format is 'json' or 'uri'
+        """
         self.write_accounts_file(file_path, desired_format, use_encrypted_keys=False)
+
     def write_accounts_file(self, file_path, desired_format='json', use_encrypted_keys=True):
         """Store the accounts in the desired_format in the given file_path.
           Accounts in the vault are encrypted.
@@ -252,7 +334,8 @@ class AccountManager:
             2. for export, they need to be decrypted before writing.
          @param file_path location of file
          @param desired_format 'json' or 'uri'
-         @param use_encrypted_keys before writing accounts to the file. (False for exporting which wants decrypted keys)"""
+         @param use_encrypted_keys before writing accounts to the file. (False for exporting which wants decrypted keys)
+         """
         # Create a label for logging and error messages appropriate to mode
         target_label = "Export"
         if use_encrypted_keys:
@@ -310,10 +393,21 @@ class AccountManager:
             self.logger.error(f"Unexpected error during {target_label}: {e}")
 
     def restore_accounts(self, file_path):
+        """Read the accounts from the given file_path. Autodetect file type.
+           """
         self.read_accounts_file(file_path, import_mode=False)
+
     def import_accounts(self, file_path):
+        """Read the accounts from the given file_path. Autodetect file type.
+           Secret keys from a plain-text file are encrypted before being put in the vault.
+           """
         return self.read_accounts_file(file_path, import_mode=True)
+    
     def import_preview(self, file_path):
+        """Read the accounts from the given file_path. Autodetect file type.
+           Secret keys from a plain-text file are encrypted before being put in the vault.
+           return the accounts so they can be displayed as a preview.
+           """
         return self.read_accounts_file(file_path, import_mode=True, preview=True)
 
     def read_accounts_file(self, file_path, import_mode=False, preview=False):
@@ -372,7 +466,8 @@ class AccountManager:
             return -5
 
     def parse_uris(self, uris):
-        # parse URIs and return account objects
+        """ (Helper method) Parse URIs and return account objects
+        """
         accounts = []
         for uri in uris:
             # Parse each URI and create account objects
@@ -387,7 +482,8 @@ class AccountManager:
         return accounts
 
     def parse_json(self, accounts_data, import_mode):
-        # parse JSON data and return account objects
+        """ (Helper method) Parse JSON and return account objects
+        """
         restored_accounts = []
         for json_account in accounts_data:
             try:
@@ -407,10 +503,10 @@ class AccountManager:
                 self.logger.error(f"Failed to read account from data {json_account}: {e}")
         return restored_accounts
 
-
-
     def _handle_external_modification(self):
-        """Handle detected external modifications to the vault file."""
+        """
+        Handle detected external modifications to the vault file.
+        """
         self.logger.info("Attempting to merge external changes")
         try:
             # Load both current memory state and disk state
@@ -436,7 +532,9 @@ class AccountManager:
             self._recover_from_backup()
 
     def _recover_from_backup(self) -> List['Account']:
-        """Attempt to recover accounts from backup file."""
+        """
+        Attempt to recover accounts from backup file.
+        """
         self.logger.debug("Attempting recovery from backup")
         try:
             if self.backup_path.exists():
@@ -455,7 +553,9 @@ class AccountManager:
 
     @staticmethod
     def _validate_account_data(content: list) -> bool:
-        """Validate account data structure."""
+        """
+        Validate account data structure.
+        """
         required_fields = {'issuer', 'label', 'secret', 'last_used'}
         for acct in content:
             if not isinstance(acct, dict):
@@ -480,13 +580,16 @@ class AccountManager:
 
     @staticmethod
     def duplicate_accounts(accounts):
+        """ Return a copy of the accounts."""
         list_copy = []
         for item in accounts:
             newitem = Account(
                 issuer=item.issuer,
                 label=item.label,
                 secret=item.secret,
-                last_used=item.last_used
+                last_used=item.last_used,
+                used_frequency=item.used_frequency,
+                favorite=item.favorite
             )
             list_copy.append(newitem)
         return list_copy

@@ -98,3 +98,17 @@ def test_duplicate_accounts(sample_accounts):
     assert len(duplicates) == 2, "duplicate_accounts should create copies of all accounts"
     assert duplicates[0].issuer == accounts[0].issuer
     assert duplicates[0] is not accounts[0], "duplicate_accounts should create distinct copies"
+
+    account3 = OtpRecord('issuer3','user3','secret3').toAccount()
+    account3.last_used = "2000-01-02 00:01"
+    account3.used_frequency = 1
+    accounts.append(account3)
+
+    duplicates = instance.duplicate_accounts(accounts)
+
+    assert len(duplicates) == 3, "duplicate_accounts should create copies of all accounts"
+    assert duplicates[2].issuer == account3.issuer
+    assert duplicates[2].label == account3.label
+    assert duplicates[2].used_frequency == account3.used_frequency
+    assert duplicates[2].last_used == account3.last_used
+    assert duplicates[2] is not accounts[2], "duplicate_accounts should create distinct copies"
