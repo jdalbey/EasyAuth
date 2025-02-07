@@ -41,7 +41,7 @@ class AppView(QMainWindow):
         self.quick_start_dialog = None  # Quick start is not showing
 
         self.setWindowTitle("Easy Auth")
-        self.setGeometry(100, 100, 550, 600)
+        self.setGeometry(50, 50, 525, 600)
 
         # Create central widget
         self.central_widget = QWidget()
