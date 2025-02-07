@@ -51,6 +51,7 @@ class OtpRecord:
     secret: str  # plain-text secret key
 
     def toAccount(self):
+        """ Convert to account by encrypting the secret key and adding last used date."""
         encryped_secret = cipher_funcs.encrypt(self.secret)
         return Account(self.issuer, self.label, encryped_secret, "1980-01-01 00:00:00")
 

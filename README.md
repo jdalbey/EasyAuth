@@ -30,22 +30,13 @@ First production release is available for download.  All features above are impl
 
 First draft of [Website](https://jdalbey.github.io/EasyAuth/) is complete.
 
-Developer Stats:  
-Source lines of code: 2392  
-Unit tests lines of code: 1529  
-Unit test cases: 83  
-
 ### Download
 
-Binary for Linux is available under [Releases](https://github.com/jdalbey/EasyAuth/releases).
+Binaries for Windows and Linux are available under [Releases](https://github.com/jdalbey/EasyAuth/releases).
 
 ### Screenshots
- 
-![Main Window](https://i.ibb.co/XxhTr1dx/Account-List.png)
 
-![Add Account](https://i.ibb.co/HTP9SGwJ/Add-Account.png)
-
-![Edit Account](https://i.ibb.co/WWf6bcgQ/Edit-Account.png)
+[Screenshot Gallery](https://jdalbey.github.io/EasyAuth/screenshot_gallery.html) 
 
 ### Limitations
 
