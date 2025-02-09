@@ -1,6 +1,8 @@
 import os
 import sys
 import logging
+
+from appconfig import AppConfig
 from utils import assets_dir
 import markdown
 from PyQt5.QtCore import Qt
@@ -53,19 +55,25 @@ class QuickStartDialog(QDialog):
             with open(self.file_path, "r",) as input_file:
                 markdown_text = input_file.read()
             text = markdown.markdown(markdown_text)
-            style = """
+            style_dark = """
 <head>
 <style>
 body {
     font-family: "Open Sans",sans-serif, Verdana;
     font-size: 16px;
-    color: rgb(51, 51, 51);
+    color: white;
     line-height: 1.2;
 }
 </style>
 </head>
 <body>
-            """
+"""
+            # Set the styling based on current theme
+            style = style_dark
+            if AppConfig().get_theme_name() == 'light':
+                # swap light for dark text color
+                style = style.replace("color: white;","color: rgb(51, 51, 51);")
+            # prepend style to html content
             text = style + text
         except FileNotFoundError as e:
             return ""
