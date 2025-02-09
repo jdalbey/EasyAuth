@@ -414,7 +414,7 @@ class AppView(QMainWindow):
             build_date =  now.strftime("%Y-%m-%d %H:%M:%S")
             version_number = "0.0"
 
-        msg = QMessageBox()
+        msg = QMessageBox(self)
         msg.setText(f'EasyAuth\n\n2FA authenticator.\n\n' +
              f"Version {version_number}  {build_date}\n\n" +
              "http://www.github.com/jdalbey/EasyAuth\n\n" +

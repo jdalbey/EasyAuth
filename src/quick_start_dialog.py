@@ -39,8 +39,11 @@ class QuickStartDialog(QDialog):
 
         # Move the dialog to be offset from the main window so the user can see the 'Add Account' button
         # while viewing the guide.
-        y = parent.geometry().y()   # use parent's y position
-        self.move(self.pos().x() + 250, y)  # offset from original x position
+        x = parent.geometry().x() + 250 if parent else 250
+        y = parent.geometry().y() if parent else 100  # Fallback y if no parent
+        self.move(x, y)
+        # y = parent.geometry().y()   # use parent's y position
+        # self.move(self.pos().x() + 250, y)  # offset from original x position
 
     def load_quickstart_text(self):
         """ Convert the markdown document to html and add style """
