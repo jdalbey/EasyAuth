@@ -16,7 +16,10 @@ class TestAddAccountDialog(unittest.TestCase):
     @patch.object(QFileDialog, "getOpenFileName")
     @patch.object(AddAccountDialog, "obtain_qr_codes")
     #@patch.object(AddAccountDialog, "open_qr_image")
-    def test_qr_code_btn(self, mock_obtain, mockFileDialog):
+    def test_A_qr_code_btn(self, mock_obtain, mockFileDialog):
+        """This test fails if run after the Cancel test.  So I changed the name so it runs first.
+           Unknown cause: Cancel closes the dialog but that's in a different test so it shouldn't matter.
+           And why did it start failing after release 0.2.0 but not before?"""
         # Create the dialog instance
         dialog = AddAccountDialog(AppView(self.app))
         dialog.accept = Mock()  # Mock the accept method of the dialog
@@ -33,7 +36,6 @@ class TestAddAccountDialog(unittest.TestCase):
 
         # Mock QFileDialog.getOpenFileName to return a tuple (file_path, filter)
         mockFileDialog.return_value = ("tests/img_qr_code_single.png", "")
-
         dialog.btn_scanQR.click()  # Click Scan
         result = dialog.provider_entry.text()
         assert result == "Bogus"

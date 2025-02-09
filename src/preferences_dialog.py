@@ -49,8 +49,8 @@ class PreferencesDialog(QDialog):
         layout.addWidget(self.minimize_during_qr_search)
 
         # Secret key initially hidden with asterisks in Edit dialog
-        self.secret_key_hidden = QCheckBox("Secret key initially hidden with asterisks in Edit dialog")
-        self.secret_key_hidden.setEnabled(False)
+        self.secret_key_hidden = QCheckBox("Secret key initially hidden with asterisks")
+        self.secret_key_hidden.setEnabled(True)
         layout.addWidget(self.secret_key_hidden)
 
         # Font button

@@ -14,7 +14,7 @@ from styles import info_btn_style
 from account_manager import Account, AccountManager
 import cipher_funcs
 import otp_funcs
-from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
+from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields, PasswordInput
 from provider_search_dialog import ProviderSearchDialog
 from utils import assets_dir
 
@@ -55,18 +55,22 @@ class EditAccountDialog(QDialog):
         # Setup actions to be taken
         self.btn_Lookup.clicked.connect(lambda: provider_lookup(self))
         self.btn_Save.clicked.connect(lambda _, account=account, idx=index: self.handle_update_request(idx, account=account))
-        #self.btn_Save.clicked.connect(save_fields)
         self.btn_Delete.clicked.connect(self.confirm_delete_account)
         self.btn_Cancel.clicked.connect(self.reject)
         self.provider_entry.textChanged.connect(lambda: validate_form(self))
         self.label_entry.textChanged.connect(lambda: validate_form(self))
         self.secret_entry.textChanged.connect(lambda: validate_form(self))
+        self.secret_entry.set_hidden(self.appconfig.is_secret_key_hidden())
+
         set_tab_order(self)
 
         # Place current account data into fields for updating
-        editable_account = copy.deepcopy(account)
-        editable_account.secret = cipher_funcs.decrypt(account.secret)
-        self.set_fields(editable_account)
+        self.editable_account = copy.deepcopy(account)
+        self.editable_account.secret = cipher_funcs.decrypt(account.secret)
+        """ Set the field values from the given account """
+        self.provider_entry.setText(self.editable_account.issuer)
+        self.label_entry.setText(self.editable_account.label)
+        self.secret_entry.setText(self.editable_account.secret)
 
         # Frame for the edit dialog features
         dialog_frame = QFrame()
@@ -122,7 +126,30 @@ class EditAccountDialog(QDialog):
             self.initial_size = self.size()
             self.setFixedWidth(self.size().width())
 
-
+    # def display_secret_key(self):
+    #     # IF preference for hiding secrets is on
+    #     if self.appconfig.is_secret_key_hidden():
+    #         # if key currently visible
+    #         if self.secret_key_visible:
+    #             self.secret_entry.setText(self.editable_account.secret)
+    #             self.show_hide_button.setToolTip("Hide secret key")
+    #             self.secret_entry.setDisabled(False)
+    #             # display the hide icon
+    #             self.show_hide_button.setStyleSheet("""
+    #                 qproperty-icon: url("assets/hide_icon_light.png");
+    #             """)
+    #         else:
+    #             self.secret_entry.setText("********")
+    #             self.secret_entry.setDisabled(True)
+    #             self.show_hide_button.setToolTip("Show secret key")
+    #             # display the show icon
+    #             self.show_hide_button.setStyleSheet("""
+    #                 qproperty-icon: url("assets/show_icon_light.png");
+    #             """)
+    #
+    # def toggle_secret_key_visibility(self):
+    #     self.secret_key_visible = not self.secret_key_visible
+    #     self.display_secret_key()
 
     def update_qr_button_text(self):
         """Update button text based on QR code visibility state"""
@@ -198,15 +225,11 @@ class EditAccountDialog(QDialog):
 
         self.update_qr_button_text()
 
-    def set_fields(self, otp_record):
-        """ Convenience method for children """
-        self.provider_entry.setText(otp_record.issuer)
-        self.label_entry.setText(otp_record.label)
-        self.secret_entry.setText(otp_record.secret)
 
 # Local main for unit testing
 if __name__ == '__main__':
     import sys
+    # Note: make sure light theme is set cause the dark icons won't be visible to your eye.
     app = QApplication(sys.argv)
     rec = account_manager.OtpRecord("A","B","AB34")
     acct = rec.toAccount()

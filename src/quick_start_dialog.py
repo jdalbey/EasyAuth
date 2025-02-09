@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-
+from utils import assets_dir
 import markdown
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
@@ -45,9 +45,7 @@ class QuickStartDialog(QDialog):
         dir_path = "docs"
         # Are we in production mode?
         if getattr(sys, 'frozen', False):
-            # PyInstaller bundled case - prefix the temp directory path
-            base_dir = sys._MEIPASS  # type: ignore   #--keep PyCharm happy
-            dir_path = os.path.join(base_dir, "assets")
+            dir_path = assets_dir()
 
         self.file_path = os.path.join(dir_path, 'Quick Start Guide.md')
         self.logger.debug(f"Quick Start Guide file_path: {self.file_path}")

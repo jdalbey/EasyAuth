@@ -14,7 +14,7 @@ import time, datetime
 import pyperclip
 import qdarktheme
 
-import utils
+from utils import assets_dir
 from provider_map import Providers
 import cipher_funcs
 from account_add_dialog import AddAccountDialog
@@ -162,13 +162,10 @@ class AppView(QMainWindow):
             """Return the correct path to images, whether in development or PyInstaller mode."""
             global dark_qss, light_qss
 
-            base_path = ""  # development mode (relative path is okay)
-            if getattr(sys, '_MEIPASS', False):
-                base_path = sys._MEIPASS  # PyInstaller extract directory
-                adjusted_path = os.path.join(base_path, "assets/")
-                adjusted_path = adjusted_path.replace("\\", "/")
-                dark_qss = dark_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
-                light_qss = light_qss.replace("url(\"assets/", f"url(\"{adjusted_path}")
+            if getattr(sys, 'frozen', False):
+                adjusted_path = assets_dir().replace("\\", "/")
+                dark_qss = dark_qss.replace("url(\"assets", f"url(\"{adjusted_path}")
+                light_qss = light_qss.replace("url(\"assets", f"url(\"{adjusted_path}")
 
         adjust_theme_paths()
         # Get desired theme from Configuration
@@ -397,9 +394,9 @@ class AppView(QMainWindow):
         """ Show About dialog, including version and build date. """
         # Find the build date
         # If production mode, use path to bundled file created during build
-        if getattr(sys, '_MEIPASS', False):
-            build_date_path = os.path.join(sys._MEIPASS, "assets", "build_date.txt")
-            version_path = os.path.join(sys._MEIPASS, "assets", "version_info.txt")
+        if getattr(sys, 'frozen', False):
+            build_date_path = os.path.join(assets_dir(), "build_date.txt")
+            version_path = os.path.join(assets_dir(), "version_info.txt")
             build_date = "Unknown"
             version_number = "0.0"
             # Read the build date from assets folder
@@ -423,7 +420,7 @@ class AppView(QMainWindow):
              "http://www.github.com/jdalbey/EasyAuth\n\n" +
              f"Vault directory:\n" + self.app_config.get_os_data_dir())
         msg.setWindowTitle("About")
-        pixmap = QPixmap(os.path.join(utils.assets_dir(), "Vault.png"))
+        pixmap = QPixmap(os.path.join(assets_dir(), "Vault.png"))
         msg.setIconPixmap(pixmap)
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
         retval = msg.exec()
