@@ -74,6 +74,29 @@ class TestEditDialogButtons(unittest.TestCase):
         MockAccountManager.update_account.assert_called_once_with(1, expected_account)
         dialog.close.assert_called_once()
 
+    @patch("account_edit_dialog.AccountManager")
+    def test_save_usage_defect(self, MockAccountManager):
+        # account with a valid secret
+        encrypted_secret = 'gAAAAABnhzAo4D3RsKjiMwAOdhM8kDAQ40zUucOhzBK_Hz_1QP0cwgL6aN1U2XgaCqItPx7ACmH6vp7b1h4XkoAYXKdy_KQUFg=='
+        account_in = Account("Woogle", "me@woogle.com", encrypted_secret, "2000-01-01 01:01", 1, True)
+        # setup the mocks
+        dialog = EditAccountDialog(None, 1, account_in)
+        # mock updated fields the user has modified
+        dialog.provider_entry.setText("ModifiedWoogle")
+        dialog.label_entry.setText("x@w.com")
+        dialog.account_manager = MockAccountManager
+        dialog.close = Mock()  # Mock the accept method of the dialog
+
+        dialog.btn_Save.click()
+
+        # verify results
+        assert dialog.encrypted_secret.startswith('gAAAA')
+        # We expect the account sent to update has the modified fields
+        expected_account = Account("ModifiedWoogle","x@w.com",encrypted_secret,"2000-01-01 01:01",1,True)
+        expected_account.secret = dialog.encrypted_secret
+        MockAccountManager.update_account.assert_called_once_with(1, expected_account)
+        dialog.close.assert_called_once()
+
     #@patch('PyQt5.QtWidgets.QMessageBox.information')  Not sure if this is better
     @patch('account_edit_dialog.QMessageBox.information')
     @patch("account_edit_dialog.AccountManager")

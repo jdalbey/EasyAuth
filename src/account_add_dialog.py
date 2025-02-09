@@ -52,7 +52,9 @@ class AddAccountDialog(QDialog):
         self.provider_entry.textChanged.connect(lambda: validate_form(self))
         self.label_entry.textChanged.connect(lambda: validate_form(self))
         self.secret_entry.textChanged.connect(lambda: validate_form(self))
+
         self.secret_entry.set_hidden(self.appconfig.is_secret_key_hidden())
+
         set_tab_order(self)
 
     def scan_qr_code(self):

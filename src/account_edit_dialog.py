@@ -165,7 +165,7 @@ class EditAccountDialog(QDialog):
         if otp_funcs.is_valid_secretkey(self.secret_entry.text()):
             self.encrypted_secret = cipher_funcs.encrypt(self.secret_entry.text())
             up_account = Account(self.provider_entry.text(), self.label_entry.text(),
-                                 self.encrypted_secret, account.last_used)
+                                 self.encrypted_secret, account.last_used, account.used_frequency, account.favorite)
             self.account_manager.update_account(index, up_account)
             self.close()
         else:
