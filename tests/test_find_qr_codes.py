@@ -25,7 +25,7 @@ class TestFind_qr_codes(unittest.TestCase):
         # Clean up dialog and other resources
         pass
 
-    image_file = 'tests/img_qr_code_single.png'
+    image_file = 'tests/test_data/img_qr_code_single.png'
 
     def test_scan_screen_for_qrcode(self):
         # Schedule a function to close the window after 1 second

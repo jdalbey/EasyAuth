@@ -35,7 +35,7 @@ class TestAddAccountDialog(unittest.TestCase):
         dialog.radioBtnFile.setChecked(True)
 
         # Mock QFileDialog.getOpenFileName to return a tuple (file_path, filter)
-        mockFileDialog.return_value = ("tests/img_qr_code_single.png", "")
+        mockFileDialog.return_value = ("tests/test_data/img_qr_code_single.png", "")
         dialog.btn_scanQR.click()  # Click Scan
         result = dialog.provider_entry.text()
         assert result == "Bogus"
