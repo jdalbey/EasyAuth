@@ -38,6 +38,11 @@ class PreferencesDialog(QDialog):
         self.display_favicons.setEnabled(True)
         layout.addWidget(self.display_favicons)
 
+        # Secret key initially hidden when dialog opens
+        self.secret_key_hidden = QCheckBox("Secret key initially hidden when dialog opens")
+        self.secret_key_hidden.setEnabled(True)
+        layout.addWidget(self.secret_key_hidden)
+
         # Minimize application after TOTP copy to clipboard
         self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
         self.minimize_after_copy.setEnabled(False)
@@ -47,11 +52,6 @@ class PreferencesDialog(QDialog):
         self.minimize_during_qr_search = QCheckBox("Minimize during QR code search")
         self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
-
-        # Secret key initially hidden with asterisks in Edit dialog
-        self.secret_key_hidden = QCheckBox("Secret key initially hidden with asterisks")
-        self.secret_key_hidden.setEnabled(True)
-        layout.addWidget(self.secret_key_hidden)
 
         # Font button
         # self.font_button = QPushButton("Font")
