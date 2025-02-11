@@ -26,7 +26,9 @@ Focus on ease of use for beginners using TOTP authentication.
 
 
 ### Status
-First production release is available for download.  All features above are implemented.
+In active development.
+First production release is available for download. 
+All features above are implemented.
 
 First draft of [Website](https://jdalbey.github.io/EasyAuth/) is complete.
 
