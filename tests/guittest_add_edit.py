@@ -43,7 +43,6 @@ def drive_with_pyautogui():
     gui.press('enter')                      # Accept
     gui.hotkey('alt','s')                   # save & close
 
-    # TODO: open vault verify first item is '007Names' "User Bob"
 
     # Exit Application
     gui.hotkey('alt','x')
@@ -58,7 +57,10 @@ def capture_output(process):
         print(stdout.decode())  # Decode bytes to string
     if stderr:
         print("Standard Error:")
-        print(stderr.decode())  # Decode bytes to string
+        log_results = stderr.decode()  # Decode bytes to string
+        print (log_results)
+        # verify account was updated to '007Names' "User Bob"
+        assert log_results.endswith("007Names (User Bob)\n")
 
 if __name__ == "__main__":
     if os.path.exists("tests/test_data/vault.json"):
