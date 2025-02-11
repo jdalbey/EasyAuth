@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
-    <height>180</height>
+    <width>527</width>
+    <height>369</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,6 +43,12 @@
        </item>
        <item row="0" column="3">
         <widget class="QLabel" name="label_22">
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>Name identifying the website or online service
 this account authenticates with.</string>
@@ -51,7 +57,10 @@ this account authenticates with.</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>question_mark_icon.png</pixmap>
+          <pixmap>question_mark_icon.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -80,6 +89,12 @@ this account authenticates with.</string>
        </item>
        <item row="1" column="3">
         <widget class="QLabel" name="label_24">
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>A label to identify this account
 such as your username or email address for the service.</string>
@@ -88,7 +103,10 @@ such as your username or email address for the service.</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>question_mark_icon.png</pixmap>
+          <pixmap>question_mark_icon.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -117,6 +135,12 @@ such as your username or email address for the service.</string>
        </item>
        <item row="2" column="3">
         <widget class="QLabel" name="label_26">
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>The alphanumeric code shared with you by the provider.</string>
          </property>
@@ -124,7 +148,10 @@ such as your username or email address for the service.</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>question_mark_icon.png</pixmap>
+          <pixmap>question_mark_icon.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
