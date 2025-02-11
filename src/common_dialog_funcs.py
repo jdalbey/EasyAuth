@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QLineEdit
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton
@@ -103,6 +105,6 @@ class PasswordInput(QLineEdit):
         """Update the button icon based on the button state."""
         visibility_string = "show" if is_hidden else "hide"
         theme_name = self.appconfig.get_theme_name()
-        self.icon_path = f"{assets_dir()}/{visibility_string}_icon_{theme_name}.png"
-        self.logger.debug (F"icon_path: {self.icon_path}")
+        self.icon_path = f"{assets_dir()}" + os.sep + f"{visibility_string}_icon_{theme_name}.png"
+        self.logger.debug (f"icon_path: {self.icon_path}")
         self.toggle_button.setStyleSheet(f"border: none; background: transparent; qproperty-icon: url({self.icon_path});")
