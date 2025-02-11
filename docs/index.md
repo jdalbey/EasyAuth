@@ -36,7 +36,8 @@ During setup of an account it scans QR codes for you.
 
 ### Learn More
  [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md)  
- [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
+ [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)  
+ <iframe width="748" height="485" src="https://www.youtube.com/embed/SoGLSwxYSWA" title="EasyAuth v0.2.1 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  
 
 ### Screenshot gallery
 [View Screenshots](screenshot_gallery.md)  
