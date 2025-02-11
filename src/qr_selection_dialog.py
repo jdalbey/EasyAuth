@@ -1,14 +1,15 @@
 import sys
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QRadioButton, QPushButton, \
-    QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup
-from account_manager import Account, OtpRecord
+    QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup, QShortcut
+from account_manager import OtpRecord
 
 class QRselectionDialog(QDialog):
-    def __init__(self, accounts, parent=None ):
+    def __init__(self, accounts, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Select a QR code")
-        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint)  # x-platform consistency
         self.selected_otp_record = None
 
         # Layout setup
@@ -24,22 +25,23 @@ class QRselectionDialog(QDialog):
 
         # Button group for radio buttons
         self.button_group = QButtonGroup(self)
+        self.radio_buttons = []  # Store references to radio buttons for tab ordering
 
         # Add accounts as rows with radio buttons
-        for otp_record in accounts:
+        for index, otp_record in enumerate(accounts):
             row_widget = QWidget()
+            row_widget.setFocusPolicy(Qt.NoFocus)
             row_layout = QHBoxLayout(row_widget)
             row_layout.setAlignment(Qt.AlignLeft)
 
-            # Radio button on the left
-            radio_button = QRadioButton()
-            self.button_group.addButton(radio_button)  # Add radio button to the button group
-            # Label should be adjacent to radio button
-            label = QLabel(f"{otp_record.issuer} - {otp_record.label}")
+            # Create radio button
+            radio_button = QRadioButton(f"&{index}: {otp_record.issuer} - {otp_record.label}")
+            self.button_group.addButton(radio_button)
+            self.radio_buttons.append(radio_button)
 
-            # Add the radio button and label to the row layout
+            # Add radio button to the layout
             row_layout.addWidget(radio_button)
-            row_layout.addWidget(label,alignment=Qt.AlignLeft)
+            row_widget.setLayout(row_layout)
             self.scroll_layout.addWidget(row_widget)
 
             # Store a reference to the account in the row widget
@@ -49,17 +51,19 @@ class QRselectionDialog(QDialog):
         scroll_area = QScrollArea()
         scroll_area.setWidget(self.scroll_frame)
         scroll_area.setWidgetResizable(True)
+        scroll_area.setFocusPolicy(Qt.NoFocus)  # Prevent scroll area from interfering with focus
         layout.addWidget(scroll_area)
 
+        # Button layout
         button_layout = QHBoxLayout()
-        # OK button
-        self.ok_button = QPushButton("OK")
+        self.ok_button = QPushButton("&OK")
         self.ok_button.clicked.connect(self.on_ok)
         button_layout.addWidget(self.ok_button)
-        # Cancel button
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(lambda: self.accept())
+
+        cancel_button = QPushButton("&Cancel")
+        cancel_button.clicked.connect(self.accept)
         button_layout.addWidget(cancel_button)
+
         layout.addLayout(button_layout)
 
         # Add spacer to push the button to the bottom
