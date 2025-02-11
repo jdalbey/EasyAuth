@@ -4,7 +4,7 @@ The quide will show how to store shared keys in your EasyAuth vault and use Time
 
 ####  Prerequisites
 
-1. You are using a Linux desktop OS.
+1. You are using a Linux or Windows desktop OS.
 2. You have a web browser open to the site with which you want to establish two-factor authentication (for example, `paypal.com`).  We will refer to this site as the "provider".
 3. You have begun the process of enabling 2-factor authentication and are viewing a QR code that contains a shared secret key. 
 
