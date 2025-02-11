@@ -99,7 +99,7 @@ class EditAccountDialog(QDialog):
         last_used_layout.addWidget(self.reveal_qr_button, 2, 0, 1, 2, Qt.AlignCenter)
         user_info_btn = QToolButton()
         user_info_btn.setToolTip("This QR code can be used to import this account in another application.")
-        info_icon = QIcon("assets/question_mark_icon.png")
+        info_icon = QIcon("assets/question_mark_icon.svg")
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
         # Make square button invisible so only circular icon shows
