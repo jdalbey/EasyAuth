@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
                              QHBoxLayout, QWidget, QMessageBox, QFrame)
 from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
-from PyQt5.QtGui import QFont, QDesktopServices, QPixmap
+from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
 import pyotp
 import time, datetime
 import pyperclip
@@ -61,7 +61,7 @@ class AppView(QMainWindow):
         menubar = self.menuBar()
 
         # File menu
-        file_menu = menubar.addMenu('File')
+        file_menu = menubar.addMenu('&File')
         add_account_action = QAction('Add Account', self)
         add_account_action.triggered.connect(self.show_add_account_form)
         file_menu.addAction(add_account_action)
@@ -78,8 +78,14 @@ class AppView(QMainWindow):
         preferences_action.triggered.connect(self.show_preferences_dialog)
         file_menu.addAction(preferences_action)
 
+        exit_action = QAction('Exit', self)
+        exit_action.setObjectName(('exitAction'))
+        exit_action.triggered.connect(sys.exit)
+        exit_action.setShortcut(QKeySequence("Alt+x"))
+        file_menu.addAction(exit_action)
+
         # Tools menu
-        tools_menu = menubar.addMenu('Tools')
+        tools_menu = menubar.addMenu('&Tools')
         tools_menu.setObjectName('tools_menu')
         reorder_action = QAction('Reorder Accounts', self)
         reorder_action.setObjectName("reorderAction")
@@ -99,7 +105,7 @@ class AppView(QMainWindow):
         sort_menu.addAction(frequency_action)
 
         # Help menu
-        help_menu = menubar.addMenu('Help')
+        help_menu = menubar.addMenu('&Help')
         quick_start_action = QAction("Quick Start",self)
         quick_start_action.setObjectName("quickstartAction")
         quick_start_action.triggered.connect(self.show_quick_start_dialog)

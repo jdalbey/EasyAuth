@@ -48,7 +48,7 @@ class EditAccountDialog(QDialog):
         self.setWindowTitle("Edit Account")
 
         # Make the Delete button visible on this form
-        self.btn_Delete = QPushButton("Delete")
+        self.btn_Delete = QPushButton("&Delete")
         self.btn_Delete.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.buttonLayout.insertWidget(2,self.btn_Delete)
 
