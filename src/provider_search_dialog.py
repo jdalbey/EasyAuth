@@ -39,6 +39,7 @@ class ProviderSearchDialog(QDialog):
         self.setup_ui()
         self.resize(600, 400)
         self.setWindowTitle("Provider Search")
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint)  # x-platform consistency
         self.logger.debug("init complete")
 
     def setup_ui(self):
