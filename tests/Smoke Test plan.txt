@@ -25,7 +25,7 @@ Add Account dialog   (test_add_account_dialog)
     Scan button
 [x]        invokes correct function    test_qr_code_btn
 [x]        from file opens chooser.     test_qr_code_btn
-[x]        correctly fills fields from scanneda image from file  test_qr_code_btn
+[x]        correctly fills fields from scanned image from file  test_qr_code_btn
         obtain_qr_codes
 [x]         none                test_obtain_qr_code
 [x]         one                 test_obtain_qr_code

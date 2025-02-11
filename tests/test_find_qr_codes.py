@@ -29,9 +29,10 @@ class TestFind_qr_codes(unittest.TestCase):
 
     def test_scan_screen_for_qrcode(self):
         # Schedule a function to close the window after 1 second
-        def close_window():
+        def grab_code():
             # Look for the image
             results = find_qr_codes.scan_screen_for_qr_codes()
+            # close the window with the qr code
             label.close()
             # Verify that we got some results
             assert len(results) > 0
@@ -49,7 +50,7 @@ class TestFind_qr_codes(unittest.TestCase):
         label.show()
         # Create a QTimer to close the window after 1 second
         timer = QTimer()
-        timer.timeout.connect(close_window)
+        timer.timeout.connect(grab_code)
         timer.start(500)
 
         # Execute the application event loop
