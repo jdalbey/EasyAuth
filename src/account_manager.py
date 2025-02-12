@@ -260,18 +260,24 @@ class AccountManager:
         This method updates an existing account with new details and saves the updated list to the vault.
 
         Args:
-            old_account (Account): The existing account to be updated.
-            new_account (Account): The new account details to replace the old account.
+            index: The index of the existing account to be updated.
+            account (Account): The new account details to replace the old account.
 
         Returns:
-            bool: True if the account was updated successfully, False otherwise.
+            bool: True if the account was updated successfully, False if it's a duplicate account
 
         Raises:
             Exception: If any error occurs during the update process.
-        """        
+        """
+        # Check for duplicates
+        for item, acc in enumerate(self.accounts):
+            # does info match and is it not me?
+            if acc.issuer == account.issuer and acc.label == account.label and item != index:
+                return False
         self.accounts[index] = account
         self.save_accounts()
         self.logger.debug(f"Updated account: {account.issuer} ({account.label})")
+        return True
 
     def delete_account(self, account):
         """

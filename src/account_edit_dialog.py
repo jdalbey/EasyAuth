@@ -166,8 +166,11 @@ class EditAccountDialog(QDialog):
             self.encrypted_secret = cipher_funcs.encrypt(self.secret_entry.text())
             up_account = Account(self.provider_entry.text(), self.label_entry.text(),
                                  self.encrypted_secret, account.last_used, account.used_frequency, account.favorite)
-            self.account_manager.update_account(index, up_account)
-            self.close()
+            # Go update the account, checking for duplicates
+            if self.account_manager.update_account(index, up_account):
+                self.close()
+            else:
+                QMessageBox.information(self, "Warning", "Account with same provider and user already exists")
         else:
             QMessageBox.information(self,"Error",f'The secret key is invalid')
 

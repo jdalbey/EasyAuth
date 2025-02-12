@@ -214,6 +214,89 @@ class TestAccountManager:
         assert updated_account.secret == encrypted_secret
 
     @patch('cipher_funcs.encrypt')
+    def test_update_account_nochange(self, mock_encrypt, account_manager):
+
+        """Test updating an existing account without changing anything."""
+        vault_dir = os.path.dirname(account_manager.vault_path)
+
+        encrypted_secret = 'gAAAAABnlSYl5cBXe7783zthq1-sSuRoccpcmsICsySJPKYYARcED4GB7XCMi5kzO8soJljShxSqXjVnFcJjeFLtq_hriG9IsA=='
+        mock_encrypt.return_value = encrypted_secret
+
+        # Clear any existing accounts
+        account_manager.accounts = []
+        # Save the new account
+        try:
+            account_manager.save_new_account(OtpRecord(
+                issuer="Foobar",
+                label="Barfoo",
+                secret="test_secret")
+            )
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
+            raise
+        # Update the existing account
+        revised_data = Account("Foobar",'Barfoo',encrypted_secret,"2020-12-12 01:01")
+        try:
+            result = account_manager.update_account(0, revised_data)
+            assert result
+        except Exception as e:
+            print(f"Exception during update: {e}")
+            raise
+
+        assert len(account_manager.accounts) == 1
+        updated_account = account_manager.accounts[0]
+        assert updated_account.issuer == "Foobar"
+        assert updated_account.label == "Barfoo"
+        assert updated_account.secret == encrypted_secret
+
+    @patch('cipher_funcs.encrypt')
+    def test_update_account_fail(self, mock_encrypt, account_manager):
+
+        """Test updating an existing account with duplicate info."""
+        vault_dir = os.path.dirname(account_manager.vault_path)
+
+        encrypted_secret = 'gAAAAABnlSYl5cBXe7783zthq1-sSuRoccpcmsICsySJPKYYARcED4GB7XCMi5kzO8soJljShxSqXjVnFcJjeFLtq_hriG9IsA=='
+        mock_encrypt.return_value = encrypted_secret
+
+        # Clear any existing accounts
+        account_manager.accounts = []
+
+        # Save the new account
+        try:
+            account_manager.save_new_account(OtpRecord(
+                issuer="Test",
+                label="TestLabel",
+                secret="test_secret")
+            )
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
+            raise
+        # Save a second account (goes into index 0)
+        try:
+            account_manager.save_new_account(OtpRecord(
+                issuer="Gargle",
+                label="user@gargle.com",
+                secret="test_secret")
+            )
+        except Exception as e:
+            print(f"Exception during save: {e}")
+            print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
+            raise
+
+        # Attempt Update the existing account
+        revised_data = Account("Gargle",'user@gargle.com',encrypted_secret,"2020-12-12 01:01")
+        try:
+            # updating item 1 with info matching item 0
+            result = account_manager.update_account(1, revised_data)
+            assert result == False
+        except Exception as e:
+            print(f"Exception during update: {e}")
+            raise
+
+
+    @patch('cipher_funcs.encrypt')
     def test_delete_account(self, mock_encrypt, account_manager):
 
         """Test deleting an existing account."""

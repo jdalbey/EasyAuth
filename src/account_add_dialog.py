@@ -1,24 +1,18 @@
 import logging
 import os
-import time
 
 import pyotp
-from PyQt5.QtCore import Qt, QThread
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy, \
-    QApplication, QFileDialog, QFrame, QWidget, QGridLayout, QLayout
-
-import find_qr_codes
-import otp_funcs
-from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
-from qr_selection_dialog import QRselectionDialog
-from appconfig import AppConfig
-from account_manager import Account, AccountManager, OtpRecord
-#from account_entry_panel import AccountEntryPanel
+from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtWidgets import QDialog, QLabel, QMessageBox, QApplication, QFileDialog
+# from account_entry_panel import AccountEntryPanel
 from PyQt5.uic import loadUi
 
-from provider_search_dialog import ProviderSearchDialog
+import find_qr_codes
+from account_manager import AccountManager, OtpRecord
+from appconfig import AppConfig
+from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
+from qr_selection_dialog import QRselectionDialog
 from utils import assets_dir
 
 

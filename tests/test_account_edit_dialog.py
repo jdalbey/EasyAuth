@@ -115,8 +115,21 @@ class TestEditDialogButtons(unittest.TestCase):
         dialog.close.assert_not_called()
         MockMessageBox.assert_called_once() # Not MockMessageBox.information.assert_called_once()
 
-        #_with(
-            #None, 'Error', "The secret key is invalid", unittest.mock.ANY        )
+    @patch('account_edit_dialog.QMessageBox.information')
+    @patch("account_edit_dialog.AccountManager")
+    def test_handle_update_request_duplicate(self,MockAccountManager,MockMessageBox):
+        encrypted_secret = 'gAAAAABnhzAo4D3RsKjiMwAOdhM8kDAQ40zUucOhzBK_Hz_1QP0cwgL6aN1U2XgaCqItPx7ACmH6vp7b1h4XkoAYXKdy_KQUFg=='
+        account_in = Account("Woogle", "me@woogle.com", encrypted_secret, "2000-01-01 01:01")
+        dialog = EditAccountDialog(None, 1, account_in)
+        dialog.account_manager = MockAccountManager
+        dialog.close = Mock()  # Mock the accept method of the dialog
+        MockAccountManager.update_account.return_value = False  # simulate failing update
+        # Call the method that shows the dialog
+        dialog.handle_update_request(1,account_in)
+        # Verify results
+        dialog.close.assert_not_called() # if update fails the dialog won't close
+        MockMessageBox.assert_called_once() # Not MockMessageBox.information.assert_called_once()
+
 
     def test_handle_QR_reveal(self):
         """ see qr code label was created """
