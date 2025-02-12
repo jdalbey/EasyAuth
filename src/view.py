@@ -136,6 +136,15 @@ class AppView(QMainWindow):
         # Create search and filter group
         self.search_box = QLineEdit()
         self.search_box.setPlaceholderText("Search...")
+        self.search_box.setObjectName("searchBox")
+        #enable a clear button within the search box, allowing users to quickly clear the text.
+        #self.search_box.setClearButtonEnabled(True)
+
+        # Create an action for the shortcut
+        search_shortcut_action = QAction(self)
+        search_shortcut_action.setShortcut(QKeySequence("Alt+S"))
+        search_shortcut_action.triggered.connect(self.search_box.setFocus)
+        self.addAction(search_shortcut_action)
         self.search_box.textChanged.connect(lambda: self.display_accounts())  # Dynamic search
         self.search_box.setMaximumWidth(200)
         toolbar.addWidget(self.search_box)
