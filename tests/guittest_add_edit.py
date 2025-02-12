@@ -36,12 +36,16 @@ def drive_with_pyautogui():
     gui.typewrite("Woogle\tUser\tAB34")     # Manually complete fields
     gui.hotkey('alt','a')                   # click 'add'
     time.sleep(1)
-    gui.press(['tab','tab','tab','space'])  # Open edit dialog
+    gui.hotkey('alt','s')                   # Search box
+    gui.typewrite("W")                    # Find Woogle
+    gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
     gui.press('tab')                        # tab to user field
     gui.typewrite('User Bob')               # update user
     gui.hotkey('alt','s')                   # save & close
 
-    gui.press(['tab','tab','tab','space'])  # Open edit dialog
+    gui.hotkey('alt','s')                   # Search box
+    # 'W' will still be in search box
+    gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
     gui.hotkey('alt', 'l')                  # Open Lookup
     gui.typewrite('spring')                 # Enter name in search field
     gui.press('enter')                      # Accept
@@ -49,6 +53,11 @@ def drive_with_pyautogui():
     gui.press(['down','down'])              # Browse the list
     gui.press('enter')                      # Accept
     gui.hotkey('alt','s')                   # save & close
+    time.sleep(2)
+    # NB: after update to 007Names the display is blank because the search box still retains 'W'
+    # and 007 doesn't match 'W'
+    gui.hotkey('alt','s')                   # search box
+    gui.press('backspace')                  # delete 'W' and 007appears.
 
 
     # Exit Application
@@ -70,8 +79,9 @@ def capture_output(process):
         assert log_results.endswith("007Names (User Bob)\n")
 
 if __name__ == "__main__":
-    if os.path.exists("tests/test_data/vault.json"):
-        os.remove("tests/test_data/vault.json")
+    vault = os.path.normpath("tests/test_data/vault.json")
+    if os.path.exists(vault):
+        os.remove(vault)
     app_process = start_app()
     drive_with_pyautogui()
     # Optionally, wait for the application process to finish
