@@ -7,9 +7,16 @@ import pyautogui as gui
 
 def start_app():
     root = os.getcwd()
-    arg1 = root + "/tests/test_data/config_test1.ini"
-    # start EasyAuth with a custom config file that points to a test directory for the vault
-    process = subprocess.Popen(['python3', 'src/main.py', '-c', arg1],
+    arg1 = root + os.path.normpath("/tests/test_data/config_test1.ini")
+    # Determine the command based on the platform
+    if os.name == 'nt':  # Windows
+        venv_path = os.path.join(root, 'venv', 'Scripts', 'python.exe')
+        command = [venv_path, 'src\\main.py', '-c', arg1]
+    else:  # Unix-based systems (Linux, macOS)
+        command = ['python3', 'src/main.py', '-c', arg1]
+    
+    # Start EasyAuth with a custom config file that points to a test directory for the vault
+    process = subprocess.Popen(command,
         stdout=subprocess.PIPE,  # Capture standard output
         stderr=subprocess.PIPE   # Capture standard error
     )
