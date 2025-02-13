@@ -18,7 +18,7 @@ Focus on ease of use for beginners using TOTP authentication.
  - GUI includes light and dark themes.
  - Preferences dialog has useful customization settings.
  - Verifying with TOTP in three easy steps: 
-   1. Open the application.  
+   1. Open the application. 
    2. Click the TOTP code for the account you are logging in to. 
    3. Paste into verification form.
  
@@ -26,9 +26,10 @@ Focus on ease of use for beginners using TOTP authentication.
 
 
 ### Status
-In active development.
-First production release is available for download. 
+In active development.  
+Expect breaking changes, features to be added and removed, and non-backwards compatibility.
 All features above are implemented.
+A production release is available for download but no support is provided. 
 
 First draft of [Website](https://jdalbey.github.io/EasyAuth/) is complete.
 
