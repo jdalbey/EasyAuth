@@ -77,7 +77,7 @@ def capture_output(process):
         log_results = stderr.decode()  # Decode bytes to string
         print (log_results)
         # verify account was updated to '007Names' "User Bob"
-        assert log_results.endswith("007Names (User Bob)\n")
+        assert log_results.strip().endswith("007Names (User Bob)")
 
 if __name__ == "__main__":
     from pathlib import Path
