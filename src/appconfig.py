@@ -142,7 +142,7 @@ class AppConfig:
     def get_os_data_dir(self):
         """ Determine the appropriate path to the database based on the OS """
         if platform.system() == "Windows":
-            return self.config.get('System','win_data_dir',fallback=str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data"))
+            return self.config.get('System','win_data_dir',fallback=str(Path.home() / "Roaming" / "org.redpoint.EasyAuth" / "data"))
         else:  # Default to Linux or Unix-like systems
             return self.config.get('System','linux_data_dir', fallback=str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data"))
 
@@ -166,7 +166,7 @@ class AppConfig:
            use the machine id the vault was created on.  """
         self.set('System', 'alt_id', "")
         """ the path to the application data directory (for vault and logs). """
-        dirpath = str(Path.home() / "AppData" / "Roaming" / "org.redpoint.EasyAuth" / "data")
+        dirpath = str(Path.home() / "Roaming" / "org.redpoint.EasyAuth" / "data")
         self.set('System', 'win_data_dir', dirpath)
         dirpath = str(Path.home() / ".var" / "app" / "org.redpoint.EasyAuth" / "data")
         self.set('System', 'linux_data_dir', dirpath)
