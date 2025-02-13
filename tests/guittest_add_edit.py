@@ -7,6 +7,7 @@ import pyautogui as gui
 
 def start_app():
     root = os.getcwd()
+    # There's a special config file for this test that has a temp vault location
     arg1 = root + os.path.normpath("/tests/test_data/config_test1.ini")
     # Determine the command based on the platform
     if os.name == 'nt':  # Windows
@@ -53,7 +54,7 @@ def drive_with_pyautogui():
     gui.press(['down','down'])              # Browse the list
     gui.press('enter')                      # Accept
     gui.hotkey('alt','s')                   # save & close
-    time.sleep(2)
+    time.sleep(0.5)
     # NB: after update to 007Names the display is blank because the search box still retains 'W'
     # and 007 doesn't match 'W'
     gui.hotkey('alt','s')                   # search box
@@ -79,8 +80,11 @@ def capture_output(process):
         assert log_results.endswith("007Names (User Bob)\n")
 
 if __name__ == "__main__":
-    vault = os.path.normpath("tests/test_data/vault.json")
+    from pathlib import Path
+    # For this test we make a vault in developer's home directory
+    vault = os.path.join(Path.home(),os.path.normpath("vault.json"))
     if os.path.exists(vault):
+        # Remove any prior artifacts
         os.remove(vault)
     app_process = start_app()
     drive_with_pyautogui()
@@ -88,3 +92,8 @@ if __name__ == "__main__":
     app_process.wait()
     # Capture and print the output from the application
     capture_output(app_process)
+    # Remove the temporary vault
+    if os.path.exists(vault):
+        os.remove(vault)
+        vaultbak = os.path.join(Path.home(),os.path.normpath("vault.backup.json"))
+        os.remove(vaultbak)
