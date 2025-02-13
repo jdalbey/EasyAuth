@@ -68,8 +68,12 @@ class AccountManager:
         return cls._instance
 
     def __init__(self, filename=None):
+        """ Create an account manager using a vault at the given filename """
         if filename is None:
             config = AppConfig()
+            # Note: if os_data_dir is absolute, prepending Path.home() has no effect
+            # if os_data_dir is '.' it results in path to home directory
+            # slash in following line is an operator to join the paths
             self.data_dir = Path.home() / config.get_os_data_dir()
             filename = str(self.data_dir.joinpath("vault.json"))
         # does vault directory exist?  If not, make it.
