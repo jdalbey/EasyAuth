@@ -185,6 +185,7 @@ def main():
     app.setStyle('Fusion')
     
     dialog = ProviderSearchDialog()
+    dialog.load_data()
 
     # Show the dialog and get the result
     if dialog.exec_() == QDialog.Accepted:

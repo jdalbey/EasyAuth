@@ -99,6 +99,13 @@ class Providers:
         pixmap = self.make_pixmap(img_raw)
         return pixmap
 
+    def find(self, provider):
+        """Lookup provider in map"""
+        provider_icon_pixmap = self.get_provider_icon_pixmap(provider)
+        if provider_icon_pixmap:
+            return True
+        return False
+
     def get_provider_icon(self,provider):
         my_icon_label = QLabel()
         provider_icon_pixmap = self.get_provider_icon_pixmap(provider)
