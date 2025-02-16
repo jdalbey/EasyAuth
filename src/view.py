@@ -407,7 +407,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def scan_QR_code_clickaction(self):
-        otprec = find_qr_codes.obtain_qr_codes(self)
+        otprec = qr_funcs.obtain_qr_codes(self)
         if otprec:
             self.show_popup()
             if self.account_manager.save_new_account(otprec):
