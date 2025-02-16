@@ -2,7 +2,7 @@ from PyQt5.QtCore import QTimer
 import sys
 from PyQt5.QtWidgets import QApplication, QLabel
 from PyQt5.QtGui import QPixmap
-import find_qr_codes
+import qr_funcs
 import unittest
 
 class TestFind_qr_codes(unittest.TestCase):

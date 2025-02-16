@@ -14,7 +14,7 @@ import time, datetime
 import pyperclip
 import qdarktheme
 
-import find_qr_codes
+import qr_funcs
 from provider_search_dialog import ProviderSearchDialog
 from qr_selection_dialog import QRselectionDialog
 from utils import assets_dir
@@ -390,9 +390,6 @@ class AppView(QMainWindow):
         try:
             add_dialog = VaultEntryDialog(self)
             add_dialog.show()
-            # # Are we in auto_find mode?
-            # if self.app_config.is_auto_find_qr_enabled():
-            #     add_dialog.obtain_qr_codes(False)
             add_dialog.exec_()
         except Exception as e:
             self.logger.error("AddAccountDialog not constructed.")
@@ -410,7 +407,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def scan_QR_code_clickaction(self):
-        otprec = self.obtain_qr_codes(called_from_Find_btn=True)
+        otprec = find_qr_codes.obtain_qr_codes(self)
         if otprec:
             self.show_popup()
             if self.account_manager.save_new_account(otprec):
@@ -437,51 +434,6 @@ class AppView(QMainWindow):
         popup.move(popup_x, popup_y)
         popup.show()
         QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
-
-    def obtain_qr_codes(self, called_from_Find_btn):
-        # We aren't going to do auto scan in v0.3 so I think this argument is obsolete.
-        # first go find_qr_codes
-        urls = find_qr_codes.scan_screen_for_qr_codes()
-        logging.debug(f"obtain_qr_codes() found these URIs: {urls}")
-        # Examine each url to see if it is an otpauth protocol and reject others
-        otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]
-        # Try to parse each url.  Put the fields into an OtpRecord and append to displaylist.
-        display_list = []
-        for uri in otpauth_list:
-            try:
-                totp_obj = pyotp.parse_uri(uri)
-            except ValueError as e:
-                continue  # skip invalid URI's
-            issuer = totp_obj.issuer
-            label = totp_obj.name
-            secret_key = totp_obj.secret
-            account = OtpRecord(issuer, label, secret_key)
-            # TODO: Extract the advanced parameters if they exists
-            logging.debug(f"obtain_qr_codes() parsing produced: {issuer} {label} ")
-            display_list.append(account)
-        # How many valid URI's do we have?
-        if len(display_list) == 0:
-            # This should only be shown during a requested find, not an automatic one.
-            if called_from_Find_btn:  # we might have got here from Find button even though auto_hunt was on and failed.
-                QMessageBox.information(self, 'Alert',
-"""No QR code found.  Be sure the QR code is visible on your screen and try again.
-(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
-""", QMessageBox.Ok)
-                return
-        if len(display_list) == 1:
-            return display_list[0]
-        # Wow, we got more than one QR code
-        if len(display_list) > 1:
-            # Ask user to select one account from the list
-            dialog = QRselectionDialog(display_list, self)
-            # The dialog.exec_() call will block execution until the dialog is closed
-            if dialog.exec_() == QDialog.Accepted:
-                self.selected_account = dialog.get_selected_account()
-                # If user made a selection,
-                if self.selected_account:
-                    logging.debug(
-                        f"QRselectionDialog returned: {self.selected_account.issuer} - {self.selected_account.label}")
-                    return self.selected_account
 
     def get_qr_from_image(self):
         otprec = find_qr_codes.open_qr_image(self)

@@ -1,9 +1,14 @@
 # Detects one or more QR codes on the screen.
+import logging
+
 from account_manager import OtpRecord
 import pyotp
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog
 from pyzbar.pyzbar import decode
 from PIL import ImageGrab
+
+from qr_selection_dialog import QRselectionDialog
+
 
 def scan_screen_for_qr_codes():
     """
@@ -28,6 +33,49 @@ def scan_screen_for_qr_codes():
     results = [qr_code.data.decode('utf-8') for qr_code in qr_codes if qr_code.data]
     # Return a list, one item for each code.
     return results
+
+def obtain_qr_codes(parent):
+    # We aren't going to do auto scan in v0.3 so I think this argument is obsolete.
+    # first go find_qr_codes
+    urls = scan_screen_for_qr_codes()
+    logging.debug(f"obtain_qr_codes() found these URIs: {urls}")
+    # Examine each url to see if it is an otpauth protocol and reject others
+    otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]
+    # Try to parse each url.  Put the fields into an OtpRecord and append to displaylist.
+    display_list = []
+    for uri in otpauth_list:
+        try:
+            totp_obj = pyotp.parse_uri(uri)
+        except ValueError as e:
+            continue  # skip invalid URI's
+        issuer = totp_obj.issuer
+        label = totp_obj.name
+        secret_key = totp_obj.secret
+        account = OtpRecord(issuer, label, secret_key)
+        # TODO: Extract the advanced parameters if they exists
+        logging.debug(f"obtain_qr_codes() parsing produced: {issuer} {label} ")
+        display_list.append(account)
+    # How many valid URI's do we have?
+    if len(display_list) == 0:
+        QMessageBox.information(parent, 'Alert',
+"""No QR code found.  Be sure the QR code is visible on your screen and try again.
+(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
+""", QMessageBox.Ok)
+        return
+    if len(display_list) == 1:
+        return display_list[0]
+    # Wow, we got more than one QR code
+    if len(display_list) > 1:
+        # Ask user to select one account from the list
+        dialog = QRselectionDialog(display_list, parent)
+        # The dialog.exec_() call will block execution until the dialog is closed
+        if dialog.exec_() == QDialog.Accepted:
+            selected_account = dialog.get_selected_account()
+            # If user made a selection,
+            if selected_account:
+                logging.debug(
+                    f"QRselectionDialog returned: {selected_account.issuer} - {selected_account.label}")
+                return selected_account
 
 def open_qr_image(parent=None):
     options = QFileDialog.Options()

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QDialog, QLabel, QMessageBox, QApplication, QFileDia
 # from account_entry_panel import AccountEntryPanel
 from PyQt5.uic import loadUi
 
-import find_qr_codes
+import qr_funcs
 from account_manager import AccountManager, OtpRecord
 from appconfig import AppConfig
 from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
