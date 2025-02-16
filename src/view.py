@@ -78,7 +78,7 @@ class AppView(QMainWindow):
         scanQRcode_action.triggered.connect(self.scan_QR_code_clickaction)
 
         openQRimage_action = QAction('Open QR image file', self)
-        openQRimage_action.triggered.connect(self.open_qr_image)
+        openQRimage_action.triggered.connect(self.get_qr_from_image)
 
         add_account_action = QAction('Enter Manually', self)
         add_account_action.setShortcut(QKeySequence("Alt+A"))
@@ -191,8 +191,8 @@ class AppView(QMainWindow):
         self.timer_label.setObjectName("timerLabel")
         self.timer_label.setToolTip("Time remaining until current TOTP code expires.")
         self.timer_label.setFont(timer_font)
+        self.timer_label.setStyleSheet("background-color:#ebebeb") # initially hidden (for light theme)
         toolbar.addWidget(self.timer_label)
-        self.timer_label.setStyleSheet("background-color:#ebebeb") # initially hidden
 
     def create_main_panel(self):
         # Create scrollable area for main content
@@ -228,7 +228,6 @@ class AppView(QMainWindow):
         self.timer = QTimer(self.central_widget)
         self.timer.timeout.connect(self.update_timer)
         self.timer.start(1000)  # 1000 milliseconds = 1 second
-
 
     def display_accounts(self):
         search_term = self.search_box.text().lower()
@@ -326,6 +325,7 @@ class AppView(QMainWindow):
 
     def update_timer(self):
         """ Called every second to update the timer """
+        # Ideally the styles would be handled in styles.py but I can't make it work.
         time_remaining = 30 - (int(time.time()) % 30)
         if self.vault_empty:
             display_time = "  "
@@ -343,7 +343,6 @@ class AppView(QMainWindow):
                 self.timer_label.setStyleSheet("background-color:lightgray")
                 if self.app_config.get_theme_name() == "dark":
                     self.timer_label.setStyleSheet("background-color:gray")
-
 
             display_time = str(time_remaining)
             # pad the display time if necessary
@@ -484,43 +483,14 @@ class AppView(QMainWindow):
                         f"QRselectionDialog returned: {self.selected_account.issuer} - {self.selected_account.label}")
                     return self.selected_account
 
-    def open_qr_image(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, f"Open QR image", "",
-                                                   "PNG Files (*.png);;All Files (*)", options=options)
-        if file_path:
-            try:
-                from pyzbar.pyzbar import decode
-                from PIL import Image
-                # Read image file
-                qr_image = Image.open(file_path)
-                # decode QR codes
-                qr_codes = decode(qr_image)
-                # Extract data from the detected QR codes
-                results = [qr_code.data.decode('utf-8') for qr_code in qr_codes if qr_code.data]
-                if len(results) == 0:
-                    QMessageBox.critical(self, "Error", f"QR image not recognized.")
-                    return
-                # results is a list
-                if len(results) > 1:
-                    QMessageBox.critical(self, "Operation failed", f"The image contained multiple QR codes.\n " +
-                                         "The program is currently unable to process more than one QR code per image.")
-                    return
-                # Parse the URI
-                try:
-                    totp_obj = pyotp.parse_uri(results[0])
-                except ValueError as e:
-                    QMessageBox.critical(self, "Error", f"QR code invalid {e}")
-                    return
-                otprec = OtpRecord(totp_obj.issuer, totp_obj.name, totp_obj.secret)
-                if self.account_manager.save_new_account(otprec):
-                    self.display_accounts()
-                else:
-                    QMessageBox.information(self, "Warning",
-                                            f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
-
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to read QR image: {e}")
+    def get_qr_from_image(self):
+        otprec = find_qr_codes.open_qr_image(self)
+        if otprec is not None:
+            if self.account_manager.save_new_account(otprec):
+                self.display_accounts()
+            else:
+                QMessageBox.information(self, "Warning",
+                                        f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
 
     def show_preferences_dialog(self):
         dialog = PreferencesDialog(parent=self)
