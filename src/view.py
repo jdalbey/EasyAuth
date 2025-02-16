@@ -286,11 +286,9 @@ class AppView(QMainWindow):
                     if self.app_config.is_display_favicons():
                         icon_label = self.providers.get_provider_icon(account.issuer)
                         rowframe_layout.addWidget(icon_label)
-                    # Show Provider and user
-                    label_string = f"{account.issuer}" #({account.label})"
-                    if len(label_string) > 45:
-                        label_string = label_string[:45] + "..."
-                    provider_label = QPushButton(label_string)
+                    # Show Provider
+                    provider_string = account.issuer
+                    provider_label = QPushButton(provider_string)
                     provider_font = QFont("Verdana", 12)
                     provider_font.setUnderline(True)
                     provider_label.setFont(provider_font)
@@ -299,28 +297,27 @@ class AppView(QMainWindow):
                     provider_label.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
                     provider_label.setCursor(Qt.CursorShape.PointingHandCursor)  # Change cursor to a pointing hand
 
-                    user_label = QLabel(account.label)
+                    # Show user
+                    user_string = account.label
+                    # Limit field length
+                    label_length =  len(provider_string) + len(user_string)
+                    if label_length > 31:
+                        adjusted_length = 31 - len(provider_string)
+                        user_string = user_string[:adjusted_length] + "..."
+                    user_label = QLabel(user_string)
                     user_label.setFont(QFont("Verdana",12))
 
+                    # Show TOTP code
                     otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
                     otplabel.setObjectName("otpLabel")
                     otplabel.setToolTip("Copy code to clipboard")
                     otplabel.setCursor(Qt.CursorShape.PointingHandCursor)  # Change cursor to a pointing hand
                     otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
-                    # edit_btn = QPushButton()
-                    # edit_btn.setObjectName("editButton")
-                    #
-                    # edit_btn.setToolTip("Edit account")
-                    # # pass the current values of index, account to show_edit_account_form
-                    # edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
-                    # rowframe_layout.addWidget(edit_btn)
-
                     rowframe_layout.addWidget(provider_label)
                     rowframe_layout.addWidget(user_label)
                     rowframe_layout.addStretch()
                     rowframe_layout.addWidget(otplabel)
-                    #rowframe_layout.addWidget(edit_btn)
 
                     self.scroll_layout.addWidget(row_frame)
 
