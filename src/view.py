@@ -330,6 +330,8 @@ class AppView(QMainWindow):
         time_remaining = 30 - (int(time.time()) % 30)
         if self.vault_empty:
             display_time = "  "
+            # Hide the timer if all accounts get deleted.
+            self.timer_label.setStyleSheet("background-color:#ebebeb")
         else:
             # Display warning color if time running out
             if time_remaining <= 5:
