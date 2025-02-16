@@ -2,18 +2,20 @@
 import qdarktheme
 
 dark_qss = """
-/*QLabel {
-    color: goldenrod;
-}*/
+QLineEdit:read-only {
+                background-color: darkgray; 
+                color: Gainsboro;
+                border: 1px solid darkgray;
+}
 QPushButton {
     border-width: 2px;
 }
-QPushButton#editButton {
-    qproperty-icon: url("assets/edit_icon_dark.png");
-}
+QPushButton#providerLabel {background: transparent; border:none; color: floralwhite }
+QPushButton#providerLabel:hover {color: blue}
+
 QPushButton#otpLabel {
     font-family: "Courier New, monospace";
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
 }
 QPushButton#otpLabel:hover {
@@ -26,7 +28,7 @@ QListView::item
     padding: 5px;
 }
 QLabel#timerLabel {
-    background-color: dimgrey;
+    background-color: gray;
     color: white;
     padding: 3px 15px;
     border-radius: 15px;
@@ -42,6 +44,11 @@ QLineEdit {
     background-color: floralwhite;
     color:  #212f3c; /* near black */
 }
+QLineEdit:read-only {
+                background-color: #ebebeb;
+                color: gray;
+                border: 1px solid darkgray;
+}
 QPushButton { background-color: #ebecf0 }  
 /*toolbar background #ebebeb */
 
@@ -52,19 +59,10 @@ QPushButton#addAccountButton { background-color: #f0f0f0; }
 QPushButton#addAccountButton:hover { background-color: #d6dfea; }
 QPushButton#addAccountButton:pressed { background-color: #b9cee9; }
 
-QPushButton#editButton {
-    qproperty-icon: url("assets/edit_icon_light.png");
-}
 QPushButton#otpLabel {
     font-family: "Courier New, monospace";
     font-size: 20px;
     font-weight: bold;
-    /*
-    background-color: gray;
-    border: None;
-    background: transparent;
-    color: black;
-    */
 }
 QPushButton#otpLabel:hover {
     color: blue;
@@ -89,7 +87,7 @@ QListView::item:selected
 
 /* For Timer */
 QLabel#timerLabel {
-    background-color: #ebebeb;  /* initially match background color */
+    background-color:lightgray;
     color: black;
     padding: 3px 15px;
     border-radius: 15px;

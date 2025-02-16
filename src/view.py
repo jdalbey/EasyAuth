@@ -58,8 +58,8 @@ class AppView(QMainWindow):
         self.create_menubar()
         self.create_toolbar()
 
-        self.display_accounts()
         self.start_timer()
+        self.display_accounts()
         self.logger.debug("view init complete")
 
     def create_menubar(self):
@@ -192,6 +192,7 @@ class AppView(QMainWindow):
         self.timer_label.setToolTip("Time remaining until current TOTP code expires.")
         self.timer_label.setFont(timer_font)
         toolbar.addWidget(self.timer_label)
+        self.timer_label.setStyleSheet("background-color:#ebebeb") # initially hidden
 
     def create_main_panel(self):
         # Create scrollable area for main content
@@ -324,17 +325,25 @@ class AppView(QMainWindow):
         self.scroll_layout.addStretch() # this keeps the rows bunched up at the top
 
     def update_timer(self):
+        """ Called every second to update the timer """
         time_remaining = 30 - (int(time.time()) % 30)
         if self.vault_empty:
             display_time = "  "
             # Hide the timer if all accounts get deleted.
             self.timer_label.setStyleSheet("background-color:#ebebeb")
+            if self.app_config.get_theme_name() == "dark":
+                self.timer_label.setStyleSheet("background-color: #333333")
         else:
             # Display warning color if time running out
             if time_remaining <= 5:
                 self.timer_label.setStyleSheet("background-color:yellow")
+                if self.app_config.get_theme_name() == "dark":
+                    self.timer_label.setStyleSheet("background-color:yellow;color:gray")
             else:
                 self.timer_label.setStyleSheet("background-color:lightgray")
+                if self.app_config.get_theme_name() == "dark":
+                    self.timer_label.setStyleSheet("background-color:gray")
+
 
             display_time = str(time_remaining)
             # pad the display time if necessary

@@ -30,9 +30,6 @@ class VaultEntryDialog(QDialog):
         self.provider_names = self.providers.provider_map.keys()
         self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint) # x-platform consistency
         self.setMinimumSize(380, 280)
-        chosen_theme = self.appconfig.get_theme_name()
-        from styles import light_qss
-        qdarktheme.setup_theme(chosen_theme, additional_qss=light_qss)
 
         try:
             filepath = os.path.join(assets_dir(), "VaultDetails.ui")
@@ -116,6 +113,8 @@ class VaultEntryDialog(QDialog):
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
+    from styles import light_qss
+    qdarktheme.setup_theme("light", additional_qss=light_qss)
     appconfig = AppConfig()
     dialog = VaultEntryDialog(None)
     dialog.exec()

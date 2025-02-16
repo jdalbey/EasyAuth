@@ -30,16 +30,10 @@ class VaultDetailsDialog(VaultEntryDialog):
         # Set initial buttons state
         self.btn_Edit.show()
         self.btn_Delete.show()
-        # Add this to your setup code
-        #self.btn_Save.setDefault(False)
-        #self.btn_Save.setAutoDefault(False)
-        # Do the same for other buttons
-        print(f"Save button default: {self.btn_Save.isDefault()}")
-        print(f"Save button autoDefault: {self.btn_Save.autoDefault()}")
-        print(f"Delete button default: {self.btn_Delete.isDefault()}")
-        print(f"Delete button autoDefault: {self.btn_Delete.autoDefault()}")
+
         # set Learn more link for this dialog
         self.label_LearnMore.setText('<a href="https://github.com/jdalbey/EasyAuth/wiki/User-Manual#41-editing-an-existing-account">Learn more</a>')
+
         # Setup actions to be taken
         self.btn_Edit.clicked.connect(self.start_editting)
         self.btn_Save.clicked.disconnect()
@@ -48,11 +42,8 @@ class VaultDetailsDialog(VaultEntryDialog):
 
         # Initially fields are read only
         self.provider_entry.setReadOnly(True)
-        self.provider_entry.setStyleSheet("color: gray; border: 1px solid gray;")
         self.label_entry.setReadOnly(True)
-        self.label_entry.setStyleSheet("color: gray; border: 1px solid gray;")  # Set a light gray background
         self.secret_entry.setReadOnly(True)
-        self.secret_entry.setStyleSheet("color: gray; border: 1px solid gray;")  # Set a light gray background
 
         # Place current account data into fields for updating
         self.editable_account = copy.deepcopy(account)
@@ -126,9 +117,7 @@ class VaultDetailsDialog(VaultEntryDialog):
         self.btn_Cancel.setEnabled(True)
         self.btn_Delete.setEnabled(True)
         self.provider_entry.setReadOnly(False)
-        self.provider_entry.setStyleSheet("color: black; ")
         self.label_entry.setReadOnly(False)
-        self.label_entry.setStyleSheet("color: black; ")
         self.setWindowTitle("Edit Vault Entry")
 
     def update_qr_button_text(self):
