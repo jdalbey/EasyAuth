@@ -37,14 +37,14 @@ def drive_with_pyautogui():
     gui.typewrite("Woogle\tUser\tAB34")     # Manually complete fields
     gui.hotkey('alt','a')                   # click 'add'
     time.sleep(1)
-    gui.hotkey('alt','s')                   # Search box
+    gui.hotkey('alt','e')                   # Search box
     gui.typewrite("W")                    # Find Woogle
     gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
     gui.press('tab')                        # tab to user field
     gui.typewrite('User Bob')               # update user
     gui.hotkey('alt','s')                   # save & close
 
-    gui.hotkey('alt','s')                   # Search box
+    gui.hotkey('alt','e')                   # Search box
     # 'W' will still be in search box
     gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
     gui.hotkey('alt', 'l')                  # Open Lookup
@@ -57,7 +57,7 @@ def drive_with_pyautogui():
     time.sleep(0.5)
     # NB: after update to 007Names the display is blank because the search box still retains 'W'
     # and 007 doesn't match 'W'
-    gui.hotkey('alt','s')                   # search box
+    gui.hotkey('alt','e')                   # search box
     gui.press('backspace')                  # delete 'W' and 007appears.
 
 

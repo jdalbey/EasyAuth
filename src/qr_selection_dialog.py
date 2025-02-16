@@ -35,7 +35,7 @@ class QRselectionDialog(QDialog):
             row_layout.setAlignment(Qt.AlignLeft)
 
             # Create radio button
-            radio_button = QRadioButton(f"&{index}: {otp_record.issuer} - {otp_record.label}")
+            radio_button = QRadioButton(f"&{index+1}: {otp_record.issuer} - {otp_record.label}")
             self.button_group.addButton(radio_button)
             self.radio_buttons.append(radio_button)
 

@@ -1,4 +1,6 @@
 import logging
+
+import pyperclip
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QTableWidget,
                              QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog, QMessageBox)
 from PyQt5.QtCore import Qt, QItemSelectionModel, QEvent
@@ -44,7 +46,10 @@ class ProviderSearchDialog(QDialog):
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
-        
+        # Directions
+        directions_label = QLabel("Selecting an item copies it to the clipboard.")
+        layout.addWidget(directions_label)
+
         # Search box
         self.search_box = SearchBox(self)
         self.search_box.setPlaceholderText("Search...")
@@ -170,6 +175,9 @@ class ProviderSearchDialog(QDialog):
         if selected_rows:
             row = selected_rows[0].row()
             self.selected_provider = self.table.item(row, 1).text()
+            # copy provider name to clipboard in case user wants to paste it into form
+            pyperclip.copy(self.selected_provider)
+
 
     def select_and_close(self):
         self.accept()
@@ -190,6 +198,7 @@ def main():
     # Show the dialog and get the result
     if dialog.exec_() == QDialog.Accepted:
         selected = dialog.get_selected_provider()
+        print (selected)
     else:
         print("No selection made")
 

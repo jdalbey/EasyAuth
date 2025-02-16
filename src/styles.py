@@ -34,9 +34,6 @@ QLabel#timerLabel {
 """
 # Custom additions to light theme
 light_qss = """
-QLabel {
-    /*color: green;*/
-}
 QCheckBox:focus {
     background-color: #d6dfea;
     color: #212f3c; /* near black */
@@ -47,6 +44,10 @@ QLineEdit {
 }
 QPushButton { background-color: #ebecf0 }  
 /*toolbar background #ebebeb */
+
+QPushButton#providerLabel {background: transparent; border:none; color: #212f3c; /* near black */ }
+QPushButton#providerLabel:hover {color: blue}
+
 QPushButton#addAccountButton { background-color: #f0f0f0; }
 QPushButton#addAccountButton:hover { background-color: #d6dfea; }
 QPushButton#addAccountButton:pressed { background-color: #b9cee9; }
@@ -56,7 +57,7 @@ QPushButton#editButton {
 }
 QPushButton#otpLabel {
     font-family: "Courier New, monospace";
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     /*
     background-color: gray;
@@ -66,9 +67,9 @@ QPushButton#otpLabel {
     */
 }
 QPushButton#otpLabel:hover {
-    text-decoration: underline;
     color: blue;
     }
+
 /* For Reorder dialog */
 QListWidget {
     border : 2px solid black;
@@ -85,6 +86,8 @@ QListView::item:selected
     background : lightblue;
     color: #212f3c; /* near black */
 }
+
+/* For Timer */
 QLabel#timerLabel {
     background-color: lightgray;
     color: black;

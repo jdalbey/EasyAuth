@@ -13,27 +13,12 @@ from export_import_dialog import ExportImportDialog
 from preferences_dialog import PreferencesDialog
 from quick_start_dialog import QuickStartDialog
 from reorder_dialog import ReorderDialog
+from vault_details_dialog import VaultDetailsDialog
 from view import AppView
 
 
 class TestView(unittest.TestCase):
 
-    @patch('view.AddAccountDialog')
-    def test_add_btn_click(self, MockAddAccountDialog):
-        # Create a mock for AddAccountDialog
-        mock_add_account_dialog = MockAddAccountDialog.return_value
-        mock_add_account_dialog.obtain_qr_codes = Mock()
-
-        # Create an instance of AppView
-        view = AppView(self.app)
-        view.app_config.set_auto_find_qr_enabled(True)
-
-        # Simulate clicking the add_btn
-        view.add_btn.click()
-
-        # Verify that obtain_qr_codes was called from AddAccountDialog
-        mock_add_account_dialog.obtain_qr_codes.assert_called_once()
-        mock_add_account_dialog.exec_.assert_called_once()
 
     @patch('view.AppView.show_edit_account_form')
     def test_edit_btn_click(self, mock_show_edit_account_form):
@@ -46,23 +31,22 @@ class TestView(unittest.TestCase):
         first_acct = view.account_manager.accounts[0]
 
         # Find the edit button in the first row
-        edit_btns = view.findChildren(QPushButton, "editButton")
+        edit_btns = view.findChildren(QPushButton, "providerLabel")
         self.assertGreater(len(edit_btns), 0, "No edit buttons found")
         edit_btn = edit_btns[0]
 
         # Simulate clicking the edit button in the first row
         edit_btn.click()
 
-        # TODO: override comparison in Account to not look at encrypted secret
         # Verify that show_edit_account_form was called with the correct index and account
         mock_show_edit_account_form.assert_called_once() #_with(0, unittest.mock.ANY) #first_acct)
 
-    @patch.object(EditAccountDialog, "exec_")
+    @patch.object(VaultDetailsDialog, "exec_")
     def test_show_edit_account_form(self,mockDialog):
         # Create an instance of AppView
         view = AppView(self.app)
         # Find the edit button in the first row
-        edit_btns = view.findChildren(QPushButton, "editButton")
+        edit_btns = view.findChildren(QPushButton, "providerLabel")
         self.assertGreater(len(edit_btns), 0, "No edit buttons found")
         edit_btn = edit_btns[0]
         # Simulate clicking the edit button in the first row
@@ -86,7 +70,7 @@ class TestView(unittest.TestCase):
         view.display_accounts()
 
         # Find the first providerLabel in the layout
-        provider_labels = view.findChildren(QLabel, "providerLabel")
+        provider_labels = view.findChildren(QPushButton, "providerLabel")
         self.assertGreater(len(provider_labels), 0, "No provider labels found")
         first_provider_label = provider_labels[0]
 
@@ -108,7 +92,7 @@ class TestView(unittest.TestCase):
         view.display_accounts()
 
         # Find the first providerLabel in the layout
-        provider_labels = view.findChildren(QLabel, "providerLabel")
+        provider_labels = view.findChildren(QPushButton, "providerLabel")
         self.assertGreater(len(provider_labels), 0, "No provider labels found")
         first_provider_label = provider_labels[0]
 

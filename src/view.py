@@ -6,7 +6,7 @@ from dataclasses import asdict
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QSizePolicy, QAction, QToolBar, QScrollArea,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
-                             QHBoxLayout, QWidget, QMessageBox, QFrame)
+                             QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu)
 from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
 from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
 import pyotp
@@ -14,6 +14,9 @@ import time, datetime
 import pyperclip
 import qdarktheme
 
+import find_qr_codes
+from provider_search_dialog import ProviderSearchDialog
+from qr_selection_dialog import QRselectionDialog
 from utils import assets_dir
 from provider_map import Providers
 import cipher_funcs
@@ -24,8 +27,11 @@ from preferences_dialog import PreferencesDialog
 from export_import_dialog import ExportImportDialog
 from reorder_dialog import ReorderDialog
 from appconfig import AppConfig
-from account_manager import AccountManager, Account
+from account_manager import AccountManager, Account, OtpRecord
 from styles import dark_qss, light_qss
+from vault_details_dialog import VaultDetailsDialog
+from vault_entry_dialog import VaultEntryDialog
+
 
 class AppView(QMainWindow):
     def __init__(self, q_app):
@@ -62,9 +68,30 @@ class AppView(QMainWindow):
 
         # File menu
         file_menu = menubar.addMenu('&File')
-        add_account_action = QAction('Add Account', self)
+
+        # Create the submenu
+        submenu = QMenu('New Vault Entry', self)
+
+        # Create actions for the submenu
+        scanQRcode_action = QAction('Scan from QR code', self)
+        scanQRcode_action.setShortcut(QKeySequence("Alt+S"))
+        scanQRcode_action.triggered.connect(self.scan_QR_code_clickaction)
+
+        openQRimage_action = QAction('Open QR image file', self)
+        openQRimage_action.triggered.connect(self.show_add_account_form)
+
+        add_account_action = QAction('Enter Manually', self)
+        add_account_action.setShortcut(QKeySequence("Alt+A"))
+
         add_account_action.triggered.connect(self.show_add_account_form)
-        file_menu.addAction(add_account_action)
+
+        # Add the actions to the submenu
+        submenu.addAction(scanQRcode_action)
+        submenu.addAction(openQRimage_action)
+        submenu.addAction(add_account_action)
+
+        # Add the submenu to the File menu
+        file_menu.addMenu(submenu)
 
         file_menu.addSeparator()
 
@@ -104,6 +131,10 @@ class AppView(QMainWindow):
         sort_menu.addAction(recency_action)
         sort_menu.addAction(frequency_action)
 
+        provider_search_action = QAction("Provider Search", self)
+        provider_search_action.triggered.connect(self.show_provider_search_dialog)
+        tools_menu.addAction(provider_search_action)
+
         # Help menu
         help_menu = menubar.addMenu('&Help')
         quick_start_action = QAction("Quick Start",self)
@@ -124,9 +155,9 @@ class AppView(QMainWindow):
         self.addToolBar(toolbar)
 
         # Add quick access buttons
-        self.add_btn = QPushButton("&Add Account")
+        self.add_btn = QPushButton('S\u0332'+"can QR code")  #Place underline under S
         self.add_btn.setObjectName("addAccountButton")
-        self.add_btn.clicked.connect(self.show_add_account_form)
+        self.add_btn.clicked.connect(self.scan_QR_code_clickaction)
         toolbar.addWidget(self.add_btn)
 
         # Add spacer to push search to the right
@@ -142,7 +173,7 @@ class AppView(QMainWindow):
 
         # Create an action for the shortcut
         search_shortcut_action = QAction(self)
-        search_shortcut_action.setShortcut(QKeySequence("Alt+S"))
+        search_shortcut_action.setShortcut(QKeySequence("Alt+e"))  #alt+e for 'search'
         search_shortcut_action.triggered.connect(self.search_box.setFocus)
         self.addAction(search_shortcut_action)
         self.search_box.textChanged.connect(lambda: self.display_accounts())  # Dynamic search
@@ -164,12 +195,12 @@ class AppView(QMainWindow):
 
     def create_main_panel(self):
         # Create scrollable area for main content
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
         scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(scroll_content)
-        scroll_area.setWidget(scroll_content)
-        self.main_layout.addWidget(scroll_area)
+        self.scroll_area.setWidget(scroll_content)
+        self.main_layout.addWidget(self.scroll_area)
         self.set_theme()
 
     def set_theme(self):
@@ -235,7 +266,7 @@ class AppView(QMainWindow):
         if self.account_manager.accounts:
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
-            self.scroll_layout.setSpacing(2)  # Set vertical spacing between rows
+            self.scroll_layout.setSpacing(1)  # Set vertical spacing between rows
             for index, account in enumerate(self.account_manager.accounts):
                 if search_term in account.issuer.lower():
                     secret_key = cipher_funcs.decrypt(account.secret)
@@ -251,36 +282,45 @@ class AppView(QMainWindow):
                     row_frame.setContentsMargins(0,0,0,0)
 
                     rowframe_layout = QHBoxLayout(row_frame)
-                    rowframe_layout.setSpacing(5)  # Set horizontal spacing between widgets in the row
                     # Show Favicon
                     if self.app_config.is_display_favicons():
                         icon_label = self.providers.get_provider_icon(account.issuer)
                         rowframe_layout.addWidget(icon_label)
                     # Show Provider and user
-                    label_string = f"{account.issuer} ({account.label})"
+                    label_string = f"{account.issuer}" #({account.label})"
                     if len(label_string) > 45:
                         label_string = label_string[:45] + "..."
-                    provider_label = QLabel(label_string)
+                    provider_label = QPushButton(label_string)
+                    provider_font = QFont("Verdana", 12)
+                    provider_font.setUnderline(True)
+                    provider_label.setFont(provider_font)
                     provider_label.setObjectName("providerLabel")
-                    provider_label.setFont(QFont("Verdana", 12))
+                    provider_label.setToolTip("View/edit details")
+                    provider_label.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
+                    provider_label.setCursor(Qt.CursorShape.PointingHandCursor)  # Change cursor to a pointing hand
+
+                    user_label = QLabel(account.label)
+                    user_label.setFont(QFont("Verdana",12))
 
                     otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
                     otplabel.setObjectName("otpLabel")
                     otplabel.setToolTip("Copy code to clipboard")
+                    otplabel.setCursor(Qt.CursorShape.PointingHandCursor)  # Change cursor to a pointing hand
                     otplabel.clicked.connect(lambda _, otplabel=otplabel, idx=index, acc=account: self.copy_to_clipboard(otplabel, idx, acc))
 
-                    edit_btn = QPushButton()
-                    edit_btn.setObjectName("editButton")
-
-                    edit_btn.setToolTip("Edit account")
-                    # pass the current values of index, account to show_edit_account_form
-                    edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
-                    rowframe_layout.addWidget(edit_btn)
+                    # edit_btn = QPushButton()
+                    # edit_btn.setObjectName("editButton")
+                    #
+                    # edit_btn.setToolTip("Edit account")
+                    # # pass the current values of index, account to show_edit_account_form
+                    # edit_btn.clicked.connect(lambda _, account=account, idx=index: self.show_edit_account_form(idx, account=account))
+                    # rowframe_layout.addWidget(edit_btn)
 
                     rowframe_layout.addWidget(provider_label)
+                    rowframe_layout.addWidget(user_label)
                     rowframe_layout.addStretch()
                     rowframe_layout.addWidget(otplabel)
-                    rowframe_layout.addWidget(edit_btn)
+                    #rowframe_layout.addWidget(edit_btn)
 
                     self.scroll_layout.addWidget(row_frame)
 
@@ -334,11 +374,11 @@ class AppView(QMainWindow):
         """ User clicked Add Account button """
         self.logger.debug("Starting Show_add_account_form")
         try:
-            add_dialog = AddAccountDialog(self)
+            add_dialog = VaultEntryDialog(self)
             add_dialog.show()
-            # Are we in auto_find mode?
-            if self.app_config.is_auto_find_qr_enabled():
-                add_dialog.obtain_qr_codes(False)
+            # # Are we in auto_find mode?
+            # if self.app_config.is_auto_find_qr_enabled():
+            #     add_dialog.obtain_qr_codes(False)
             add_dialog.exec_()
         except Exception as e:
             self.logger.error("AddAccountDialog not constructed.")
@@ -349,11 +389,85 @@ class AppView(QMainWindow):
     def show_edit_account_form(self,index,account):
         self.logger.debug (f"entering show_edit_account_form with {index} {account.issuer}")
         try:
-            dialog_EditAcct = EditAccountDialog(self, index, account)
+            dialog_EditAcct = VaultDetailsDialog(self, index, account)
             dialog_EditAcct.exec_()
         except Exception as e:
             self.logger.error("EditAccountDialog not constructed.")
         self.display_accounts()
+
+    def scan_QR_code_clickaction(self):
+        otprec = self.obtain_qr_codes(called_from_Find_btn=True)
+        if otprec:
+            self.show_popup()
+            if self.account_manager.save_new_account(otprec):
+                self.display_accounts()
+            else:
+                QMessageBox.information(self, "Warning", f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
+
+    def show_popup(self):
+        # Show a floating message relative to the form fields
+        popup = QLabel("QR code found!", self)
+        popup.setObjectName("qr_code_found")
+        popup.setAlignment(Qt.AlignCenter)
+        popup.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
+        popup.setStyleSheet("QLabel#qr_code_found {font-size:16px; background-color: #dff0d8; color: #3c763d; padding: 5px; border: 1px solid #d6e9c6;}")
+        popup.resize(150, 50)
+        # Calculate position just above the field
+
+        #button_geometry = self.entry_panel.mapToGlobal(self.entry_panel.provider_entry.geometry().topLeft())
+        button_geometry = self.scroll_area.parent().mapToGlobal(self.scroll_area.geometry().topLeft())
+        button_center_x = button_geometry.x() + self.scroll_area.width() // 2
+        popup_x = button_center_x - popup.width() // 2
+        popup_y = button_geometry.y() - popup.height() - 5  # 5 pixels gap above the button
+
+        popup.move(popup_x, popup_y)
+        popup.show()
+        QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
+
+    def obtain_qr_codes(self, called_from_Find_btn):
+        # We aren't going to do auto scan in v0.3 so I think this argument is obsolete.
+        # first go find_qr_codes
+        urls = find_qr_codes.scan_screen_for_qr_codes()
+        logging.debug(f"obtain_qr_codes() found these URIs: {urls}")
+        # Examine each url to see if it is an otpauth protocol and reject others
+        otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]
+        # Try to parse each url.  Put the fields into an OtpRecord and append to displaylist.
+        display_list = []
+        for uri in otpauth_list:
+            try:
+                totp_obj = pyotp.parse_uri(uri)
+            except ValueError as e:
+                continue  # skip invalid URI's
+            issuer = totp_obj.issuer
+            label = totp_obj.name
+            secret_key = totp_obj.secret
+            account = OtpRecord(issuer, label, secret_key)
+            # TODO: Extract the advanced parameters if they exists
+            logging.debug(f"obtain_qr_codes() parsing produced: {issuer} {label} ")
+            display_list.append(account)
+        # How many valid URI's do we have?
+        if len(display_list) == 0:
+            # This should only be shown during a requested find, not an automatic one.
+            if called_from_Find_btn:  # we might have got here from Find button even though auto_hunt was on and failed.
+                QMessageBox.information(self, 'Alert',
+"""No QR code found.  Be sure the QR code is visible on your screen and try again.
+(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
+""", QMessageBox.Ok)
+                return
+        if len(display_list) == 1:
+            return display_list[0]
+        # Wow, we got more than one QR code
+        if len(display_list) > 1:
+            # Ask user to select one account from the list
+            dialog = QRselectionDialog(display_list, self)
+            # The dialog.exec_() call will block execution until the dialog is closed
+            if dialog.exec_() == QDialog.Accepted:
+                self.selected_account = dialog.get_selected_account()
+                # If user made a selection,
+                if self.selected_account:
+                    logging.debug(
+                        f"QRselectionDialog returned: {self.selected_account.issuer} - {self.selected_account.label}")
+                    return self.selected_account
 
     def show_preferences_dialog(self):
         dialog = PreferencesDialog(parent=self)
@@ -392,6 +506,12 @@ class AppView(QMainWindow):
         self.account_manager.sort_frequency()
         self.accounts = self.account_manager.accounts
         self.display_accounts()
+
+    def show_provider_search_dialog(self):
+        dlg = ProviderSearchDialog()
+        dlg.load_data()
+        dlg.show()
+        dlg.exec_()
 
     def show_quick_start_dialog(self):
         if self.quick_start_dialog is None or not self.quick_start_dialog.isVisible():
@@ -457,6 +577,6 @@ class AppView(QMainWindow):
 # local main for unit testing
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = AppView()
+    window = AppView(app)
     window.show()
     sys.exit(app.exec_())
