@@ -89,7 +89,7 @@ QListView::item:selected
 
 /* For Timer */
 QLabel#timerLabel {
-    background-color: lightgray;
+    background-color: #ebebeb;  /* initially match background color */
     color: black;
     padding: 3px 15px;
     border-radius: 15px;

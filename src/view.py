@@ -6,7 +6,7 @@ from dataclasses import asdict
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QSizePolicy, QAction, QToolBar, QScrollArea,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
-                             QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu)
+                             QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu, QFileDialog)
 from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
 from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
 import pyotp
@@ -78,7 +78,7 @@ class AppView(QMainWindow):
         scanQRcode_action.triggered.connect(self.scan_QR_code_clickaction)
 
         openQRimage_action = QAction('Open QR image file', self)
-        openQRimage_action.triggered.connect(self.show_add_account_form)
+        openQRimage_action.triggered.connect(self.open_qr_image)
 
         add_account_action = QAction('Enter Manually', self)
         add_account_action.setShortcut(QKeySequence("Alt+A"))
@@ -331,11 +331,18 @@ class AppView(QMainWindow):
         if self.vault_empty:
             display_time = "  "
         else:
+            # Display warning color if time running out
+            if time_remaining <= 5:
+                self.timer_label.setStyleSheet("background-color:yellow")
+            else:
+                self.timer_label.setStyleSheet("background-color:lightgray")
+
             display_time = str(time_remaining)
             # pad the display time if necessary
             if len(display_time) < 2:
                 display_time = ' ' + display_time
         self.timer_label.setText(display_time)
+
         # refresh the display every 30 seconds
         # NB: assumes timer period is 30 seconds for all accounts
         if time_remaining == 30:
@@ -468,6 +475,44 @@ class AppView(QMainWindow):
                     logging.debug(
                         f"QRselectionDialog returned: {self.selected_account.issuer} - {self.selected_account.label}")
                     return self.selected_account
+
+    def open_qr_image(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, f"Open QR image", "",
+                                                   "PNG Files (*.png);;All Files (*)", options=options)
+        if file_path:
+            try:
+                from pyzbar.pyzbar import decode
+                from PIL import Image
+                # Read image file
+                qr_image = Image.open(file_path)
+                # decode QR codes
+                qr_codes = decode(qr_image)
+                # Extract data from the detected QR codes
+                results = [qr_code.data.decode('utf-8') for qr_code in qr_codes if qr_code.data]
+                if len(results) == 0:
+                    QMessageBox.critical(self, "Error", f"QR image not recognized.")
+                    return
+                # results is a list
+                if len(results) > 1:
+                    QMessageBox.critical(self, "Operation failed", f"The image contained multiple QR codes.\n " +
+                                         "The program is currently unable to process more than one QR code per image.")
+                    return
+                # Parse the URI
+                try:
+                    totp_obj = pyotp.parse_uri(results[0])
+                except ValueError as e:
+                    QMessageBox.critical(self, "Error", f"QR code invalid {e}")
+                    return
+                otprec = OtpRecord(totp_obj.issuer, totp_obj.name, totp_obj.secret)
+                if self.account_manager.save_new_account(otprec):
+                    self.display_accounts()
+                else:
+                    QMessageBox.information(self, "Warning",
+                                            f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
+
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to read QR image: {e}")
 
     def show_preferences_dialog(self):
         dialog = PreferencesDialog(parent=self)
