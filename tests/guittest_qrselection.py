@@ -2,6 +2,8 @@ import os
 import threading
 import time
 import subprocess
+from pathlib import Path
+
 import pyautogui as gui
 from PIL import Image
 
@@ -24,11 +26,6 @@ def drive_with_pyautogui():
     # Wait for the app to start
     time.sleep(1)
 
-    # Press Add Account button
-    #gui.mouseInfo()
-    gui.hotkey('alt', 'a')                  # Open add dialog
-    time.sleep(1)
-
 def capture_output(process):
     # Capture stdout and stderr from the process
     stdout, stderr = process.communicate()  # Wait for process to finish and capture output
@@ -37,7 +34,10 @@ def capture_output(process):
         print(stdout.decode())  # Decode bytes to string
     if stderr:
         print("Standard Error:")
-        print(stderr.decode())  # Decode bytes to string
+        log_results = stderr.decode()  # Decode bytes to string
+        print (log_results)
+        # verify account was updated correctly
+        assert log_results.strip().endswith("LinkedIn (earthling@planet.com)")
 
 def find_and_close_image_window():
     # Using wmctrl to find windows by title
@@ -61,13 +61,12 @@ def grab_code():
     gui.hotkey('alt','s')       # click "Scan" button
     # Selection dialog should appear
     time.sleep(1)
-    gui.hotkey('alt','0')       # click first radi0 button
+    gui.hotkey('alt','1')       # click first radio button
     gui.hotkey('alt','o')       # click OK
     time.sleep(1)               # Pause for human verification
     # close the window with the qr code
     find_and_close_image_window()
-    # form fields should be autofilled
-    gui.hotkey('alt','a')       # click 'Add'
+    # display should show new account
     time.sleep(1)
 
     # Exit Application
@@ -85,8 +84,11 @@ def show_image():
     return image
 
 if __name__ == "__main__":
-    if os.path.exists("tests/test_data/vault.json"):
-        os.remove("tests/test_data/vault.json")
+    # For this test we make a vault in developer's home directory
+    vault = os.path.join(Path.home(),os.path.normpath("vault.json"))
+    if os.path.exists(vault):
+        # Remove any prior artifacts
+        os.remove(vault)
 
     # Execute `show_image()` after 0.5 seconds
     #threading.Timer(0.5, show_image).start()

@@ -24,22 +24,28 @@ def start_app():
     return process
 
 def drive_with_pyautogui():
-    gui.PAUSE = 0.5  # sec after each command
+    gui.PAUSE = 0.25  # sec after each command
     gui.FAILSAFE = True
     # Wait for the app to start
     time.sleep(1)
 
     # Press Add Account button
     #gui.mouseInfo()
-    gui.hotkey('alt', 'a')                  # Open add dialog
+    gui.hotkey('alt', 'a')                  # open add vault entry dialaog
     time.sleep(1)
     # Fill the form fields
-    gui.typewrite("Woogle\tUser\tAB34")     # Manually complete fields
-    gui.hotkey('alt','a')                   # click 'add'
+    gui.typewrite("Woogle")
+    gui.press('tab')
+    gui.typewrite('User')
+    gui.press('tab')
+    gui.typewrite('AB34')                   # Manually complete fields
+    gui.hotkey('alt','s')                   # click 'save'
     time.sleep(1)
     gui.hotkey('alt','e')                   # Search box
-    gui.typewrite("W")                    # Find Woogle
-    gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
+    gui.typewrite("W")                      # Find Woogle
+    gui.press(['tab','space'])              # Tab to edit button, Open details dialog
+    # Modify the user
+    gui.hotkey('alt','e')                   # Click Edit button
     gui.press('tab')                        # tab to user field
     gui.typewrite('User Bob')               # update user
     gui.hotkey('alt','s')                   # save & close
@@ -47,19 +53,25 @@ def drive_with_pyautogui():
     gui.hotkey('alt','e')                   # Search box
     # 'W' will still be in search box
     gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
-    gui.hotkey('alt', 'l')                  # Open Lookup
-    gui.typewrite('spring')                 # Enter name in search field
-    gui.press('enter')                      # Accept
-    gui.hotkey('alt', 'l')                  # Open Lookup
-    gui.press(['down','down'])              # Browse the list
-    gui.press('enter')                      # Accept
+    gui.hotkey('alt','e')                   # Click Edit button
+    gui.hotkey('ctrl','a')                  # select all
+    gui.typewrite('adaf')                   # Enter name in search field
+    gui.press('down')                       # autocompletes AdaFruit
+    gui.press('enter')
     gui.hotkey('alt','s')                   # save & close
     time.sleep(0.5)
-    # NB: after update to 007Names the display is blank because the search box still retains 'W'
-    # and 007 doesn't match 'W'
+    # NB: after update to Adafruit the display is blank because the search box still retains 'W'
+    # and Adafruit doesn't match 'W'
     gui.hotkey('alt','e')                   # search box
-    gui.press('backspace')                  # delete 'W' and 007appears.
+    gui.press('backspace')                  # delete 'W' and Adafruit appears
+    time.sleep(1)
 
+    gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
+    gui.hotkey('alt','q')                   # show QR code
+    gui.hotkey('alt','o')                   # click OK
+    gui.hotkey('alt','e')                   # Click Edit button
+    gui.hotkey('alt','d')                   # Click Delete button
+    gui.hotkey('alt','y')                   # confirm
 
     # Exit Application
     gui.hotkey('alt','x')
@@ -76,8 +88,8 @@ def capture_output(process):
         print("Standard Error:")
         log_results = stderr.decode()  # Decode bytes to string
         print (log_results)
-        # verify account was updated to '007Names' "User Bob"
-        assert log_results.strip().endswith("007Names (User Bob)")
+        # verify account was updated correctly
+        assert log_results.strip().endswith("Adafruit (User Bob)")
 
 if __name__ == "__main__":
     from pathlib import Path

@@ -84,7 +84,7 @@ class VaultDetailsDialog(VaultEntryDialog):
         last_used_layout.addWidget(self.usage_count_label, 1, 1)
 
         # Reveal QR Code Button
-        self.reveal_qr_button = QPushButton("Show QR code")
+        self.reveal_qr_button = QPushButton("Show &QR code")
         self.reveal_qr_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.reveal_qr_button.clicked.connect(self.handle_QR_reveal)
         last_used_layout.addWidget(self.reveal_qr_button, 2, 0, 1, 2, Qt.AlignCenter)
