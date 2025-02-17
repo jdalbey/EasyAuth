@@ -101,15 +101,9 @@ class VaultDetailsDialog(VaultEntryDialog):
         last_used_layout.addWidget(user_info_btn, 2, 2, Qt.AlignCenter)
         self.bottom_layout.addWidget(last_used_frame,alignment=Qt.AlignCenter)
 
-        # Add spacer to push buttons toward top
-        #spacer = QWidget()
-        #spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #self.bottom_layout.addWidget(spacer)
         # Locate the form's layout so we can add the bottom fields
         form_layout = self.findChild(QVBoxLayout, "mainVerticalLayout")
-#        form_layout.addLayout(self.bottom_layout)
         form_layout.insertLayout(1, self.bottom_layout)
-        # self.buttonLayout.insertWidget(2,self.btn_Delete)
 
     def start_editting(self):
         self.btn_Edit.setEnabled(False)
