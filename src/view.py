@@ -336,9 +336,9 @@ class AppView(QMainWindow):
         else:
             # Display warning color if time running out
             if time_remaining <= 5:
-                self.timer_label.setStyleSheet("background-color:yellow")
+                self.timer_label.setStyleSheet("background-color: #f7f48a ") #yellow")
                 if self.app_config.get_theme_name() == "dark":
-                    self.timer_label.setStyleSheet("background-color:yellow;color:gray")
+                    self.timer_label.setStyleSheet("background-color:#f7f48a;color:gray")
             else:
                 self.timer_label.setStyleSheet("background-color:lightgray")
                 if self.app_config.get_theme_name() == "dark":
@@ -407,7 +407,13 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def scan_QR_code_clickaction(self):
-        otprec = qr_funcs.obtain_qr_codes(self)
+        if self.app_config.is_minimize_during_qr_search():
+            self.hide()
+            time.sleep(0.1)
+            otprec = qr_funcs.obtain_qr_codes(self)
+            self.show()
+        else:
+            otprec = qr_funcs.obtain_qr_codes(self)
         if otprec:
             self.show_popup()
             if self.account_manager.save_new_account(otprec):

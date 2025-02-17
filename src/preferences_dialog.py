@@ -40,8 +40,8 @@ class PreferencesDialog(QDialog):
         layout.addWidget(self.scan_permission)
 
         # Minimize during QR code search
-        self.minimize_during_qr_search = QCheckBox("Minimize during QR code search")
-        self.minimize_during_qr_search.setEnabled(False)
+        self.minimize_during_qr_search = QCheckBox("Hide window during QR code scan")
+        self.minimize_during_qr_search.setEnabled(True)
         layout.addWidget(self.minimize_during_qr_search)
 
         # Minimize application after TOTP copy to clipboard
