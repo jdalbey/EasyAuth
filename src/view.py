@@ -436,7 +436,7 @@ class AppView(QMainWindow):
         QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
 
     def get_qr_from_image(self):
-        otprec = find_qr_codes.open_qr_image(self)
+        otprec = qr_funcs.open_qr_image(self)
         if otprec is not None:
             if self.account_manager.save_new_account(otprec):
                 self.display_accounts()

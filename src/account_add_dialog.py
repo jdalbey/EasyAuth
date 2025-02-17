@@ -145,7 +145,7 @@ class AddAccountDialog(QDialog):
 
     def obtain_qr_codes(self, called_from_Find_btn):
         # first go find_qr_codes
-        urls = find_qr_codes.scan_screen_for_qr_codes()
+        urls = qr_funcs.scan_screen_for_qr_codes()
         logging.debug (f"obtain_qr_codes() found these URIs: {urls}")
         # Examine each url to see if it is an otpauth protocol and reject others
         otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]

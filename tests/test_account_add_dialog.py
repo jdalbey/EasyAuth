@@ -10,7 +10,6 @@ from account_manager import AccountManager, OtpRecord
 from appconfig import AppConfig
 from view import AppView
 
-
 class TestAddAccountDialog(unittest.TestCase):
 
     @patch.object(QFileDialog, "getOpenFileName")
@@ -42,7 +41,7 @@ class TestAddAccountDialog(unittest.TestCase):
 
     @patch('qr_selection_dialog.QRselectionDialog')
     @patch('account_edit_dialog.QMessageBox.information')
-    @patch("find_qr_codes.scan_screen_for_qr_codes")
+    @patch("qr_funcs.scan_screen_for_qr_codes")
     def test_obtain_qr_code(self, mock_find, MockMessageBox, mock_SelectionDialog):
         dialog = AddAccountDialog(AppView(self.app))
         dialog.accept = Mock()  # Mock the accept method of the dialog
