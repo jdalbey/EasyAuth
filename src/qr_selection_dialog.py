@@ -26,6 +26,8 @@ class QRselectionDialog(QDialog):
         # Button group for radio buttons
         self.button_group = QButtonGroup(self)
         self.radio_buttons = []  # Store references to radio buttons for tab ordering
+        # Connect the buttonToggled signal to a slot
+        self.button_group.buttonToggled.connect(self.enable_ok_button)
 
         # Add accounts as rows with radio buttons
         for index, otp_record in enumerate(accounts):
@@ -57,18 +59,22 @@ class QRselectionDialog(QDialog):
         # Button layout
         button_layout = QHBoxLayout()
         self.ok_button = QPushButton("&OK")
+        self.ok_button.setEnabled(False)  #initially disabled
         self.ok_button.clicked.connect(self.on_ok)
         button_layout.addWidget(self.ok_button)
 
-        cancel_button = QPushButton("&Cancel")
-        cancel_button.clicked.connect(self.accept)
-        button_layout.addWidget(cancel_button)
+        self.cancel_button = QPushButton("&Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addWidget(self.cancel_button)
 
         layout.addLayout(button_layout)
 
         # Add spacer to push the button to the bottom
         spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(spacer)
+
+    def enable_ok_button(self):
+        self.ok_button.setEnabled(True)
 
     def on_ok(self):
         # Check which radio button is selected
