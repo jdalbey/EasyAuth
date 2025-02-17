@@ -382,7 +382,14 @@ class AppView(QMainWindow):
         popup.move(popup_x, popup_y)
         popup.show()
 
-        QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
+        QTimer.singleShot(3000, lambda popup=popup: self.copy_action_complete(popup))  # Hide after 3 seconds
+
+    def copy_action_complete(self, popup):
+        """ When copy popup times out, close it. """
+        popup.close()
+        # Minimize this window if preference permits
+        if self.app_config.is_minimize_after_copy():
+            self.showMinimized()
 
     def show_add_account_form(self):
         """ User clicked Add Account button """

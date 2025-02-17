@@ -46,7 +46,7 @@ class PreferencesDialog(QDialog):
 
         # Minimize application after TOTP copy to clipboard
         self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
-        self.minimize_after_copy.setEnabled(False)
+        self.minimize_after_copy.setEnabled(True)
         layout.addWidget(self.minimize_after_copy)
 
         # Font button
