@@ -10,9 +10,10 @@ class TestAppConfig:
         # reset the singleton
         AppConfig._instance = None
         # A complete config file
-        settings_string = """[Settings]\nauto_find_qr = True\nsearch_by = Provider\nminimize_after_copy = False
-        minimize_during_qr_search = False\nauto_fetch_favicons = False\ndisplay_favicons = False\nsecret_key_hidden = False
-        language = English\nanimate_copy = False"""
+        settings_string = """
+[Settings]\nsearch_by = Provider\nminimize_after_copy = False
+minimize_during_qr_search = False\nauto_fetch_favicons = False\ndisplay_favicons = True\nsecret_key_hidden = False\n
+language = English\nscan_permission = False"""
         kConfigPath = "/tmp/config_test.ini"
         text_file = open(kConfigPath, "w")
         text_file.write(settings_string)
@@ -25,10 +26,8 @@ class TestAppConfig:
         theme = config.get_theme_name()
         alt_id = config.get_alt_id()
 
-        assert config.is_auto_find_qr_enabled()
-        assert smart_filter == False
+        assert config.is_display_favicons()
         assert theme == "light"
-        #assert alt_id.startswith("10b")
         assert alt_id == None
 
     def test_partial_config(self):
@@ -44,7 +43,7 @@ class TestAppConfig:
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        result = config.is_auto_find_qr_enabled()
+        result = config.is_display_favicons()
         assert not result  # fallback = False
         result = config.get_os_data_dir()
         assert result.endswith("data")
@@ -62,7 +61,7 @@ class TestAppConfig:
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        assert config.is_auto_find_qr_enabled()
+        assert config.is_display_favicons()
 
     def test_noarg_missingfile(self):
         # reset the singleton
@@ -77,7 +76,7 @@ class TestAppConfig:
 
         config = AppConfig()  # noarg constructor
 
-        assert config.is_auto_find_qr_enabled()
+        assert config.is_display_favicons()
         # should have been created by restore_defaults()
         assert os.path.exists(filepath)
 

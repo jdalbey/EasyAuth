@@ -24,15 +24,6 @@ class PreferencesDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
-        # Auto Find QR Code
-        self.auto_find_qr_checkbox = QCheckBox("Add Account scans for QR code automatically:")
-        self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
-        layout.addWidget(self.auto_find_qr_checkbox)
-
-        # Animate form fill
-        self.animate_form_fill = QCheckBox("Animate typing during auto form fill")
-        layout.addWidget(self.animate_form_fill)
-
         # Display website favicons
         self.display_favicons = QCheckBox("Display provider favicons")
         self.display_favicons.setEnabled(True)
@@ -43,15 +34,20 @@ class PreferencesDialog(QDialog):
         self.secret_key_hidden.setEnabled(True)
         layout.addWidget(self.secret_key_hidden)
 
-        # Minimize application after TOTP copy to clipboard
-        self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
-        self.minimize_after_copy.setEnabled(False)
-        layout.addWidget(self.minimize_after_copy)
+        # Permission to scan screen for QR code
+        self.scan_permission = QCheckBox("Allowed to scan screen for QR code")
+        self.scan_permission.setEnabled(True)
+        layout.addWidget(self.scan_permission)
 
         # Minimize during QR code search
         self.minimize_during_qr_search = QCheckBox("Minimize during QR code search")
         self.minimize_during_qr_search.setEnabled(False)
         layout.addWidget(self.minimize_during_qr_search)
+
+        # Minimize application after TOTP copy to clipboard
+        self.minimize_after_copy = QCheckBox("Minimize application after TOTP copy to clipboard")
+        self.minimize_after_copy.setEnabled(False)
+        layout.addWidget(self.minimize_after_copy)
 
         # Font button
         # self.font_button = QPushButton("Font")
@@ -85,6 +81,7 @@ class PreferencesDialog(QDialog):
         self.restore_defaults_button.setFocusPolicy(Qt.NoFocus)
         button_row.addWidget(self.restore_defaults_button, alignment=Qt.AlignLeft)
         button_row.addStretch()
+
         # OK button
         btn_OK = QPushButton("&OK")
         btn_OK.clicked.connect(self.save_settings)
@@ -110,21 +107,19 @@ class PreferencesDialog(QDialog):
         self.load_settings()
 
     def load_settings(self):
-        self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
-        self.minimize_during_qr_search.setChecked(self.app_config.is_minimize_during_qr_search())
-        self.animate_form_fill.setChecked(self.app_config.is_animate_form_fill())
         self.display_favicons.setChecked(self.app_config.is_display_favicons())
         self.secret_key_hidden.setChecked(self.app_config.is_secret_key_hidden())
-        self.auto_find_qr_checkbox.setChecked(self.app_config.is_auto_find_qr_enabled())
+        self.scan_permission.setChecked(self.app_config.is_scan_permission())
+        self.minimize_after_copy.setChecked(self.app_config.is_minimize_after_copy())
+        self.minimize_during_qr_search.setChecked(self.app_config.is_minimize_during_qr_search())
         self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
     def apply_settings(self):
-        self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
-        self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
-        self.app_config.set_animate_form_fill(self.animate_form_fill.isChecked())
         self.app_config.set_display_favicons(self.display_favicons.isChecked())
         self.app_config.set_secret_key_hidden(self.secret_key_hidden.isChecked())
-        self.app_config.set_auto_find_qr_enabled(self.auto_find_qr_checkbox.isChecked())
+        self.app_config.set_scan_permission(self.scan_permission.isChecked())
+        self.app_config.set_minimize_after_copy(self.minimize_after_copy.isChecked())
+        self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.parent().set_theme()  # set theme in application
         self.parent().display_accounts() # redisplay accounts
@@ -153,5 +148,7 @@ class PreferencesDialog(QDialog):
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
-    dialog = PreferencesDialog(app)
+    from styles import light_qss
+    qdarktheme.setup_theme("light", additional_qss=light_qss)
+    dialog = PreferencesDialog(None)
     dialog.exec()

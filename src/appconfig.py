@@ -63,11 +63,23 @@ class AppConfig:
         self.save_config()
 
     # Add methods to get and set the new settings
-    def is_auto_find_qr_enabled(self):
-        return self.get('Settings', 'auto_find_qr', fallback='False') == 'True'
+    def is_display_favicons(self):
+        return self.get('Settings', 'display_favicons', fallback='False') == 'True'
 
-    def set_auto_find_qr_enabled(self, value):
-        self.set('Settings', 'auto_find_qr', 'True' if value else 'False')
+    def set_display_favicons(self, value):
+        self.set('Settings', 'display_favicons', 'True' if value else 'False')
+
+    def is_secret_key_hidden(self):
+        return self.get('Settings', 'secret_key_hidden', fallback='False') == 'True'
+
+    def set_secret_key_hidden(self, value):
+        self.set('Settings', 'secret_key_hidden', 'True' if value else 'False')
+
+    def is_scan_permission(self):
+        return self.get('Settings', 'scan_permission', fallback='False') == 'True'
+
+    def set_scan_permission(self, value):
+        self.set('Settings', 'scan_permission', 'True' if value else 'False')
 
     def is_minimize_after_copy(self):
         return self.get('Settings', 'minimize_after_copy', fallback='False') == 'True'
@@ -80,24 +92,6 @@ class AppConfig:
 
     def set_minimize_during_qr_search(self, value):
         self.set('Settings', 'minimize_during_qr_search', 'True' if value else 'False')
-
-    def is_display_favicons(self):
-        return self.get('Settings', 'display_favicons', fallback='False') == 'True'
-
-    def set_display_favicons(self, value):
-        self.set('Settings', 'display_favicons', 'True' if value else 'False')
-
-    def is_animate_form_fill(self):
-        return self.get('Settings', 'animate_form_fill', fallback='True') == 'True'
-
-    def set_animate_form_fill(self, value):
-        self.set('Settings', 'animate_form_fill', 'True' if value else 'False')
-
-    def is_secret_key_hidden(self):
-        return self.get('Settings', 'secret_key_hidden', fallback='False') == 'True'
-
-    def set_secret_key_hidden(self, value):
-        self.set('Settings', 'secret_key_hidden', 'True' if value else 'False')
 
     def get_language(self):
         return self.get('Settings', 'language', fallback='English')
@@ -152,14 +146,12 @@ class AppConfig:
 
     def restore_defaults(self):
         """ restore and write defaults """
-        self.set_auto_find_qr_enabled(True)
-        self.set_minimize_after_copy(False)
-        self.set_minimize_during_qr_search(False)
-        self.set_animate_form_fill(True)
         self.set_display_favicons(True)
         self.set_secret_key_hidden(False)
+        self.set_scan_permission(False)
+        self.set_minimize_after_copy(False)
+        self.set_minimize_during_qr_search(False)
         self.set_language('English')
-        self.set_smart_filtering_enabled(False)
         self.set_theme_name("light")
         # 'Hidden' settings are not listed in the Preferences dialog and don't have public setter methods
         """ Alternate machine id.  If you want to use a vault created on a different machine you need to

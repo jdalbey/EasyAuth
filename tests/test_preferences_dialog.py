@@ -24,19 +24,19 @@ class TestPreferencesDialog(unittest.TestCase):
         # Create the dialog instance - it loads settings
         dialog = PreferencesDialog(view)
         # Get the state of the checkbox
-        dlg_state = dialog.auto_find_qr_checkbox.isChecked()
+        dlg_state = dialog.display_favicons.isChecked()
         # Flip the checkbox
-        dialog.auto_find_qr_checkbox.setChecked(not dlg_state)
+        dialog.display_favicons.setChecked(not dlg_state)
         # Load the settings again
         dialog.load_settings()
         # Verify load_settings restored the checkbox state
-        assert dlg_state == dialog.auto_find_qr_checkbox.isChecked()
+        assert dlg_state == dialog.display_favicons.isChecked()
 
     def set_theme(self):
         """ Mock method used for testing apply_settings() """
         pass
 
-    @patch.object(AppConfig,"set_auto_find_qr_enabled")
+    @patch.object(AppConfig,"set_display_favicons")
     def test_apply_settings(self,mockConfig):
         """ We're just checking a single setting for this smoke test """
         view = AppView(self.app)
