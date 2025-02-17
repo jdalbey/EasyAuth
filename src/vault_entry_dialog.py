@@ -47,16 +47,17 @@ class VaultEntryDialog(QDialog):
         self.use_default_icon()
 
         # Setup auto-complete for provider field
-        completer = QCompleter(self.provider_names)
-        completer.setCaseSensitivity(False)  # Makes it case-insensitive
-        completer.setFilterMode(Qt.MatchContains)  # Allows substring matching
-        self.provider_entry.setCompleter(completer)
+        self.completer = QCompleter(self.provider_names)
+        self.completer.setCaseSensitivity(False)  # Makes it case-insensitive
+        self.completer.setFilterMode(Qt.MatchContains)  # Allows substring matching
+        self.provider_entry.setCompleter(self.completer)
         # Connect activated signal to update icon_name when a match is selected
         # Ensures that when the user picks a provider, the first letter is copied to icon_name.
-        completer.activated.connect(self.update_icon_name)
+        # Will call update_icon_name with the string from activated()
+        #self.completer.activated[str].connect(self.update_icon_name)
         # Connect text changed signal to monitor matches dynamically
         # If only one match remains, it preemptively updates icon_name without requiring user selection.
-        self.provider_entry.textEdited.connect(self.check_single_match)
+        #self.provider_entry.textEdited.connect(self.check_single_match)
         # Connect editingFinished signal
         self.provider_entry.editingFinished.connect(self.on_provider_entry_editting_finished)
 
@@ -82,30 +83,18 @@ class VaultEntryDialog(QDialog):
         pixmap = QPixmap(os.path.join(assets_dir(),"globe_icon.png"))
         self.icon_label.setPixmap(pixmap)
 
-    def update_icon_name(self, text):
-        """ Update icon_name field when a provider is selected. """
-        if text:
-            pixmap = self.providers.get_provider_icon_pixmap(text)
-            self.icon_label.setPixmap(pixmap)
-
-    def check_single_match(self):
+    def on_provider_entry_editting_finished(self):
+        """ Use default icon if provider name not found """
+        print (f"Editing finished with {self.provider_entry.text()}")
         """ Check if only one match remains and update icon_name. """
         match_list = [name for name in self.provider_names if self.provider_entry.text().lower() in name.lower()]
+        print(f"match_list length: {len(match_list)}")
         if len(match_list) == 1:
             pixmap = self.providers.get_provider_icon_pixmap(match_list[0])
             self.icon_label.setPixmap(pixmap)
+            self.provider_entry.setText(match_list[0])
+            print ("complete")
         else:
-            self.use_default_icon()
-
-    def on_provider_entry_editting_finished(self):
-        """ Use default icon if provider name not found """
-        found = False
-        # Search for user's entry
-        for name in self.provider_names:
-            if self.provider_entry.text() == name:
-                found = True
-        # If not in provider names then use default
-        if not found:
             self.use_default_icon()
 
 

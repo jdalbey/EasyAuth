@@ -56,8 +56,7 @@ def drive_with_pyautogui():
     gui.hotkey('alt','e')                   # Click Edit button
     gui.hotkey('ctrl','a')                  # select all
     gui.typewrite('adaf')                   # Enter name in search field
-    gui.press('down')                       # autocompletes AdaFruit
-    gui.press('enter')
+    gui.press('tab')                       # autocompletes AdaFruit
     gui.hotkey('alt','s')                   # save & close
     time.sleep(0.5)
     # NB: after update to Adafruit the display is blank because the search box still retains 'W'
