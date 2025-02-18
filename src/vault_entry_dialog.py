@@ -84,17 +84,14 @@ class VaultEntryDialog(QDialog):
         self.icon_label.setPixmap(pixmap)
 
     def on_provider_entry_editting_finished(self):
-        """ Use default icon if provider name not found """
-        print (f"Editing finished with {self.provider_entry.text()}")
         """ Check if only one match remains and update icon_name. """
         match_list = [name for name in self.provider_names if self.provider_entry.text().lower() in name.lower()]
-        print(f"match_list length: {len(match_list)}")
         if len(match_list) == 1:
             pixmap = self.providers.get_provider_icon_pixmap(match_list[0])
             self.icon_label.setPixmap(pixmap)
             self.provider_entry.setText(match_list[0])
-            print ("complete")
         else:
+            # Use default icon if provider name not found
             self.use_default_icon()
 
 
