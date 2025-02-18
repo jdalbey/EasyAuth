@@ -6,7 +6,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QPushButton, QLabel, QMenuBar, QMenu, QAction
 
 import pyperclip
-from account_edit_dialog import EditAccountDialog
+
 from account_manager import AccountManager, OtpRecord, Account
 from appconfig import AppConfig
 from export_import_dialog import ExportImportDialog

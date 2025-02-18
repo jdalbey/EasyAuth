@@ -3,25 +3,23 @@ import unittest
 from unittest.mock import patch, Mock, MagicMock
 
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
-
-from account_add_dialog import AddAccountDialog
-from account_edit_dialog import EditAccountDialog
 from account_manager import AccountManager, OtpRecord, Account
 import common_dialog_funcs
 import provider_search_dialog
 from appconfig import AppConfig
 from view import AppView
-
+from vault_details_dialog import VaultDetailsDialog
+from vault_entry_dialog import VaultEntryDialog
 
 class TestCommonDialogFunctions(unittest.TestCase):
     @patch('common_dialog_funcs.QMessageBox.information')
-    @patch("account_edit_dialog.AccountManager")
+    @patch("vault_entry_dialog.AccountManager")
     def test_save_duplicate_account(self,MockAccountManager,MockMessageBox):
         # account with an invalid secret
         encrypted_secret = 'gAAAAABnmqBZJAE6715s4cUAj0T-zcgU2FqYWZBx04JOB-kIaxqCl9rhhBrW8til6eb9PX8Q5r9qlH2XO0rlrlfG5vFXNbq3ww=='
         account_in = Account("Woogle", "me@woogle.com", encrypted_secret, "2000-01-01 01:01")
 
-        dialog = EditAccountDialog(None, 1, account_in)
+        dialog = VaultDetailsDialog(None, 1, account_in)
         dialog.account_manager.save_new_account = MagicMock(return_value=False)
         dialog.close = Mock()
 
@@ -46,7 +44,7 @@ class TestCommonDialogFunctions(unittest.TestCase):
         mock_dialog.get_selected_provider.return_value = "Woogle"
 
         # Create AddAccountDialog instance
-        add_dlg = AddAccountDialog(AppView(self.app))
+        add_dlg = VaultEntryDialog(AppView(self.app))
 
         # Call function that opens the dialog
         common_dialog_funcs.provider_lookup(add_dlg)

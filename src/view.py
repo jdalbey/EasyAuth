@@ -17,12 +17,9 @@ from permission_dialog import PermissionDialog, get_permission
 
 import qr_funcs
 from provider_search_dialog import ProviderSearchDialog
-from qr_selection_dialog import QRselectionDialog
 from utils import assets_dir
 from provider_map import Providers
 import cipher_funcs
-from account_add_dialog import AddAccountDialog
-from account_edit_dialog import EditAccountDialog
 from quick_start_dialog import QuickStartDialog
 from preferences_dialog import PreferencesDialog
 from export_import_dialog import ExportImportDialog

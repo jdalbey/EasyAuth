@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch, Mock
 from PyQt5.QtWidgets import QApplication
-from account_add_dialog import AddAccountDialog
 from account_manager import AccountManager, OtpRecord
 from appconfig import AppConfig
+from vault_entry_dialog import VaultEntryDialog
 from view import AppView
 
 class TestVaultEntryDialog(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestVaultEntryDialog(unittest.TestCase):
         mock_account_manager = MockAccountManager.return_value
 
         # Create an instance of AddAccountDialog
-        dialog = AddAccountDialog(AppView(self.app))
+        dialog = VaultEntryDialog(AppView(self.app))
         dialog.account_manager = mock_account_manager
 
         # Set values for the input fields
@@ -41,7 +41,7 @@ class TestVaultEntryDialog(unittest.TestCase):
     def test_Cancel_button(self, MockAccountManager):
         # Mock the AccountManager
         dialog_manager = MockAccountManager.return_value # is the mock instance created when AccountManager() is called in ConfirmAccountDialog.
-        dialog = AddAccountDialog(AppView(self.app))
+        dialog = VaultEntryDialog(AppView(self.app))
 
         # Replace account manager in dialog with the mock
         dialog.account_manager = dialog_manager
@@ -63,7 +63,7 @@ class TestVaultEntryDialog(unittest.TestCase):
 
     def test_learn_more(self):
         """ Test link content, not that it actually opens the browser page """
-        dialog = AddAccountDialog(AppView(self.app))
+        dialog = VaultEntryDialog(AppView(self.app))
         link = dialog.label_LearnMore
         linktext = link.text()
         expected = '<a href="https://github.com/jdalbey/EasyAuth/wiki'
