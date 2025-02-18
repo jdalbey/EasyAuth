@@ -1,8 +1,5 @@
 ## Roadmap
 
- - Complete Preferences options
- - Backup/Restore (encrypted Export/Import)
  - Import-merge
- - Favorites
- - Windows version
+ - Allow change provider name but keep icon
 

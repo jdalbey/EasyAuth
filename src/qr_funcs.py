@@ -58,7 +58,7 @@ def obtain_qr_codes(parent):
     # How many valid URI's do we have?
     if len(display_list) == 0:
         QMessageBox.information(parent, 'Alert',
-"""No QR code found.  Be sure the QR code is visible on your screen and try again.
+"""No QR code found.  Be sure the QR code with the secret key is visible on your screen and try again.
 (The provider will show a QR code in your web browser during enabling of two-factor authentication.)
 """, QMessageBox.Ok)
         return

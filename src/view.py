@@ -13,6 +13,7 @@ import pyotp
 import time, datetime
 import pyperclip
 import qdarktheme
+from permission_dialog import PermissionDialog, get_permission
 
 import qr_funcs
 from provider_search_dialog import ProviderSearchDialog
@@ -250,7 +251,7 @@ class AppView(QMainWindow):
                     "Your vault is empty.",
                     "The vault stores two-factor authentication keys",
                     "provided by a website or other online service.",
-                    "Store your secret key by clicking 'Add Account'",
+                    "Store your secret key by clicking 'Scan QR code'",
                     "or"
                 ]
                 for line in help_message:
@@ -414,15 +415,36 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def scan_QR_code_clickaction(self):
+        if self.app_config.is_scan_permission():
+            self.fetch_QR_codes()
+        else:
+            # Display the permission dialog
+            result = get_permission(self)
+
+            if result == PermissionDialog.ALWAYS_ALLOW:
+                # permanently granting permission
+                self.app_config.set_scan_permission(True)
+                self.fetch_QR_codes()
+
+            elif result == PermissionDialog.JUST_THIS_TIME:
+                # one time permission
+                self.fetch_QR_codes()
+
+
+    def fetch_QR_codes(self):
+        # check option to minimize window during QR scan
         if self.app_config.is_minimize_during_qr_search():
             self.hide()
-            time.sleep(0.1)
-            otprec = qr_funcs.obtain_qr_codes(self)
-            self.show()
+            time.sleep(0.1) # short delay to allow window to hide
+            otprec = qr_funcs.obtain_qr_codes(self) # Scan QR code
+            self.show() # the window reappears
         else:
+            # Scan QR code without hiding window
             otprec = qr_funcs.obtain_qr_codes(self)
+        # If a QR code was found
         if otprec:
-            self.show_popup()
+            self.show_popup()  # Popup announcing success
+            # Save the result in the vault
             if self.account_manager.save_new_account(otprec):
                 self.display_accounts()
             else:
@@ -437,8 +459,6 @@ class AppView(QMainWindow):
         popup.setStyleSheet("QLabel#qr_code_found {font-size:16px; background-color: #dff0d8; color: #3c763d; padding: 5px; border: 1px solid #d6e9c6;}")
         popup.resize(150, 50)
         # Calculate position just above the field
-
-        #button_geometry = self.entry_panel.mapToGlobal(self.entry_panel.provider_entry.geometry().topLeft())
         button_geometry = self.scroll_area.parent().mapToGlobal(self.scroll_area.geometry().topLeft())
         button_center_x = button_geometry.x() + self.scroll_area.width() // 2
         popup_x = button_center_x - popup.width() // 2
