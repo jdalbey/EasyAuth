@@ -24,6 +24,8 @@ from account_manager import AccountManager
   }
 """
 
+"""Confirm Export: The export file contains your vault data in an unencrypted format.
+Use a secure channel for transmitting it and delete it immediately after you are done using it."""
 class ExportImportDialog(QDialog):
     def __init__(self, parent=None):
         super(ExportImportDialog, self).__init__(parent)

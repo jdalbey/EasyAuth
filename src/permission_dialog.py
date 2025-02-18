@@ -51,7 +51,7 @@ using File > New Vault Entry > Enter Manually."""
 
         # Create the buttons
         deny_button = QPushButton("&Deny")
-        just_this_time_button = QPushButton("&Just this time")
+        just_this_time_button = QPushButton("&Just once")
         always_allow_button = QPushButton("&Always allow")
 
         # Connect buttons to their respective return values
