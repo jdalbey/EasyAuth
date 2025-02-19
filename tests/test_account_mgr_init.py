@@ -92,7 +92,7 @@ class TestAccountManager:
         """Test validation of account data structure."""
         invalid_data = [{"issuer": "Test"}]  # Missing required fields
 
-        assert not account_manager._validate_account_data(invalid_data)
+        assert not account_manager._validate_vault_data(invalid_data)
 
         # Contains v0 fields but not v1
         invalid_data = [{
@@ -102,7 +102,7 @@ class TestAccountManager:
             "last_used": "2024-01-14 12:00",
         }]
 
-        assert not account_manager._validate_account_data(invalid_data)
+        assert not account_manager._validate_vault_data(invalid_data)
 
         # Contains all fields but secret is not encrypted
         invalid_data = [{
@@ -115,7 +115,7 @@ class TestAccountManager:
             "icon": None
         }]
 
-        assert not account_manager._validate_account_data(invalid_data)
+        assert not account_manager._validate_vault_data(invalid_data)
 
         valid_data = [{
             "issuer": "Test",
@@ -127,7 +127,7 @@ class TestAccountManager:
             "icon": None
         }]
 
-        assert account_manager._validate_account_data(valid_data)
+        assert account_manager._validate_vault_data(valid_data)
 
     def test_save_and_load_accounts(self, account_manager, sample_accounts):
         """Test saving and loading accounts."""

@@ -147,7 +147,7 @@ class AccountManager:
             # Read and validate primary vault
             with open(self.vault_path, 'r') as f:
                 content = json.load(f)
-                if not self._validate_account_data(content):
+                if not self._validate_vault_data(content):
                     raise ValueError("Invalid vault format (wrong version?)")
                 # Assign the content to the account list
                 accounts = [Account(**acc) for acc in content["vault"]["entries"]]
@@ -573,7 +573,7 @@ class AccountManager:
             if self.backup_path.exists():
                 with open(self.backup_path, 'r') as f:
                     content = json.load(f)
-                    if self._validate_account_data(content):
+                    if self._validate_vault_data(content):
                         self.logger.debug("Successfully recovered from backup")
                         return [Account(**acc) for acc in content['vault']['entries']]
 
@@ -585,7 +585,7 @@ class AccountManager:
             return []
 
     @staticmethod
-    def _validate_account_data(content: list) -> bool:
+    def _validate_vault_data(content: list) -> bool:
         """
         Validate account data structure.
         """

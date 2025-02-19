@@ -83,31 +83,47 @@ class TestAccountMgr:
 
     def test_vault_data_validation(self, account_manager):
         """Test validation of account data structure."""
-        invalid_data = [{"issuer": "Test"}]  # Missing required fields
+        invalid_data = [{"issuer": "Test"}]  # Not a vault
 
-        assert not account_manager._validate_account_data(invalid_data)
+        assert not account_manager._validate_vault_data(invalid_data)
 
-        # Contains all fields but secret is not encrypted
-        invalid_data = [{
+        # Vault missing required fields
+        invalid_data = {"vault":{"version":"1",
+                                 "entries":[{
             "issuer": "Test",
             "label": "Test",
             "secret": "secret",
             "last_used": "2024-01-14 12:00"
-        }]
+        }]}}
 
-        assert not account_manager._validate_account_data(invalid_data)
+        assert not account_manager._validate_vault_data(invalid_data)
 
-        valid_data = [{
+        # Contains all fields but secret is not encrypted
+        invalid_data = {"vault":{"version":"1",
+                                 "entries":[{
+            "issuer": "Test",
+            "label": "Test",
+            "secret": "secret",
+            "last_used": "2024-01-14 12:00",
+            "used_frequency": 2,
+            "favorite":False,
+            "icon":None
+        }]}}
+
+        assert not account_manager._validate_vault_data(invalid_data)
+
+        valid_data = {"vault":{"version":"1",
+                                 "entries":[{
             "issuer": "Test",
             "label": "Test",
             "secret": "gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==",
             "last_used": "2024-01-14 12:00",
             "used_frequency": 3,
-            'favorite':"False",
+            'favorite':False,
             "icon":None
-        }]
+        }]}}
 
-        assert account_manager._validate_account_data(valid_data)
+        assert account_manager._validate_vault_data(valid_data)
 
     def test_save_and_load_accounts(self, account_manager, sample_accounts):
         """Test saving and loading accounts."""
