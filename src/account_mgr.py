@@ -127,7 +127,7 @@ class AccountManager:
         This method loads accounts from the vault file into the account manager.
 
         Returns:
-            bool: True if the accounts were loaded successfully, False otherwise.
+            list of accounts (may be empty)
 
         Raises:
             Exception: If any error occurs during the loading process.
@@ -589,6 +589,10 @@ class AccountManager:
         """
         Validate account data structure.
         """
+        # Accept an empty list
+        if len(content) == 0:
+            return True
+
         if "vault" in content:
             if "version" in content['vault']:
                 if content['vault']['version'] == kCurrent_Vault_Version:

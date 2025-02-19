@@ -10,10 +10,10 @@ from account_mgr import AccountManager, Account, OtpRecord
 @pytest.fixture
 def sample_accounts():
     """Sample account data for testing."""
-    return [
-        {"issuer": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00"},
-        {"issuer": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00"},
-    ]
+    return {"vault": {"version": "1","entries":[
+        {"issuer": "Provider1", "label": "Label1", "secret": "Secret1", "last_used": "2025-01-01 12:00","used_frequency":2,"favorite":False,"icon":""},
+        {"issuer": "Provider2", "label": "Label2", "secret": "Secret2", "last_used": "2025-01-02 12:00","used_frequency":2,"favorite":False,"icon":""}
+    ]}}
 
 @pytest.fixture(autouse=True)
 def reset_singleton():
@@ -94,7 +94,7 @@ def test_typical_use():
 
 def test_duplicate_accounts(sample_accounts):
     instance = AccountManager("/tmp/testvault.json")
-    accounts = [OtpRecord(acc['issuer'],acc['label'],acc['secret']).toAccount() for acc in sample_accounts]
+    accounts = [OtpRecord(acc['issuer'],acc['label'],acc['secret']).toAccount() for acc in sample_accounts['vault']['entries']]
     duplicates = instance.duplicate_accounts(accounts)
     assert len(duplicates) == 2, "duplicate_accounts should create copies of all accounts"
     assert duplicates[0].issuer == accounts[0].issuer

@@ -54,7 +54,9 @@ class TestAccountMgr:
         """ must be first method in suite to ensure the singleton uses a tmp file for all other tests"""
         x = str(account_manager.vault_path)
         assert str(account_manager.vault_path).startswith("/tmp")
-
+        # removes the tmp dir
+        print(f"Teardown: Removing temporary directory {account_manager.vault_path}")
+        os.remove(account_manager.vault_path)
     def test_singleton_pattern(self):
         """Test that AccountManager follows singleton pattern."""
         manager1 = AccountManager()
@@ -139,6 +141,9 @@ class TestAccountMgr:
         assert len(loaded_accounts) == len(sample_accounts)
         assert loaded_accounts[0].issuer == sample_accounts[0]["issuer"]
         assert loaded_accounts[0].label == sample_accounts[0]["label"]
+        assert loaded_accounts[1].used_frequency == sample_accounts[1]["used_frequency"]
+        assert loaded_accounts[1].favorite == sample_accounts[1]["favorite"]
+        assert loaded_accounts[1].icon == sample_accounts[1]["icon"]
 
     def test_backup_creation(self, account_manager, sample_accounts):
         """Test that backup file is created when saving accounts."""
@@ -225,7 +230,7 @@ class TestAccountMgr:
             print(f"After exception - dir permissions: {oct(os.stat(vault_dir).st_mode)}")
             raise
         # Update the existing account
-        revised_data = Account("Foobar",'Barfoo',encrypted_secret,"2020-12-12 01:01")
+        revised_data = Account("Foobar",'Barfoo',encrypted_secret,"2020-12-12 01:01",2,False,"")
         try:
             account_manager.update_account(0, revised_data)
         except Exception as e:
@@ -237,6 +242,13 @@ class TestAccountMgr:
         assert updated_account.issuer == "Foobar"
         assert updated_account.label == "Barfoo"
         assert updated_account.secret == encrypted_secret
+        assert updated_account.used_frequency == 2
+        assert updated_account.favorite == False
+        assert updated_account.icon == ""
+        # removes the tmp dir
+        print(f"Teardown: Removing temporary directory {account_manager.vault_path}")
+        os.remove(account_manager.vault_path)
+
 
     @patch('cipher_funcs.encrypt')
     def test_update_account_nochange(self, mock_encrypt, account_manager):
