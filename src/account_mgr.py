@@ -148,7 +148,7 @@ class AccountManager:
             with open(self.vault_path, 'r') as f:
                 content = json.load(f)
                 if not self._validate_account_data(content):
-                    raise ValueError("Invalid account data format")
+                    raise ValueError("Invalid vault format (wrong version?)")
                 # Assign the content to the account list
                 accounts = [Account(**acc) for acc in content["vault"]["entries"]]
                 self._last_modified_time = current_mtime
@@ -516,9 +516,17 @@ class AccountManager:
                 secret_key = json_account['secret']
                 if import_mode:
                     secret_key = cipher_funcs.encrypt(json_account['secret'])
-                restored_account = Account(json_account['issuer'],json_account['label'],secret_key,
-                                           json_account['last_used'],json_account['used_frequency'],
-                                           json_account['favorite'], json_account['icon'])
+                # required fields
+                restored_account = Account(json_account['issuer'],json_account['label'],secret_key)
+                # optional fields
+                if 'last_used' in json_account:
+                    restored_account.last_used = json_account['last_used']
+                if 'used_frequency' in json_account:
+                    restored_account.used_frequency = json_account['used_frequency']
+                if 'favorite' in json_account:
+                    restored_account.favorite = json_account['favorite']
+                if 'icon' in json_account:
+                    restored_account.icon = json_account['icon']
 
                 restored_accounts.append(restored_account)
 
@@ -588,7 +596,8 @@ class AccountManager:
                         # Detected vaultv1 format
                         accounts_data = content["vault"]["entries"]
         else:
-            accounts_data = content
+            print("ERROR - Vault data not in correct format.")
+            return False
 
         required_fields = {'issuer', 'label', 'secret', 'last_used', 'used_frequency', 'favorite', 'icon'}
         for acct in accounts_data:
