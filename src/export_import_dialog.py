@@ -131,8 +131,10 @@ class ExportImportDialog(QDialog):
             try:
                 self.account_manager.export_accounts(file_path,file_format)
                 QMessageBox.information(self, "Success", f"Accounts successfully exported up to {file_path}")
+                self.close()
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to export accounts: {e}")
+                self.close()
 
     def build_provider_preview(self, account_list):
         """ build a string with names of first few providers to be imported """
