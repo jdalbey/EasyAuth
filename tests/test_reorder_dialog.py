@@ -3,7 +3,7 @@ from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtCore import Qt
 from reorder_dialog import ReorderDialog
-from account_manager import OtpRecord
+from account_mgr import OtpRecord
 @pytest.fixture
 def app(qtbot):
     app = QApplication([])

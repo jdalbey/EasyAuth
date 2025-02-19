@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPixmap, QDrag, QFont
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
                              QListWidgetItem, QPushButton, QWidget, QLabel, QApplication, QSizePolicy)
 
-from account_manager import AccountManager
+from account_mgr import AccountManager
 
 class CustomListWidget(QListWidget):
     def __init__(self, parent=None):
@@ -105,7 +105,6 @@ class ReorderDialog(QDialog):
 if __name__ == '__main__':
     import sys
     from dataclasses import asdict
-    from account_manager import AccountManager
 
     app = QApplication(sys.argv)
     mgr = AccountManager()

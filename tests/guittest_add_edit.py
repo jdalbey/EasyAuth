@@ -31,7 +31,7 @@ def drive_with_pyautogui():
 
     # Press Add Account button
     #gui.mouseInfo()
-    gui.hotkey('alt', 'a')                  # open add vault entry dialaog
+    gui.hotkey('alt', 'a')                  # open add vault entry dialog
     time.sleep(1)
     # Fill the form fields
     gui.typewrite("Woogle")
@@ -52,7 +52,8 @@ def drive_with_pyautogui():
 
     gui.hotkey('alt','e')                   # Search box
     # 'W' will still be in search box
-    gui.press(['tab','space'])              # Tab to edit button, Open edit dialog
+    gui.press('tab')              # Tab to edit button, Open edit dialog
+    gui.press('space')              # Tab to edit button, Open edit dialog
     gui.hotkey('alt','e')                   # Click Edit button
     gui.hotkey('ctrl','a')                  # select all
     gui.typewrite('adaf')                   # Enter name in search field

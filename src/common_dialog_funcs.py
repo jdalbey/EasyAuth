@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QPushButton
 from PyQt5.QtGui import QIcon
 from utils import assets_dir
 import otp_funcs, logging
-from account_manager import OtpRecord
+from account_mgr import OtpRecord
 from appconfig import AppConfig
 from provider_search_dialog import ProviderSearchDialog
 

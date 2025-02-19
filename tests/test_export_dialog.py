@@ -5,7 +5,7 @@ import pytest
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt
 from export_import_dialog import ExportImportDialog
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 
 class TestExportDialog(unittest.TestCase):
 

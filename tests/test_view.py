@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QPushButton, QLa
 
 import pyperclip
 
-from account_manager import AccountManager, OtpRecord, Account
+from account_mgr import AccountManager, OtpRecord, Account
 from appconfig import AppConfig
 from export_import_dialog import ExportImportDialog
 from preferences_dialog import PreferencesDialog
@@ -19,16 +19,18 @@ from view import AppView
 
 class TestView(unittest.TestCase):
 
-
     @patch('view.AppView.show_edit_account_form')
-    def test_edit_btn_click(self, mock_show_edit_account_form):
+    def test_edit_btn_click(self, mock_show_edit_account_form, ):
         # Create an instance of AppView
         view = AppView(self.app)
 
-        # Mock the accounts list
-        #mock_account = OtpRecord("TestProvider", "test@example.com", "AB45").toAccount()
-        #view.accounts = [mock_account]
-        first_acct = view.account_manager.accounts[0]
+        # Mock the accounts list with two mock accounts
+        mock_account1 = OtpRecord("Provider1", "label1", "AB34").toAccount()
+        mock_account2 = OtpRecord("Provider2", "label2", "AB34").toAccount()
+
+        view.account_manager.accounts = [mock_account1, mock_account2]
+
+        view.display_accounts()
 
         # Find the edit button in the first row
         edit_btns = view.findChildren(QPushButton, "providerLabel")

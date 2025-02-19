@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QDialog, QLabel, QMessageBox, QApplication, QFileDia
 from PyQt5.uic import loadUi
 
 import qr_funcs
-from account_manager import AccountManager, OtpRecord
+from account_mgr import AccountManager, OtpRecord
 from appconfig import AppConfig
 from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
 from provider_map import Providers

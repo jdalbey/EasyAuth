@@ -7,7 +7,7 @@ from PyQt5.QtGui import QPixmap
 import qr_funcs
 import unittest
 
-from account_manager import OtpRecord
+from account_mgr import OtpRecord
 
 
 class Test_qr_funcss(unittest.TestCase):

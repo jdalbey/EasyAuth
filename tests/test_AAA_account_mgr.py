@@ -7,7 +7,7 @@ import tempfile
 from unittest.mock import Mock, patch
 
 import cipher_funcs
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 
 @pytest.fixture
 def account_manager(request):
@@ -33,17 +33,23 @@ def sample_accounts():
             "issuer": "Google",
             "label": "Work",
             "secret": 'gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==',
-            "last_used": "2024-01-14 10:00"
+            "last_used": "2024-01-14 10:00",
+            "used_frequency": 0,
+            "favorite": False,
+            "icon": None
         },
         {
             "issuer": "GitHub",
             "label": "Personal",
             "secret": 'gAAAAABnkHqr0nPIqDdHwAEXwRiB53q5sgS3AUF-RG9SpbHwpNowsuLjqpuY2coo9VlqkZk5Fit3-vbduso6X7CzT2nKJG8TgQ==',
-            "last_used": "2024-01-14 11:00"
+            "last_used": "2024-01-14 11:00",
+            "used_frequency": 0,
+            "favorite": False,
+            "icon": None
         }
     ]
 
-class TestAccountManager:
+class TestAccountMgr:
     def test_account_manager_init(self, account_manager):
         """ must be first method in suite to ensure the singleton uses a tmp file for all other tests"""
         x = str(account_manager.vault_path)
@@ -95,7 +101,10 @@ class TestAccountManager:
             "issuer": "Test",
             "label": "Test",
             "secret": "gAAAAABnkHnoOtMp73O9EPlDqmSDIJneDqMih3lUVnuEN4vKXaTOEUGX0GuTlr6MhOFZocVBV-iNC2NiZTlqEV49vDPCRbSf_g==",
-            "last_used": "2024-01-14 12:00"
+            "last_used": "2024-01-14 12:00",
+            "used_frequency": 3,
+            'favorite':"False",
+            "icon":None
         }]
 
         assert account_manager._validate_account_data(valid_data)
@@ -356,8 +365,15 @@ class TestAccountManager:
         modified_accounts = sample_accounts.copy()
         modified_accounts[0]["label"] = "Modified"
         with open(account_manager.vault_path, 'w') as f:
-            json.dump(modified_accounts, f)
-        
+            vault_content = {
+                "vault": {
+                    "version": "1",
+                    "entries": []
+                        }
+            }
+            vault_content["vault"]["entries"] = modified_accounts
+            json.dump(vault_content, f, indent=2)
+
         # Force reload
         account_manager._last_modified_time = None
         loaded_accounts = account_manager.load_accounts()

@@ -1,6 +1,6 @@
 
 import otp_funcs
-from account_manager import Account
+from account_mgr import Account
 
 class TestOTPfuncs:
     def test_is_valid_secretkey(self):

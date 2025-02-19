@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDial
     QButtonGroup, QToolButton, QHBoxLayout, QSizePolicy
 from utils import assets_dir
 from styles import info_btn_style
-from account_manager import AccountManager
+from account_mgr import AccountManager
 """ Reference: Gnome-Authenticator backup JSON format
   {
     "secret": "37E4WSILXWLQ87C2QJ4MXABCD2OW7L6H",

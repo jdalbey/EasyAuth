@@ -6,7 +6,7 @@ import shutil
 import tempfile
 from unittest.mock import Mock, patch
 import cipher_funcs
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 
 
 @pytest.fixture
@@ -95,6 +95,11 @@ class TestAccountManager:
 
         account_manager.save_new_account(acct2)
         account_manager.save_new_account(acct1)
+        acct1up = account_manager.accounts[0]
+        acct1up.issuer = "Boogie"
+        acct1up.used_frequency = 1
+        acct1up.icon = 'Bullwinkle'
+        account_manager.update_account(0,acct1up)
         # Backup these existing accounts
         account_manager.backup_accounts("/tmp/backup_test1.json")
         # assert that file exists with non-zero size
@@ -105,16 +110,19 @@ class TestAccountManager:
 
         # Restore from backup file
         account_manager.restore_accounts("/tmp/backup_test1.json")
-        assert account_manager.accounts[0].issuer == acct1.issuer
+        print (F"acct1 {acct1.issuer}")
+        assert account_manager.accounts[0].issuer == acct1up.issuer
         assert account_manager.accounts[1].issuer == acct2.issuer
-        assert account_manager.accounts[0].label == acct1.label
+        assert account_manager.accounts[0].label == acct1up.label
         assert account_manager.accounts[1].label == acct2.label
-        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
+        assert account_manager.accounts[0].secret == acct1up.secret
         assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
+        assert account_manager.accounts[0].used_frequency == 1
+        assert account_manager.accounts[0].icon == 'Bullwinkle'
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
-            vault_accounts = json.load(f)
-            assert vault_accounts[0]['issuer'] == "Boggle"
+            vault_accounts = json.load(f)['vault']['entries']
+            assert vault_accounts[0]['issuer'] == "Boogie"
         os.remove("/tmp/backup_test1.json")
 
     def test_export_and_import(self,account_manager, sample_accounts):
@@ -125,6 +133,11 @@ class TestAccountManager:
         acct2 = OtpRecord("Github", "Personal", "secret_2")
         account_manager.save_new_account(acct2)
         account_manager.save_new_account(acct1)
+        acct1up = account_manager.accounts[0]
+        acct1up.issuer = "Boogie"
+        acct1up.used_frequency = 1
+        acct1up.icon = 'Bullwinkle'
+        account_manager.update_account(0,acct1up)
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test2.json",'json')
         # assert that file exists with non-zero size
@@ -145,16 +158,18 @@ class TestAccountManager:
 
         # Import from exported file
         account_manager.import_accounts("/tmp/backup_test2.json")
-        assert account_manager.accounts[0].issuer == acct1.issuer
+        assert account_manager.accounts[0].issuer == acct1up.issuer
         assert account_manager.accounts[1].issuer == acct2.issuer
-        assert account_manager.accounts[0].label == acct1.label
+        assert account_manager.accounts[0].label == acct1up.label
         assert account_manager.accounts[1].label == acct2.label
-        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
+        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == cipher_funcs.decrypt(acct1up.secret)
         assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
+        assert account_manager.accounts[0].used_frequency == 1
+        assert account_manager.accounts[0].icon == 'Bullwinkle'
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
-            vault_accounts = json.load(f)
-            assert vault_accounts[0]['issuer'] == "Boggle"
+            vault_accounts = json.load(f)['vault']['entries']
+            assert vault_accounts[0]['issuer'] == "Boogie"
         os.remove("/tmp/backup_test2.json")
 
     def test_import_preview(self,account_manager, sample_accounts):
@@ -217,7 +232,7 @@ class TestAccountManager:
         assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
-            vault_accounts = json.load(f)
+            vault_accounts = json.load(f)['vault']['entries']
             assert vault_accounts[0]['issuer'] == "Boggle"
         os.remove("/tmp/backup_test4.txt")
 

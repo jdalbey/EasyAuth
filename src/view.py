@@ -25,7 +25,7 @@ from preferences_dialog import PreferencesDialog
 from export_import_dialog import ExportImportDialog
 from reorder_dialog import ReorderDialog
 from appconfig import AppConfig
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 from styles import dark_qss, light_qss
 from vault_details_dialog import VaultDetailsDialog
 from vault_entry_dialog import VaultEntryDialog

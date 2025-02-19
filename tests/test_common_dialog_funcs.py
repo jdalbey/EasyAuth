@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch, Mock, MagicMock
 
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
-from account_manager import AccountManager, OtpRecord, Account
+from account_mgr import AccountManager, OtpRecord, Account
 import common_dialog_funcs
 import provider_search_dialog
 from appconfig import AppConfig
