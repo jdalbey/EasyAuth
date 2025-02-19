@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 
 from appconfig import AppConfig
 from export_import_dialog import ExportImportDialog
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 from preferences_dialog import PreferencesDialog
 from view import AppView
 

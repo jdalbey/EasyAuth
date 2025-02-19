@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QRadioButton, QPushButton, \
     QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup, QShortcut
-from account_manager import OtpRecord
+from account_mgr import OtpRecord
 
 class QRselectionDialog(QDialog):
     def __init__(self, accounts, parent=None):

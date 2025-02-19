@@ -5,7 +5,7 @@ import threading
 import os
 import json
 from unittest.mock import patch, mock_open
-from account_manager import AccountManager, Account, OtpRecord
+from account_mgr import AccountManager, Account, OtpRecord
 
 @pytest.fixture
 def sample_accounts():
@@ -60,7 +60,7 @@ def test_load_accounts(mock_open, mock_exists):
 
 def test_typical_use():
     # Create a test vault
-    outMessage = '[{"issuer": "Bogus", "label": "boogum@badmail.com", "secret": "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "last_used": ""}, {"issuer": "MichaelangeloSite", "label": "Michael@woopmail.com", "secret": "gAAAAABngeZJ7iSx3k33zLLDh9KoTosnTxBooUGvzKLBlrqa-BwNEpgvsZfYRF4z8DxdvrqxvGgWWE7aealVfXzln5QKTiETEA==", "last_used": ""}]'
+    outMessage = '{"vault": {"version": "1","entries":[{"issuer": "Bogus", "label": "boogum@badmail.com", "secret": "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "last_used": "", "used_frequency": 2, "favorite":false,"icon":null}, {"issuer": "MichaelangeloSite", "label": "Michael@woopmail.com", "secret": "gAAAAABngeZJ7iSx3k33zLLDh9KoTosnTxBooUGvzKLBlrqa-BwNEpgvsZfYRF4z8DxdvrqxvGgWWE7aealVfXzln5QKTiETEA==", "last_used": "", "used_frequency": 2, "favorite":false,"icon":null}]}}'
     text_file = open("/tmp/testvault.json", "w")
     text_file.write(outMessage)
     text_file.close()
@@ -72,9 +72,10 @@ def test_typical_use():
     assert len(instance.accounts) == 3
     assert instance.accounts[0].issuer == "Woogle"
     # Update an existing item
-    update_me = Account("Bogus", "update_me@slowmail.com", "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "2000-01-01 12:01")
+    update_me = Account("Bogus", "update_me@slowmail.com", "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "2000-01-01 12:01",2,False,"icon")
     instance.update_account(1,update_me)
     assert instance.accounts[1].label == "update_me@slowmail.com"
+    assert instance.accounts[1].icon== "icon"
     # delete an item
     delete_me = update_me
     instance.delete_account(delete_me)

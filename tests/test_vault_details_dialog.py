@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 from PyQt5.QtWidgets import QMessageBox, QApplication, QLabel, QDialog
-from account_manager import Account
+from account_mgr import Account
 from vault_details_dialog import VaultDetailsDialog
 
 

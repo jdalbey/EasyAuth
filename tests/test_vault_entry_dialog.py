@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 from PyQt5.QtWidgets import QApplication
-from account_manager import AccountManager, OtpRecord
+from account_mgr import AccountManager, OtpRecord
 from appconfig import AppConfig
 from vault_entry_dialog import VaultEntryDialog
 from view import AppView
@@ -37,7 +37,7 @@ class TestVaultEntryDialog(unittest.TestCase):
         dialog.account_manager.save_new_account.assert_called_once_with(expected_account)
 
 
-    @patch('account_add_dialog.AccountManager')
+    @patch('vault_entry_dialog.AccountManager')
     def test_Cancel_button(self, MockAccountManager):
         # Mock the AccountManager
         dialog_manager = MockAccountManager.return_value # is the mock instance created when AccountManager() is called in ConfirmAccountDialog.

@@ -1,7 +1,7 @@
 # Detects one or more QR codes on the screen.
 import logging
 
-from account_manager import OtpRecord
+from account_mgr import OtpRecord
 import pyotp
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog
 from pyzbar.pyzbar import decode

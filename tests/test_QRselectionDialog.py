@@ -2,7 +2,7 @@ import pytest
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtCore import Qt
 from qr_selection_dialog import QRselectionDialog
-from account_manager import Account, OtpRecord
+from account_mgr import Account, OtpRecord
 @pytest.fixture
 def app(qtbot):
     app = QApplication([])

@@ -7,10 +7,9 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QFrame, QSizePolicy, QGridLayout, QPushButton, QVBoxLayout, \
     QToolButton, QApplication, QWhatsThis
 
-import account_manager
 import cipher_funcs
 import otp_funcs
-from account_manager import Account
+from account_mgr import Account
 from styles import info_btn_style
 from utils import assets_dir
 from vault_entry_dialog import VaultEntryDialog
