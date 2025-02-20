@@ -186,14 +186,17 @@ class AccountManager:
                     "entries": []
                         }
             }
+
             # First write to temporary file
             with open(temp_path, 'w') as f:
                 account_data = [acc.__dict__ for acc in self.accounts]
                 vault_content["vault"]["entries"] = account_data
                 json.dump(vault_content, f, indent=2)
 
-            # Create backup of current file if it exists
-            if self.vault_path.exists():
+            # Magic number for length of string in a vault file with no entries
+            empty_vault_size = 58
+            # Create backup of current file if it exists AND has at least one entry.
+            if self.vault_path.exists() and os.path.getsize(self.vault_path) > empty_vault_size:
                 shutil.copy2(self.vault_path, self.backup_path)
 
             # Atomic rename of temporary file to actual file
@@ -255,6 +258,7 @@ class AccountManager:
                 label=otp_record.label,
                 secret=encrypted_secret,
                 last_used=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # TODO: default values for used_frequency, favorite, icon
             )
 
             self.accounts.insert(0, account)

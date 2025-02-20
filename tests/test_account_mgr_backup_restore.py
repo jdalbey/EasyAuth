@@ -94,7 +94,7 @@ class TestAccountManager:
         acct2 = OtpRecord("Github", "Personal", "secret_2")
 
         account_manager.save_new_account(acct2)
-        account_manager.save_new_account(acct1)
+        account_manager.save_new_account(acct1)  # this will cause backup of acct2 in vault.backup.json
         acct1up = account_manager.accounts[0]
         acct1up.issuer = "Boogie"
         acct1up.used_frequency = 1
@@ -124,6 +124,30 @@ class TestAccountManager:
             vault_accounts = json.load(f)['vault']['entries']
             assert vault_accounts[0]['issuer'] == "Boogie"
         os.remove("/tmp/backup_test1.json")
+
+        # remove the vault (but leave the backup)
+        os.remove(account_manager.vault_path)
+        # next time we save something it should NOT backup from the non-existant vault.
+        account_manager.save_new_account(acct1)
+        # check length of backup it should be > 0 (because save should have not changed it)
+        file_size = os.path.getsize(account_manager.backup_path)
+        assert file_size > 0
+
+        # Delete the existing accounts
+        current_account = account_manager.accounts[0]
+        account_manager.delete_account(current_account)
+        current_account = account_manager.accounts[0]
+        account_manager.delete_account(current_account)
+        current_account = account_manager.accounts[0]
+        account_manager.delete_account(current_account)
+        # next time we save something it should NOT backup from the EMPTY vault.
+        account_manager.save_new_account(acct1)
+        # check length of backup it should be > 0 (because save should have not changed it)
+        file_size = os.path.getsize(account_manager.backup_path)
+        print ("backup size ",file_size)
+        vault_with_no_entries_size = 58
+        assert file_size > vault_with_no_entries_size
+
 
     def test_export_and_import(self,account_manager, sample_accounts):
         # Erase accounts for a clean fixture
