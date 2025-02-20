@@ -257,8 +257,7 @@ class AccountManager:
                 issuer=otp_record.issuer,
                 label=otp_record.label,
                 secret=encrypted_secret,
-                last_used=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                # TODO: default values for used_frequency, favorite, icon
+                # Note: default values for remaining fields are provided in dataclass
             )
 
             self.accounts.insert(0, account)
