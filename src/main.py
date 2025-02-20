@@ -3,10 +3,20 @@ from PyQt5.QtWidgets import QApplication
 from appconfig import AppConfig
 from handle_args import handle_args
 from view import AppView
-
 import qdarktheme
+"""
+   EasyAuth - 2FA secrets manager and TOTP generator.
+   Copyright 2025 John Dalbey
+   MIT License
+"""
 def main():
-    # Enable HiDPI.
+    """
+    Application main method:
+        Setup PyQt for GUI.
+        Configure logging.
+        Load application preferences.
+        Display the main window.
+    """
     qdarktheme.enable_hi_dpi()
 
     # Declare a PyQt application

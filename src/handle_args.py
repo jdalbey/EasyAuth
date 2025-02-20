@@ -3,10 +3,13 @@ import os
 
 from appconfig import AppConfig
 
-# Handle command line argument parsing
+""" Handle command line argument parsing """
 
 def validate_arguments(args):
-    # See if an alternate config file is specified
+    """ Process any user provided arguments (currently, only one).
+    Args: args is the command line arguments obtained by argparse
+    """
+    # Is an alternate config file specified
     if args.config_file:
         # Convert relative path to absolute path
         absolute_path = os.path.abspath(args.config_file)

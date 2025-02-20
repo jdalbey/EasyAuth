@@ -219,7 +219,7 @@ class AppView(QMainWindow):
         if chosen_theme == "dark":
             qdarktheme.setup_theme(chosen_theme,additional_qss=dark_qss)
         else:
-            qdarktheme.setup_theme(chosen_theme,additional_qss=light_qss)
+            qdarktheme.setup_theme(chosen_theme,additional_qss=light_qss,custom_colors={"background": "#fff6e6"})
 
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
