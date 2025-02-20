@@ -589,9 +589,6 @@ class AccountManager:
         """
         Validate account data structure.
         """
-        # Accept an empty list
-        if len(content) == 0:
-            return True
 
         if "vault" in content:
             if "version" in content['vault']:

@@ -51,8 +51,16 @@ def test_thread_safety():
     assert all(inst is instances[0] for inst in instances), "Singleton is not thread-safe"
 
 @patch("os.path.exists", return_value=True)
-@patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
-def test_load_accounts(mock_open, mock_exists):
+@patch("builtins.open", new_callable=mock_open, read_data=json.dumps(""))
+def test_load_emptyfile(mock_open, mock_exists):
+    instance = AccountManager()
+    accounts = instance.load_accounts()
+    assert accounts == [], "load_accounts should return an empty list if the vault file is empty"
+    mock_open.assert_called_with(instance.backup_path, "r")  # should have tried to load backup
+
+@patch("os.path.exists", return_value=True)
+@patch("builtins.open", new_callable=mock_open, read_data=json.dumps("{\"vault\": {\"version\": \"1\",\"entries\":\"[]\"}}"))
+def test_load_empty_vault(mock_open, mock_exists):
     instance = AccountManager()
     accounts = instance.load_accounts()
     assert accounts == [], "load_accounts should return an empty list if the vault is empty"
