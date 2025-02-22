@@ -112,7 +112,7 @@ class AppView(QMainWindow):
         # Tools menu
         tools_menu = menubar.addMenu('&Tools')
         tools_menu.setObjectName('tools_menu')
-        reorder_action = QAction('Reorder Accounts', self)
+        reorder_action = QAction('Reorder Vault Entries', self)
         reorder_action.setObjectName("reorderAction")
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)

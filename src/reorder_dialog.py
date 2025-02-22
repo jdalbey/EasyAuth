@@ -53,7 +53,7 @@ class ReorderDialog(QDialog):
         super().__init__(parent)
         # Create copies of each account
         self.accounts = AccountManager.duplicate_accounts(accounts)
-        self.setWindowTitle("Reorder Accounts")
+        self.setWindowTitle("Reorder Vault Entries")
         self.resize(500, 300)
         self.setup_ui()
 
