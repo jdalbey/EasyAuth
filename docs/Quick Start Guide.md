@@ -21,7 +21,7 @@ The main window appears with the new entry listed at the top.
 
 ### Step 2: Verifying with the TOTP code.
 
-1. For each vault entry a six-digit One-Time Password (TOTP) is displayed that changes every 30 seconds. The seconds timer indicates how much time remains for the displayed TOTP to be active.  
+1. For each vault entry a six-digit One-Time Password (TOTP) is displayed that changes every 30 seconds. 
 
 2. Click the 6-digit TOTP code to copy it to the clipboard.
 

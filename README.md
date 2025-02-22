@@ -43,7 +43,7 @@ Binaries for Windows and Linux are available under [Releases](https://github.com
 
 ### Limitations
 
-Currently tested on Linux and Windows 10.
+Currently tested on Linux Mint and Windows 10.
 
 Uses only TOTP codes with SHA1, 6-digit, 30-second parameters.
 
