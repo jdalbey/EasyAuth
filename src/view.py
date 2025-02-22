@@ -117,7 +117,7 @@ class AppView(QMainWindow):
         reorder_action.triggered.connect(self.show_reorder_dialog)
         tools_menu.addAction(reorder_action)
 
-        sort_menu = tools_menu.addMenu('Sort Accounts')
+        sort_menu = tools_menu.addMenu('Sort Entries')
         alpha_sort_action = QAction("Alphabetically", self)
         alpha_sort_action.setObjectName("sortAlphaAction")
         recency_action = QAction("Recently Used", self)
