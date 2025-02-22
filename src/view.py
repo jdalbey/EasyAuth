@@ -513,7 +513,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_provider_search_dialog(self):
-        dlg = ProviderSearchDialog()
+        dlg = ProviderSearchDialog(self)
         dlg.load_data()
         dlg.show()
         dlg.exec_()
