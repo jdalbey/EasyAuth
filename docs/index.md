@@ -16,7 +16,7 @@ It doesn't require manually typing verification codes.
 During setup of an account it scans QR codes for you. 
 
 ### How do I use it?  
-1. When setting up 2FA a QR code will be displayed in your browser. Launch EasyAuth and click the Scan QR code button ![Scan QR code button](assets/Scan-qr-code-button.png)
+1. When setting up 2FA a QR code will be displayed in your browser. Launch EasyAuth and click the ![Scan QR code button](assets/ScanQRcode-button.png) button.
 2. The secret key is stored in the vault.
     ![QR code found](assets/Step1-scan.png)
 3. Click on the passcode button to copy it to the clipboard.
@@ -46,7 +46,10 @@ During setup of an account it scans QR codes for you.
 ### Demo video
  <iframe width="700" height="475" src="https://www.youtube.com/embed/SoGLSwxYSWA" title="EasyAuth v0.2.1 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  
 
+
+
 ### Try it out
+
 Practice storing a new secret key using this sample QR code.  
 
 ![sample qr code](assets/img-qrcode-easyauth-demo.png)  
@@ -60,5 +63,4 @@ Practice storing a new secret key using this sample QR code.
 
 
 [Sample 2FA Setup Page](Setup2FA_1_QRcode.html)
-
 
