@@ -47,9 +47,9 @@ During setup of an account it scans QR codes for you.
 ### Try it out
 Practice storing a new secret key using the sample QR code below.
 1. Launch EasyAuth.
-2. Make sure the QR code below is visible on the screen. Click 'Add Account".
-3. The form fields are filled automatically with the data from the QR code. Click "Add".
-4. Observe the new account in the main window.
+2. Make sure the QR code below is visible on the screen. Click 'Scan QR code".
+3. The QR code is read and a new vault entry created using the secret key, provider name, and user. 
+4. Observe the new entry in the main window.
 
 ![sample qr code](assets/img-qrcode-easyauth-demo.png)  
 

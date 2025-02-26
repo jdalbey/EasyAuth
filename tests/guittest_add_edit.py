@@ -14,9 +14,11 @@ def start_app():
         venv_path = os.path.join(root, 'venv', 'Scripts', 'python.exe')
         command = [venv_path, 'src\\main.py', '-c', arg1]
     else:  # Unix-based systems (Linux, macOS)
-        command = ['python3', 'src/main.py', '-c', arg1]
+        command = ['./dist/easyauth_0.3.0', '-c', arg1]
+        #Wcommand = ['python3', 'src/main.py', '-c', arg1]
     
     # Start EasyAuth with a custom config file that points to a test directory for the vault
+    #process = subprocess.Popen(command)
     process = subprocess.Popen(command,
         stdout=subprocess.PIPE,  # Capture standard output
         stderr=subprocess.PIPE   # Capture standard error
@@ -24,10 +26,10 @@ def start_app():
     return process
 
 def drive_with_pyautogui():
-    gui.PAUSE = 0.25  # sec after each command
+    gui.PAUSE = 0.5  # sec after each command
     gui.FAILSAFE = True
     # Wait for the app to start
-    time.sleep(1)
+    time.sleep(2)
 
     # Press Add Account button
     #gui.mouseInfo()
