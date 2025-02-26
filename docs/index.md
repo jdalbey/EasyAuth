@@ -1,7 +1,7 @@
 
 The easiest (and fastest) way to 2FA verification.
 
-![Main Window](assets/Account-List.png)  
+![Main Window](assets/EasyAuth_setup_demo.gif)  
 <h3 style="text-align: center;"> 
 <a href="https://github.com/jdalbey/EasyAuth/releases/latest">Download for Windows and Linux</a>  
 </h3>
@@ -16,10 +16,12 @@ It doesn't require manually typing verification codes.
 During setup of an account it scans QR codes for you. 
 
 ### How do I use it?  
-![copy paste demo](assets/copy-paste-demo.gif)
-* When logging into to a site you will be prompted for a verification code.
-* From EasyAuth click on the passcode button to copy it to the clipboard.
-* Paste the code into the verification form.
+1. When setting up 2FA a QR code will be displayed in your browser. Launch EasyAuth and click the Scan QR code button ![Scan QR code button](assets/Scan-qr-code-button.png)
+2. The secret key is stored in the vault.
+    ![QR code found](assets/Step1-scan.png)
+3. Click on the passcode button to copy it to the clipboard.
+4. Paste the code into the verification form.
+   ![Step2](assets/Step2-paste.png)
 
 
 ### Features
@@ -45,14 +47,18 @@ During setup of an account it scans QR codes for you.
  <iframe width="700" height="475" src="https://www.youtube.com/embed/SoGLSwxYSWA" title="EasyAuth v0.2.1 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  
 
 ### Try it out
-Practice storing a new secret key using the sample QR code below.
-1. Launch EasyAuth.
-2. Make sure the QR code below is visible on the screen. Click 'Scan QR code".
-3. The QR code is read and a new vault entry created using the secret key, provider name, and user. 
-4. Observe the new entry in the main window.
+Practice storing a new secret key using this sample QR code.  
 
 ![sample qr code](assets/img-qrcode-easyauth-demo.png)  
 
+1. Launch EasyAuth.
+2. Make sure the QR code above is visible on the screen. Click 'Scan QR code".
+3. The QR code is read and a new vault entry created using the secret key, provider name, and user. 
+4. Observe the new entry in the main window. ![Vault entry](assets/EasyAuthdemo-vault-entry.png)
 
-[Sample 2FA Setup Page](Setup2FA_Sample.html)
+  
+
+
+[Sample 2FA Setup Page](Setup2FA_1_QRcode.html)
+
 
