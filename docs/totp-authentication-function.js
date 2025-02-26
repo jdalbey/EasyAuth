@@ -65,7 +65,7 @@ function authenticateUser() {
   
   // Validate the TOTP code
   const isValid = validateTOTP(code, secretKey);
-  
+
   if (isValid) {
     // Authentication successful
     window.location.href = nextPage; //'Setup2FA_5_LoginACK.html';
@@ -74,6 +74,7 @@ function authenticateUser() {
     // Authentication failed
     showAlert(code + ' is not the correct authentication code for someone@goodmail.com. Please try again.');
     
+
     // Reset the form
     inputs.forEach(input => {
       input.value = '';
@@ -90,6 +91,9 @@ function authenticateUser() {
   }
 }
 
+/* Reset the input fields and submit button */
+function resetForm() {
+}
 /**
  * Shows an alert message to the user
  * @param {string} message - The message to display
@@ -109,14 +113,18 @@ function showAlert(message) {
 document.addEventListener('DOMContentLoaded', (event) => {
   const inputs = document.querySelectorAll('.digit');
   const submitButton = document.getElementById('submit-button');
-  
+  const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   inputs.forEach((input, index) => {
     input.addEventListener('input', (e) => {
       if (input.value.length === 1 && index < inputs.length - 1) {
         inputs[index + 1].focus();
       }
       if (index === inputs.length - 1 && input.value.length === 1) {
-        authenticateUser();
+      timeout(500).then(() => {
+            console.log('500ms has passed');
+            authenticateUser();
+        });
       }
     });
 
@@ -126,7 +134,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
         inputs.forEach((input, i) => {
           input.value = paste[i];
         });
-        authenticateUser();
+      timeout(500).then(() => {
+            console.log('500ms has passed');
+            authenticateUser();
+        });
       }
       e.preventDefault();
     });
