@@ -44,7 +44,7 @@ During setup of an account it scans QR codes for you.
 [View Screenshots](screenshot_gallery.md)  
 
 ### Demo video
-<iframe width="820" height="526" src="https://www.youtube.com/embed/EwcvA4PUlV0" title="EasyAuth v0.3.0 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="700" height="475" src="https://www.youtube.com/embed/EwcvA4PUlV0" title="EasyAuth v0.3.0 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 
 
