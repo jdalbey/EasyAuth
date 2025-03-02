@@ -31,7 +31,7 @@ class VaultDetailsDialog(VaultEntryDialog):
         self.btn_Delete.show()
 
         # set Learn more link for this dialog
-        self.label_LearnMore.setText('<a href="https://github.com/jdalbey/EasyAuth/wiki/User-Manual#41-editing-an-existing-account">Learn more</a>')
+        self.label_LearnMore.setText('<a href="https://github.com/jdalbey/EasyAuth/wiki/User-Manual#41-editing-an-existing-vault-entry">Learn more</a>')
 
         # Setup actions to be taken
         self.btn_Edit.clicked.connect(self.start_editting)

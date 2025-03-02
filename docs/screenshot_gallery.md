@@ -20,6 +20,6 @@ _Export / Import dialog._
 ![Reorder Dialog](assets/ReorderDialog.png)  
 _Reorder dialog uses drag and drop._
 <br><br><br>  
-![Preferences Dialog](assets/PreferencesDialog.png)
+![Preferences Dialog](assets/PreferencesDialog.png)  
 _Preferences dialog._
 

@@ -185,7 +185,7 @@
      <item>
       <widget class="QLabel" name="label_LearnMore">
        <property name="text">
-        <string>&lt;a href=&quot;https://github.com/jdalbey/EasyAuth/wiki/User-Manual#31-adding-a-new-account&quot;&gt;Learn more&lt;/a&gt;</string>
+        <string>&lt;a href=&quot;https://github.com/jdalbey/EasyAuth/wiki/User-Manual#313-enter-manually&quot;&gt;Learn more&lt;/a&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
