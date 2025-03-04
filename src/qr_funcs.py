@@ -1,6 +1,7 @@
 # Detects one or more QR codes on the screen.
 import logging
 
+import otp_funcs
 from account_mgr import OtpRecord
 import pyotp
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog
@@ -35,32 +36,60 @@ def scan_screen_for_qr_codes():
     return results
 
 def obtain_qr_codes(parent):
-    # We aren't going to do auto scan in v0.3 so I think this argument is obsolete.
     # first go find_qr_codes
     urls = scan_screen_for_qr_codes()
+    # Show alert if no QR codes found.
+    if len(urls) == 0:
+        QMessageBox.information(parent, 'Alert',
+"""No QR code found.  Be sure the complete QR code with the secret key is visible on your screen and try again.
+(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
+""", QMessageBox.Ok)
+        return
     logging.debug(f"obtain_qr_codes() found these URIs: {urls}")
+
     # Examine each url to see if it is an otpauth protocol and reject others
     otpauth_list = [item for item in urls if item.startswith('otpauth://totp')]
+    if len(otpauth_list) < len(urls):
+        QMessageBox.information(parent, 'Alert',
+"""QR code found but not for two-factor authentication.  Be sure the QR code with the secret key is visible on your screen and try again.
+(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
+""", QMessageBox.Ok)
+        return
     # Try to parse each url.  Put the fields into an OtpRecord and append to displaylist.
     display_list = []
+    invalid_messages = ""
     for uri in otpauth_list:
         try:
             totp_obj = pyotp.parse_uri(uri)
         except ValueError as e:
+            invalid_messages += (str(e) + "\n")
             continue  # skip invalid URI's
+        # Validate issuer field
         issuer = totp_obj.issuer
+        if issuer == None:
+            invalid_messages += "Missing issuer name.\n"
+            continue
         label = totp_obj.name
+        # Validate secret key
         secret_key = totp_obj.secret
+        if not otp_funcs.is_valid_secretkey(secret_key):
+            invalid_messages += 'Invalid secret key'
+            continue
+        # Validate digits field
+        digits = totp_obj.digits
+        if digits != 6:
+            invalid_messages += "EasyAuth is limited to 6-digit TOTP codes.\n"
+            continue
         account = OtpRecord(issuer, label, secret_key)
-        # TODO: Extract the advanced parameters if they exists
+
         logging.debug(f"obtain_qr_codes() parsing produced: {issuer} {label} ")
         display_list.append(account)
     # How many valid URI's do we have?
     if len(display_list) == 0:
         QMessageBox.information(parent, 'Alert',
-"""No QR code found.  Be sure the QR code with the secret key is visible on your screen and try again.
-(The provider will show a QR code in your web browser during enabling of two-factor authentication.)
-""", QMessageBox.Ok)
+"EasyAuth couldn't process the QR code found.  Reason: \n" +
+invalid_messages
+, QMessageBox.Ok)
         return
     if len(display_list) == 1:
         return display_list[0]
@@ -117,5 +146,7 @@ if __name__ == '__main__':
     urls = scan_screen_for_qr_codes()
     for url in urls:
         print(url)
+        totp_obj = pyotp.parse_uri(url)
+        print ("TOTP: ",totp_obj.now())
     #url = 'otpauth://totp/PayPal:steve@dottotech.com?secret=DITATUPFVUIJK7X7&issuer=PayPal'
     #url = 'otpauth://totp/bobjones?secret=DITATUPFVUIJK7X7&issuer=Gargle.com'
