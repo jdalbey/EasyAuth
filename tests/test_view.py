@@ -28,7 +28,7 @@ class TestView(unittest.TestCase):
         mock_account1 = OtpRecord("Provider1", "label1", "AB34").toAccount()
         mock_account2 = OtpRecord("Provider2", "label2", "AB34").toAccount()
 
-        view.account_manager.accounts = [mock_account1, mock_account2]
+        view.account_manager._accounts = [mock_account1, mock_account2]
 
         view.display_accounts()
 
@@ -61,12 +61,14 @@ class TestView(unittest.TestCase):
     def test_display_accounts(self, MockAccountManager):
         # Create an instance of AppView
         view = AppView(self.app)
-
+        # Create a mock instance that will be returned by the patched constructor
+        mock_manager = MockAccountManager.return_value
         # Mock the accounts list with two mock accounts
         mock_account1 = OtpRecord("Provider1", "label1", "AB34").toAccount()
         mock_account2 = OtpRecord("Provider2", "label2", "AB34").toAccount()
 
-        view.account_manager.accounts = [mock_account1, mock_account2]
+        # Configure the mock to return our test accounts when get_accounts() is called
+        mock_manager.get_accounts.return_value = [mock_account1, mock_account2]
 
         # Call the display_accounts method
         view.display_accounts()
@@ -83,12 +85,15 @@ class TestView(unittest.TestCase):
     def test_search(self, MockAccountManager):
         # Create an instance of AppView
         view = AppView(self.app)
-
+        # Create a mock instance that will be returned by the patched constructor
+        mock_manager = MockAccountManager.return_value
         # Mock the accounts list with two mock accounts
         mock_account1 = OtpRecord("Able", "label1", "AB34").toAccount()
         mock_account2 = OtpRecord("Baker", "label2", "AB34").toAccount()
 
-        view.account_manager.accounts = [mock_account1, mock_account2]
+        # Configure the mock to return our test accounts when get_accounts() is called
+        mock_manager.get_accounts.return_value = [mock_account1, mock_account2]
+
         view.search_box.setText("k")
         # Call the display_accounts method
         view.display_accounts()
@@ -129,9 +134,15 @@ class TestView(unittest.TestCase):
     @patch('view.AccountManager')
     def test_copy_to_clipboard(self, MockAccountManager):
         view = AppView(self.app)
+        # Create a mock instance that will be returned by the patched constructor
+        mock_manager = MockAccountManager.return_value
+
         mock_account1 = OtpRecord("Rexall", "label1", "AB34").toAccount()
         mock_account2 = OtpRecord("Pennies", "label2", "AB34").toAccount()
-        view.account_manager.accounts = [mock_account1, mock_account2]
+
+        # Configure the mock to return our test accounts when get_accounts() is called
+        mock_manager.get_accounts.return_value = [mock_account1, mock_account2]
+
         view.display_accounts()
         # Find the otplabel button in the first row
         otp_btns = view.findChildren(QPushButton, "otpLabel")

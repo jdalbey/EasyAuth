@@ -54,7 +54,7 @@ def test_thread_safety():
 @patch("builtins.open", new_callable=mock_open, read_data=json.dumps(""))
 def test_load_emptyfile(mock_open, mock_exists):
     instance = AccountManager()
-    accounts = instance.load_accounts()
+    accounts = instance.get_accounts()
     assert accounts == [], "load_accounts should return an empty list if the vault file is empty"
     mock_open.assert_called_with(instance.backup_path, "r")  # should have tried to load backup
 
@@ -62,7 +62,7 @@ def test_load_emptyfile(mock_open, mock_exists):
 @patch("builtins.open", new_callable=mock_open, read_data=json.dumps("{\"vault\": {\"version\": \"1\",\"entries\":\"[]\"}}"))
 def test_load_empty_vault(mock_open, mock_exists):
     instance = AccountManager()
-    accounts = instance.load_accounts()
+    accounts = instance.get_accounts()
     assert accounts == [], "load_accounts should return an empty list if the vault is empty"
     mock_open.assert_called_with(instance.vault_path, "r")
 
@@ -74,20 +74,21 @@ def test_typical_use():
     text_file.close()
     # load the test vault
     instance = AccountManager("/tmp/testvault.json")
-    assert len(instance.accounts) == 2
+    check_accounts = instance.get_accounts()
+    assert len(check_accounts) == 2
     # Add a new item
     instance.save_new_account(OtpRecord("Woogle","me@woogle.com","ABC234"))
-    assert len(instance.accounts) == 3
-    assert instance.accounts[0].issuer == "Woogle"
+    assert len(instance._accounts) == 3
+    assert instance._accounts[0].issuer == "Woogle"
     # Update an existing item
     update_me = Account("Bogus", "update_me@slowmail.com", "gAAAAABngeZPBmux2r-vLPKMp1_FNjoWbibd_bOoNiUeMCosqBnSwJEXXDuENHV8XVa8mYXu6k93IRzQsRMgurxH2ebaXl35PA==", "2000-01-01 12:01",2,False,"icon")
     instance.update_account(1,update_me)
-    assert instance.accounts[1].label == "update_me@slowmail.com"
-    assert instance.accounts[1].icon== "icon"
+    assert instance._accounts[1].label == "update_me@slowmail.com"
+    assert instance._accounts[1].icon== "icon"
     # delete an item
     delete_me = update_me
     instance.delete_account(delete_me)
-    assert len(instance.accounts) == 2
+    assert len(instance._accounts) == 2
     # backup the accounts to a file
     instance.backup_accounts("/tmp/testbackup.json")
     # Read the file and compare to expected
@@ -103,7 +104,7 @@ def test_typical_use():
 def test_duplicate_accounts(sample_accounts):
     instance = AccountManager("/tmp/testvault.json")
     accounts = [OtpRecord(acc['issuer'],acc['label'],acc['secret']).toAccount() for acc in sample_accounts['vault']['entries']]
-    duplicates = instance.duplicate_accounts(accounts)
+    duplicates = AccountManager.duplicate_accounts(accounts)
     assert len(duplicates) == 2, "duplicate_accounts should create copies of all accounts"
     assert duplicates[0].issuer == accounts[0].issuer
     assert duplicates[0] is not accounts[0], "duplicate_accounts should create distinct copies"
@@ -114,7 +115,7 @@ def test_duplicate_accounts(sample_accounts):
     account3.icon = "icongoeshere"
     accounts.append(account3)
 
-    duplicates = instance.duplicate_accounts(accounts)
+    duplicates = AccountManager.duplicate_accounts(accounts)
 
     assert len(duplicates) == 3, "duplicate_accounts should create copies of all accounts"
     assert duplicates[2].issuer == account3.issuer

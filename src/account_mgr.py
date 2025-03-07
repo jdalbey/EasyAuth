@@ -108,21 +108,44 @@ class AccountManager:
             # Track file modification time to detect external changes
             self._last_modified_time = None
             
-            # Load accounts with validation
-            self.accounts = self.load_accounts()
+            # Initialize accounts as None - lazy loading
+            self._accounts = None
             self.initialized = True
 
-    def set_accounts(self,account_string):
+    def get_accounts(self) -> List['Account']:
+        """
+        Get the current accounts list, checking for modifications first.
+        This is the main method for accessing accounts and should be used
+        instead of directly accessing self._accounts.
+        @return list of Accounts
+        """
+        # First load if needed (lazy loading)
+        if self._accounts is None:
+            self._accounts = self._load_accounts_from_disk()
+            return self._accounts
+        
+        # Check for external modifications
+        if self.vault_path.exists():
+            current_mtime = os.path.getmtime(self.vault_path)
+            if self._last_modified_time and current_mtime != self._last_modified_time:
+                self.logger.info("Detected external modifications to vault file")
+                self._accounts = self._handle_external_modification()
+        
+        return self._accounts
+
+    def set_accounts(self, account_string):
         """Set accounts from a string - dependency injection for testing
         @param account_string is JSON string of vault data"""
         content = json.loads(account_string)
-        self.accounts = [Account(**acc) for acc in content]
+        self._accounts = [Account(**acc) for acc in content]
         self.save_accounts()
         self.logger.debug(f"Saved accounts : {account_string} ")
 
-    def load_accounts(self) -> List['Account']:
+    def _load_accounts_from_disk(self) -> List['Account']:
         """
         Load accounts from vault with validation and backup recovery.
+        This is a private method that should be called by get_accounts()
+        or other methods that need to load accounts directly from disk.
 
         This method loads accounts from the vault file into the account manager.
 
@@ -138,12 +161,6 @@ class AccountManager:
                 self.logger.info(f"Vault file not found at {self.vault_path}")
                 return []
 
-            # Check for external modifications
-            current_mtime = os.path.getmtime(self.vault_path)
-            if self._last_modified_time and current_mtime != self._last_modified_time:
-                self.logger.info("Detected external modifications to vault file")
-                self._handle_external_modification()
-
             # Read and validate primary vault
             with open(self.vault_path, 'r') as f:
                 content = json.load(f)
@@ -151,7 +168,7 @@ class AccountManager:
                     raise ValueError("Invalid vault format (wrong version?)")
                 # Assign the content to the account list
                 accounts = [Account(**acc) for acc in content["vault"]["entries"]]
-                self._last_modified_time = current_mtime
+                self._last_modified_time = os.path.getmtime(self.vault_path)
                 return accounts
 
         except (json.JSONDecodeError, ValueError) as e:
@@ -179,6 +196,9 @@ class AccountManager:
             if not os.path.exists(os.path.dirname(self.vault_path)):
                 os.makedirs(os.path.dirname(self.vault_path), exist_ok=True)
 
+            # Ensure we have the latest accounts
+            accounts = self.get_accounts()
+            
             # Prepare the header string.
             vault_content = {
                 "vault": {
@@ -189,7 +209,7 @@ class AccountManager:
 
             # First write to temporary file
             with open(temp_path, 'w') as f:
-                account_data = [acc.__dict__ for acc in self.accounts]
+                account_data = [acc.__dict__ for acc in accounts]
                 vault_content["vault"]["entries"] = account_data
                 json.dump(vault_content, f, indent=2)
 
@@ -218,13 +238,12 @@ class AccountManager:
 
         except Exception as e:
             self.logger.error(f"Unexpected error while saving accounts: {str(e)}")
-        try:
-            if temp_path.exists():
-                os.remove(temp_path)
-        except (PermissionError, OSError):
-            self.logger.warning(f"Could not clean up temporary file: {temp_path}")
-
-        return False
+            try:
+                if temp_path.exists():
+                    os.remove(temp_path)
+            except (PermissionError, OSError):
+                self.logger.warning(f"Could not clean up temporary file: {temp_path}")
+            return False
 
     def save_new_account(self, otp_record) -> bool:
         """
@@ -244,12 +263,12 @@ class AccountManager:
             Exception: If any other error occurs during the saving process.
         """
         try:
-            # Check for duplicates
+            # Get latest accounts and check for duplicates
+            accounts = self.get_accounts()
             if any(
                 acc.issuer == otp_record.issuer and acc.label == otp_record.label
-                for acc in self.accounts
+                for acc in accounts
             ):
-                #raise ValueError("Account with same provider and label already exists")
                 return False
 
             encrypted_secret = cipher_funcs.encrypt(otp_record.secret)
@@ -260,7 +279,7 @@ class AccountManager:
                 # Note: default values for remaining fields are provided in dataclass
             )
 
-            self.accounts.insert(0, account)
+            self._accounts.insert(0, account)
             if self.save_accounts():
                 self.logger.debug(f"Successfully saved new account: {otp_record.issuer} ({otp_record.label})")
             else:
@@ -287,12 +306,16 @@ class AccountManager:
         Raises:
             Exception: If any error occurs during the update process.
         """
+        # Get latest accounts
+        accounts = self.get_accounts()
+        
         # Check for duplicates
-        for item, acc in enumerate(self.accounts):
+        for item, acc in enumerate(accounts):
             # does info match and is it not me?
             if acc.issuer == account.issuer and acc.label == account.label and item != index:
                 return False
-        self.accounts[index] = account
+                
+        self._accounts[index] = account
         self.save_accounts()
         self.logger.debug(f"Updated account: {account.issuer} ({account.label})")
         return True
@@ -311,16 +334,21 @@ class AccountManager:
 
         Raises:
             Exception: If any error occurs during the deletion process.
-        """        
-        self.accounts.remove(account)
+        """
+        # Get latest accounts
+        accounts = self.get_accounts()
+        
+        self._accounts.remove(account)
         self.save_accounts()
         self.logger.debug(f"Deleted account: {account.issuer} ({account.label})")
 
+    # Update any method that directly accessed self.accounts to use get_accounts() instead
+    # For example:
     def sort_alphabetically(self):
         """
         Sort the accounts alphabetically by issuer.
         """
-        self.accounts = sorted(self.accounts, key=lambda x: x.issuer)
+        self._accounts = sorted(self.get_accounts(), key=lambda x: x.issuer)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted alphabetically.")
 
@@ -328,7 +356,7 @@ class AccountManager:
         """
         Sort the accounts by most recently used.
         """
-        self.accounts = sorted(self.accounts, key=lambda x: x.last_used, reverse=True)
+        self._accounts = sorted(self.get_accounts(), key=lambda x: x.last_used, reverse=True)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted by recently used.")
 
@@ -336,7 +364,7 @@ class AccountManager:
         """
         Sort the accounts by most frequently used.
         """
-        self.accounts = sorted(self.accounts, key=lambda x: x.used_frequency, reverse=True)
+        self._accounts = sorted(self.get_accounts(), key=lambda x: x.used_frequency, reverse=True)
         self.save_accounts()
         self.logger.debug(f"Accounts sorted by used frequency.")
 
@@ -370,13 +398,13 @@ class AccountManager:
         vault_accounts = []
 
         # Check if accounts exist and are iterable
-        if not hasattr(self, 'accounts') or not isinstance(self.accounts, list):
+        if not self.get_accounts():
             self.logger.error(f"Internal error: No accounts to {target_label}. 'self.accounts' is not a list.")
             return
 
         # Convert accounts to plaintext
         uri_list = ""
-        for account in self.accounts:
+        for account in self.get_accounts():
             # Expects encrypted keys that it converts to plain URI
             uri_list += account.get_otp_auth_uri() + "\n"  # convert to URI and append to string
             try:
@@ -470,11 +498,11 @@ class AccountManager:
                 return accounts
 
             # Update the active accounts from the restored data
-            self.accounts = accounts
-            self.logger.debug(f"Read these accounts: {self.accounts}")
+            self._accounts = accounts
+            self.logger.debug(f"Updating active accounts from restored data")
             self.save_accounts()
             self.logger.debug(f"Read completed for  {len(accounts)} accounts from {file_path}")
-            self.logger.debug(self.accounts)
+            self.logger.debug(self._accounts)
 
             self.logger.debug(f"Successful {target} of accounts from {file_path}")
 
@@ -539,33 +567,43 @@ class AccountManager:
                 self.logger.error(f"Failed to read account from data {json_account}: {e}")
         return restored_accounts
 
-    def _handle_external_modification(self):
+
+    def _handle_external_modification(self) -> List['Account']:
         """
         Handle detected external modifications to the vault file.
+        Returns merged accounts list.
         """
         self.logger.info("Attempting to merge external changes")
         try:
-            # Load both current memory state and disk state
+            # Load both current memory state and disk state with correct structure
             with open(self.vault_path, 'r') as f:
                 disk_content = json.load(f)
+                if not self._validate_vault_data(disk_content):
+                    raise ValueError("Invalid vault format in external modifications")
+                    
                 disk_accounts = {
                     self._account_key(acc): Account(**acc)
-                    for acc in disk_content
+                    for acc in disk_content["vault"]["entries"]
                 }
 
             memory_accounts = {
                 self._account_key(acc.__dict__): acc
-                for acc in self.accounts
+                for acc in self._accounts
             }
 
             # Merge changes, preferring memory state for conflicts
             merged = {**disk_accounts, **memory_accounts}
-            self.accounts = list(merged.values())
+            merged_accounts = list(merged.values())
+            
+            # Update the modified time
+            self._last_modified_time = os.path.getmtime(self.vault_path)
+            
             self.logger.debug("Successfully merged external changes")
+            return merged_accounts
 
         except Exception as e:
             self.logger.error(f"Failed to handle external modifications: {str(e)}")
-            self._recover_from_backup()
+            return self._recover_from_backup()
 
     def _recover_from_backup(self) -> List['Account']:
         """

@@ -85,20 +85,20 @@ class TestAccountManager:
         account_manager.vault_path = test_vault_path
         print (f"Vault path: {account_manager.vault_path}")
 
-        accounts = account_manager.load_accounts()
+        accounts = account_manager.get_accounts()
         assert isinstance(accounts, list)
         assert len(accounts) == 2
 
         """Test saving and loading accounts."""
         # Create Account objects
         account_objs = [Account(**acc) for acc in sample_accounts]
-        account_manager.accounts = account_objs
+        account_manager._accounts = account_objs
 
         # Save accounts
         assert account_manager.save_accounts()
 
         # Load accounts
-        loaded_accounts = account_manager.load_accounts()
+        loaded_accounts = account_manager.get_accounts()
         assert len(loaded_accounts) == len(sample_accounts)
         assert loaded_accounts[0].issuer == sample_accounts[0]["issuer"]
         assert loaded_accounts[0].label == sample_accounts[0]["label"]
@@ -122,8 +122,8 @@ class TestAccountManager:
             print(f"Exception during update: {e}")
             raise
 
-        assert len(account_manager.accounts) == 2
-        updated_account = account_manager.accounts[0]
+        assert len(account_manager._accounts) == 2
+        updated_account = account_manager._accounts[0]
         assert updated_account.issuer == "Woogle"
         assert updated_account.label == "sheep"
         assert updated_account.secret == encrypted_secret

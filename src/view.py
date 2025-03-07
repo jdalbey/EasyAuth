@@ -229,7 +229,7 @@ class AppView(QMainWindow):
 
     def display_accounts(self):
         search_term = self.search_box.text().lower()
-        self.account_manager.load_accounts()
+        self.account_manager.get_accounts()
 
         # Clear the existing widgets in the scroll_layout
         while self.scroll_layout.count():
@@ -238,7 +238,7 @@ class AppView(QMainWindow):
                 child.widget().deleteLater()
 
         # Check if the accounts list is empty
-        if not self.account_manager.accounts:
+        if len(self.account_manager.get_accounts()) == 0:
             # See if a QR code is visible.  Would be nice on an initally empty vault.
             # if not qr_hunting.process_qr_codes(called_from_Find_btn=False):
                 # If not show empty_vault message
@@ -261,11 +261,11 @@ class AppView(QMainWindow):
                 self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
 
         # If account list is not empty show it
-        if self.account_manager.accounts:
+        if len(self.account_manager.get_accounts()) > 0:
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
             self.scroll_layout.setSpacing(1)  # Set vertical spacing between rows
-            for index, account in enumerate(self.account_manager.accounts):
+            for index, account in enumerate(self.account_manager.get_accounts()):
                 if search_term in account.issuer.lower():
                     secret_key = cipher_funcs.decrypt(account.secret)
                     try:
@@ -486,7 +486,7 @@ class AppView(QMainWindow):
         self.display_accounts()
 
     def show_reorder_dialog(self):
-        account_list = self.account_manager.accounts
+        account_list = self.account_manager.get_accounts()
         dialog = ReorderDialog(account_list, self)
         if dialog.exec_() == QDialog.DialogCode.Accepted:
             self.accounts = dialog.get_ordered_accounts()
@@ -499,17 +499,14 @@ class AppView(QMainWindow):
 
     def do_alpha_sort_action(self):
         self.account_manager.sort_alphabetically()
-        self.accounts = self.account_manager.accounts
         self.display_accounts()
 
     def do_recency_sort_action(self):
         self.account_manager.sort_recency()
-        self.accounts = self.account_manager.accounts
         self.display_accounts()
 
     def do_frequency_sort_action(self):
         self.account_manager.sort_frequency()
-        self.accounts = self.account_manager.accounts
         self.display_accounts()
 
     def show_provider_search_dialog(self):

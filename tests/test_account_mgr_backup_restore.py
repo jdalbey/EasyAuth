@@ -60,19 +60,36 @@ def sample_accounts():
             "last_used": "2024-01-14 11:00"
         }
     ]
-
+import stat
 class TestAccountManager:
+    def is_read_only(self, file_path):
+        # Check if the file exists
+        if os.path.exists(file_path):
+            # Get the file's status using os.stat()
+            file_stat = os.stat(file_path)
+
+            # Check if the file is read-only
+            # A file is read-only if the owner does not have write permissions
+            return not bool(file_stat.st_mode & stat.S_IWUSR)
+        else:
+            return False  # File doesn't exist
+
     def test_permission_error(self,account_manager):
+        acct2 = OtpRecord("Github", "Personal", "secret_2")
+        account_manager.save_new_account(acct2)
+
         # Specify the file path in the tmp directory
         file_path = "/tmp/my_empty_file.txt"
-        # Create an empty file
-        with open(file_path, 'w') as file:
-            pass
-        # Make the file read-only
-        os.chmod(file_path, 0o400)
+        # See if it already exists
+        if not self.is_read_only(file_path):
+            # Create an empty file
+            with open(file_path, 'w') as file:
+                pass
+            # Make the file read-only
+            os.chmod(file_path, 0o400)
         try:
             account_manager.backup_accounts(file_path)
-            assert False, "Backup succeed on read-only file"
+            assert False, "Backup succeeded on read-only file, when it shouldn't."
         except OSError as e:
             # since the file is read-only, trying to backup should fail
             print (str(e))
@@ -95,7 +112,8 @@ class TestAccountManager:
 
         account_manager.save_new_account(acct2)
         account_manager.save_new_account(acct1)  # this will cause backup of acct2 in vault.backup.json
-        acct1up = account_manager.accounts[0]
+        accounts = account_manager.get_accounts()
+        acct1up = accounts[0]
         acct1up.issuer = "Boogie"
         acct1up.used_frequency = 1
         acct1up.icon = 'Bullwinkle'
@@ -106,19 +124,20 @@ class TestAccountManager:
         assert os.path.isfile("/tmp/backup_test1.json")
 
         # Remove accounts for the test - simulating disaster
-        account_manager.accounts = []
+        account_manager._accounts = []
 
         # Restore from backup file
         account_manager.restore_accounts("/tmp/backup_test1.json")
+        accounts = account_manager.get_accounts()
         print (F"acct1 {acct1.issuer}")
-        assert account_manager.accounts[0].issuer == acct1up.issuer
-        assert account_manager.accounts[1].issuer == acct2.issuer
-        assert account_manager.accounts[0].label == acct1up.label
-        assert account_manager.accounts[1].label == acct2.label
-        assert account_manager.accounts[0].secret == acct1up.secret
-        assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
-        assert account_manager.accounts[0].used_frequency == 1
-        assert account_manager.accounts[0].icon == 'Bullwinkle'
+        assert accounts[0].issuer == acct1up.issuer
+        assert accounts[1].issuer == acct2.issuer
+        assert accounts[0].label == acct1up.label
+        assert accounts[1].label == acct2.label
+        assert accounts[0].secret == acct1up.secret
+        assert cipher_funcs.decrypt(accounts[1].secret) == acct2.secret
+        assert accounts[0].used_frequency == 1
+        assert accounts[0].icon == 'Bullwinkle'
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
             vault_accounts = json.load(f)['vault']['entries']
@@ -134,11 +153,14 @@ class TestAccountManager:
         assert file_size > 0
 
         # Delete the existing accounts
-        current_account = account_manager.accounts[0]
+        accounts = account_manager.get_accounts()
+        current_account = accounts[0]
         account_manager.delete_account(current_account)
-        current_account = account_manager.accounts[0]
+        accounts = account_manager.get_accounts()
+        current_account = accounts[0]
         account_manager.delete_account(current_account)
-        current_account = account_manager.accounts[0]
+        accounts = account_manager.get_accounts()
+        current_account = accounts[0]
         account_manager.delete_account(current_account)
         # next time we save something it should NOT backup from the EMPTY vault.
         account_manager.save_new_account(acct1)
@@ -151,13 +173,14 @@ class TestAccountManager:
 
     def test_export_and_import(self,account_manager, sample_accounts):
         # Erase accounts for a clean fixture
-        account_manager.accounts = []
+        account_manager._accounts = []
         # Create Account objects
         acct1 = OtpRecord("Boggle", "Work", "secret_1")
         acct2 = OtpRecord("Github", "Personal", "secret_2")
         account_manager.save_new_account(acct2)
         account_manager.save_new_account(acct1)
-        acct1up = account_manager.accounts[0]
+        accounts = account_manager.get_accounts()
+        acct1up = accounts[0]
         acct1up.issuer = "Boogie"
         acct1up.used_frequency = 1
         acct1up.icon = 'Bullwinkle'
@@ -178,18 +201,19 @@ class TestAccountManager:
             print(f"Failed to decode JSON from file /tmp/backup_test2.json: {e}")
             assert False
         # Remove accounts for the test - simulating disaster
-        account_manager.accounts = []
+        account_manager._accounts = []
 
         # Import from exported file
         account_manager.import_accounts("/tmp/backup_test2.json")
-        assert account_manager.accounts[0].issuer == acct1up.issuer
-        assert account_manager.accounts[1].issuer == acct2.issuer
-        assert account_manager.accounts[0].label == acct1up.label
-        assert account_manager.accounts[1].label == acct2.label
-        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == cipher_funcs.decrypt(acct1up.secret)
-        assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
-        assert account_manager.accounts[0].used_frequency == 1
-        assert account_manager.accounts[0].icon == 'Bullwinkle'
+        accounts = account_manager.get_accounts()
+        assert accounts[0].issuer == acct1up.issuer
+        assert accounts[1].issuer == acct2.issuer
+        assert accounts[0].label == acct1up.label
+        assert accounts[1].label == acct2.label
+        assert cipher_funcs.decrypt(accounts[0].secret) == cipher_funcs.decrypt(acct1up.secret)
+        assert cipher_funcs.decrypt(accounts[1].secret) == acct2.secret
+        assert accounts[0].used_frequency == 1
+        assert accounts[0].icon == 'Bullwinkle'
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
             vault_accounts = json.load(f)['vault']['entries']
@@ -199,7 +223,7 @@ class TestAccountManager:
     def test_import_preview(self,account_manager, sample_accounts):
         """Preview is just import that returns the account list before saving it."""
         # Erase accounts for a clean fixture
-        account_manager.accounts = []
+        account_manager._accounts = []
         # Create Account objects
         acct1 = OtpRecord("Boggle", "Work", "secret_1")
         acct2 = OtpRecord("Github", "Personal", "secret_2")
@@ -208,10 +232,11 @@ class TestAccountManager:
         # Export these existing accounts
         account_manager.export_accounts("/tmp/backup_test3.json",'json')
         # Remove accounts for the test - so we can verify that preview doesn't touch the vault.
-        account_manager.accounts = []
+        account_manager._accounts = []
         # Import from exported file
         account_list = account_manager.import_preview("/tmp/backup_test3.json")
-        assert len(account_manager.accounts) == 0  # preview should not touch accounts
+        accounts = account_manager.get_accounts()
+        assert len(accounts) == 0  # preview should not touch accounts
         assert account_list is not None
         assert len(account_list) == 2
         assert account_list[0].issuer == acct1.issuer
@@ -225,7 +250,7 @@ class TestAccountManager:
 
     def test_export_and_import_uri(self,account_manager, sample_accounts):
         # Erase accounts for a clean fixture
-        account_manager.accounts = []
+        account_manager._accounts = []
         # Create Account objects
         acct1 = OtpRecord("Boggle", "Work", "secret_1")
         acct2 = OtpRecord("Github", "Personal", "secret_2")
@@ -244,16 +269,17 @@ class TestAccountManager:
             print(f"Failed to read file /tmp/backup_test4.txt: {e}")
             assert False
         # Remove accounts for the test - simulating disaster
-        account_manager.accounts = []
+        account_manager._accounts = []
 
         # Import from exported file
         account_manager.import_accounts("/tmp/backup_test4.txt")
-        assert account_manager.accounts[0].issuer == acct1.issuer
-        assert account_manager.accounts[1].issuer == acct2.issuer
-        assert account_manager.accounts[0].label == acct1.label
-        assert account_manager.accounts[1].label == acct2.label
-        assert cipher_funcs.decrypt(account_manager.accounts[0].secret) == acct1.secret
-        assert cipher_funcs.decrypt(account_manager.accounts[1].secret) == acct2.secret
+        accounts = account_manager.get_accounts()
+        assert accounts[0].issuer == acct1.issuer
+        assert accounts[1].issuer == acct2.issuer
+        assert accounts[0].label == acct1.label
+        assert accounts[1].label == acct2.label
+        assert cipher_funcs.decrypt(accounts[0].secret) == acct1.secret
+        assert cipher_funcs.decrypt(accounts[1].secret) == acct2.secret
         # Also check the content of vault file
         with open(account_manager.vault_path, 'r') as f:
             vault_accounts = json.load(f)['vault']['entries']
@@ -262,7 +288,7 @@ class TestAccountManager:
 
     def test_import_uri_fail(self,account_manager):
         # Erase accounts for a clean fixture
-        account_manager.accounts = []
+        account_manager._accounts = []
         assert -1 == account_manager.import_accounts("/tmp/notexist")
 
         with open("/tmp/bad_uris.txt", 'w') as file:
@@ -274,4 +300,3 @@ class TestAccountManager:
             file.write("{'provider'")
         result = account_manager.import_accounts("/tmp/bad_json.txt")
         assert result == -3
-
