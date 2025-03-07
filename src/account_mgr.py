@@ -573,7 +573,7 @@ class AccountManager:
         Handle detected external modifications to the vault file.
         Returns merged accounts list.
         """
-        self.logger.info("Attempting to merge external changes")
+        self.logger.debug("Attempting to load external changes")
         try:
             # Load both current memory state and disk state with correct structure
             with open(self.vault_path, 'r') as f:
@@ -585,21 +585,26 @@ class AccountManager:
                     self._account_key(acc): Account(**acc)
                     for acc in disk_content["vault"]["entries"]
                 }
+                self._last_modified_time = os.path.getmtime(self.vault_path)
+                self.logger.debug("Successfully read external changes")
+                return list(disk_accounts.values())
 
-            memory_accounts = {
-                self._account_key(acc.__dict__): acc
-                for acc in self._accounts
-            }
-
-            # Merge changes, preferring memory state for conflicts
-            merged = {**disk_accounts, **memory_accounts}
-            merged_accounts = list(merged.values())
-            
-            # Update the modified time
-            self._last_modified_time = os.path.getmtime(self.vault_path)
-            
-            self.logger.debug("Successfully merged external changes")
-            return merged_accounts
+            # memory_accounts = {
+            #     self._account_key(acc.__dict__): acc
+            #     for acc in self._accounts
+            # }
+            # self.logger.debug(f"memory: {memory_accounts}")
+            # self.logger.debug(f"disk: {disk_accounts}")
+            #
+            # # Merge changes, preferring memory state for conflicts
+            # merged = {**disk_accounts, **memory_accounts}
+            # merged_accounts = list(merged.values())
+            #
+            # # Update the modified time
+            # self._last_modified_time = os.path.getmtime(self.vault_path)
+            #
+            # self.logger.debug("Successfully merged external changes")
+            # return merged_accounts
 
         except Exception as e:
             self.logger.error(f"Failed to handle external modifications: {str(e)}")

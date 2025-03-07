@@ -90,13 +90,11 @@ class TestAccountMgr:
         # This should trigger the _handle_external_modification method internally
         loaded_accounts = account_manager.get_accounts()
 
-        # We expect 2 accounts now - the original in memory and the modified one from disk
-        assert len(loaded_accounts) == 2
+        # We expect the modified one from disk
+        assert len(loaded_accounts) == 1
 
-        # Check that both versions exist in the result
-        labels = [acc.label for acc in loaded_accounts]
-        assert original_account.label in labels
-        assert "Modified" in labels
+        # Check that modified version was loaded
+        assert loaded_accounts[0].label == "Modified"
 
     def test_recover_from_backup(self, account_manager, sample_accounts):
         """Test recovery from backup when vault is corrupted."""

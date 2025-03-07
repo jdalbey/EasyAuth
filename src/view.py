@@ -1,6 +1,7 @@
 import json
 import os
 import sys, logging
+import threading
 from dataclasses import asdict
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
@@ -221,11 +222,22 @@ class AppView(QMainWindow):
         else:
             qdarktheme.setup_theme(chosen_theme,additional_qss=light_qss,custom_colors={"background": "#fff6e6"})
 
+    def check_for_file_changes(self):
+        current_accounts = self.account_manager._accounts
+        # Call get_accounts to force check for file modifications
+        if current_accounts != self.account_manager.get_accounts():
+            self.display_accounts()
+
     def start_timer(self):
         # Set up the QTimer to call update_timer every second
         self.timer = QTimer(self.central_widget)
         self.timer.timeout.connect(self.update_timer)
         self.timer.start(1000)  # 1000 milliseconds = 1 second
+
+        # Run the file check in a separate thread
+        # thread = threading.Thread(target=self.check_for_file_changes)
+        # thread.daemon = True  # Makes sure the thread exits when the program exits
+        # thread.start()
 
     def display_accounts(self):
         search_term = self.search_box.text().lower()
@@ -352,6 +364,8 @@ class AppView(QMainWindow):
         # NB: assumes timer period is 30 seconds for all accounts
         if time_remaining == 30:
             self.display_accounts()
+
+        self.check_for_file_changes()
 
     def copy_to_clipboard(self, totp_label, idx, account):
         """ @param totp_label is the label of the one-time password """

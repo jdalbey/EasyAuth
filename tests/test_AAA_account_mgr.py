@@ -440,8 +440,6 @@ class TestAccountMgr:
         with open(account_manager.vault_path, 'w') as f:
             json.dump(modified_content, f)
 
-        # Update file modification time to ensure it's different
-        #os.utime(account_manager.vault_path, None)
         # Force reload by modifying the last modified time
         account_manager._last_modified_time = 1
 
@@ -449,7 +447,7 @@ class TestAccountMgr:
         accounts = account_manager.get_accounts()
 
         # Verify the modified account was loaded
-        assert len(accounts) == 2
+        assert len(accounts) == 1
         assert accounts[0].issuer == "ModifiedExternally"
         assert accounts[0].used_frequency == 5
         assert accounts[0].favorite == True
