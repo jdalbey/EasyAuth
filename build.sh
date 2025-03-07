@@ -55,8 +55,6 @@ echo "   "$(date) > /tmp/build_date.txt
     --hidden-import 'html.parser' \
     --add-data "assets:assets" \
     --add-data "docs/Quick Start Guide.md:assets" \
-    --add-data "images:images" \
     --add-data "/tmp/build_date.txt:assets" \
-    --onefile \
     src/main.py
 
