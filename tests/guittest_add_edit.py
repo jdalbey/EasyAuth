@@ -14,8 +14,8 @@ def start_app():
         venv_path = os.path.join(root, 'venv', 'Scripts', 'python.exe')
         command = [venv_path, 'src\\main.py', '-c', arg1]
     else:  # Unix-based systems (Linux, macOS)
-        command = ['./dist/easyauth_0.3.0', '-c', arg1]
-        #Wcommand = ['python3', 'src/main.py', '-c', arg1]
+        #command = ['./dist/easyauth_0.3.0', '-c', arg1]
+        command = ['python3', 'src/main.py', '-c', arg1]
     
     # Start EasyAuth with a custom config file that points to a test directory for the vault
     #process = subprocess.Popen(command)

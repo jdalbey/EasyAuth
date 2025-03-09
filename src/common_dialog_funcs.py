@@ -52,6 +52,8 @@ def save_fields(dialog):
     issuer = dialog.provider_entry.text()
     label = dialog.label_entry.text()
     secret = dialog.secret_entry.text()
+    secret = secret.strip()
+    secret = secret.replace(" ","") # remove spaces before validating
     otp_record = OtpRecord(issuer, label, secret)
     # Validate secret key
     if otp_funcs.is_valid_secretkey(secret):

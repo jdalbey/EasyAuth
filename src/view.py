@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QSizePolicy, QAction, QToolBar, QScrollArea,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
                              QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu, QFileDialog)
-from PyQt5.QtCore import Qt, QTimer, QUrl, QRect
+from PyQt5.QtCore import Qt, QTimer, QUrl, QRect, QSettings, QPoint
 from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
 import pyotp
 import time, datetime
@@ -42,11 +42,12 @@ class AppView(QMainWindow):
         self.providers = Providers()
         self.vault_empty = False # Don't display timer if vault empty
         self.app_config = AppConfig() # Get the global AppConfig instance
-        self.current_dialog = None
-        self.quick_start_dialog = None  # Quick start is not showing
+        self.window_settings = QSettings("EasyAuth", "window")  # .config location
+        self.restore_window_settings()  # Restore previous position & size
 
+        self.quick_start_dialog = None  # Quick start is not showing
         self.setWindowTitle("EasyAuth")
-        self.setGeometry(50, 50, 525, 600)
+
 
         # Create central widget
         self.central_widget = QWidget()
@@ -446,7 +447,7 @@ class AppView(QMainWindow):
         # check option to minimize window during QR scan
         if self.app_config.is_minimize_during_qr_search():
             self.hide()
-            time.sleep(0.1) # short delay to allow window to hide
+            time.sleep(0.3) # short delay to allow window to hide
             otprec = qr_funcs.obtain_qr_codes(self) # Scan QR code
             self.show() # the window reappears
         else:
@@ -577,18 +578,29 @@ class AppView(QMainWindow):
         retval = msg.exec()
 
     def closeEvent(self, event):
-        geometry = self.geometry()
-        # TODO Save window geometry and position for next startup
-        self.logger.debug(f"Current window geometry:  {QRect(geometry)}")
-        self.logger.debug(f"Current window position: {self.pos().x()} x {self.pos().y()}")
+        # Save window geometry and position for next startup
+        self.window_settings.setValue("geometry", self.saveGeometry())
+        self.window_settings.setValue("pos", self.pos())
+        self.logger.debug("window geometry saved")
+        # geometry = self.geometry()
+        # self.logger.debug(f"Current window geometry:  {QRect(geometry)}")
+        # self.logger.debug(f"Current window position: {self.pos().x()} x {self.pos().y()}")
         # Note that upon startup geometry says 100,100 but pos says 100,68.
         super().closeEvent(event)
 
-"""    def showEvent(self, event):
-        super().showEvent(event)
-        # Store the initial size when the dialog is first shown
-        if self.initial_size is None:
-            self.initial_size = self.size()"""
+    def restore_window_settings(self):
+        """ Restore the window size and position upon startup """
+        geometry = self.window_settings.value("geometry")
+        pos = self.window_settings.value("pos")
+        # If settings were found, apply them
+        if geometry:
+            self.restoreGeometry(geometry)
+            self.logger.debug("window geometry restored.")
+        else:
+            self.setGeometry(50, 50, 525, 600)
+        if pos:
+            self.logger.debug("window position restored.")
+            self.move(QPoint(pos))
 
 # local main for unit testing
 if __name__ == '__main__':
