@@ -39,14 +39,13 @@ During setup of an account it scans QR codes for you.
 ### Learn More
  [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md)  
  [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)  
+ [Video tutorial](https://www.youtube.com/watch?v=-LsL8Jgswqo) (11 minutes)  
 
 ### Screenshot gallery
 [View Screenshots](screenshot_gallery.md)  
 
-### Demo video
-<iframe width="700" height="475" src="https://www.youtube.com/embed/EwcvA4PUlV0" title="EasyAuth v0.3.0 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-
+### Demo video (2 minutes)
+<iframe width="700" height="475" src="https://www.youtube.com/embed/EwcvA4PUlV0" title="EasyAuth v0.3.0 Demo - setup two-factor authentication" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  
 
 ### Try it out
 
@@ -57,7 +56,8 @@ Practice storing a new secret key using this sample QR code.
 1. Launch EasyAuth.
 2. Make sure the QR code above is visible on the screen. Click 'Scan QR code".
 3. The QR code is read and a new vault entry created using the secret key, provider name, and user. 
-4. Observe the new entry in the main window. ![Vault entry](assets/EasyAuthdemo-vault-entry.png)
+4. Observe the new entry in the main window. 
+![Vault entry](assets/EasyAuthdemo-vault-entry.png)
 
   
 
