@@ -7,25 +7,8 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDial
 from utils import assets_dir
 from styles import info_btn_style
 from account_mgr import AccountManager
-""" Reference: Gnome-Authenticator backup JSON format
-  {
-    "secret": "37E4WSILXWLQ87C2QJ4MXABCD2OW7L6H",
-    "issuer": "Figma",
-    "label": "fig@figma.commy",
-    "digits": 6,
-    "type": "totp",
-    "algorithm": "sha1",
-    "thumbnail": null,
-    "last_used": 0,
-    "used_frequency": 0,
-    "counter": 1,
-    "tags": [],
-    "period": 30
-  }
-"""
 
-"""Confirm Export: The export file contains your vault data in an unencrypted format.
-Use a secure channel for transmitting it and delete it immediately after you are done using it."""
+""" Export and Import features. """
 class ExportImportDialog(QDialog):
     def __init__(self, parent=None):
         super(ExportImportDialog, self).__init__(parent)
@@ -111,11 +94,13 @@ class ExportImportDialog(QDialog):
         self.setLayout(layout)
 
     def export(self):
+        """ Export the vault to an external file. """
         # Find out which radio button is selected
         export_file_types = ['json','uri']
-        # Oddly checkedId is -2 or -3, so map to 0,1
+        # Oddly radio button checkedId is -2 or -3, so map to 0,1
         file_format = export_file_types[(self.button_group.checkedId() * -1) -2]
 
+        # Present a save file chooser dialog
         options = QFileDialog.Options()
         if file_format == 'json':
             file_path, _ = QFileDialog.getSaveFileName(self, f"Export to {file_format} format", "", "JSON Files (*.json);;All Files (*)", options=options)
@@ -129,11 +114,12 @@ class ExportImportDialog(QDialog):
                 file_path += ".txt"
 
             try:
+                # Go export the vault to chosen file
                 self.account_manager.export_accounts(file_path,file_format)
-                QMessageBox.information(self, "Success", f"Accounts successfully exported up to {file_path}")
+                QMessageBox.information(self, "Success", f"Vault successfully exported up to {file_path}")
                 self.close()
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to export accounts: {e}")
+                QMessageBox.critical(self, "Error", f"Failed to export vault: {e}")
                 self.close()
 
     def build_provider_preview(self, account_list):
@@ -148,6 +134,7 @@ class ExportImportDialog(QDialog):
         return sample_msg, confirm_count - limit
 
     def importer(self):
+        """ Import items from saved file into vault. """
         app_name= "EasyAuth"
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, f"Import {app_name} Accounts", "", "All Files (*)", options=options)
@@ -167,7 +154,25 @@ class ExportImportDialog(QDialog):
                 if reply == QMessageBox.Yes:
                     # Don't need to check result code here because it was checked during preview above
                     self.account_manager.import_accounts(file_path)
-                    QMessageBox.information(self, "Success", f"Accounts successfully imported from  {file_path}")
+                    QMessageBox.information(self, "Success", f"Vault successfully imported from  {file_path}")
                     self.close()
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to import accounts: {e}")
+                QMessageBox.critical(self, "Error", f"Failed to import vault: {e}")
+
+
+""" Reference: Gnome-Authenticator backup JSON format
+  {
+    "secret": "37E4WSILXWLQ87C2QJ4MXABCD2OW7L6H",
+    "issuer": "Figma",
+    "label": "fig@figma.commy",
+    "digits": 6,
+    "type": "totp",
+    "algorithm": "sha1",
+    "thumbnail": null,
+    "last_used": 0,
+    "used_frequency": 0,
+    "counter": 1,
+    "tags": [],
+    "period": 30
+  }
+"""

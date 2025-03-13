@@ -1,15 +1,17 @@
 import logging
+import sys
 
 import pyperclip
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QTableWidget,
-                             QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog, QMessageBox)
-from PyQt5.QtCore import Qt, QItemSelectionModel, QEvent
+from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QIcon
-import json
-import sys
+from PyQt5.QtWidgets import (QVBoxLayout, QLineEdit, QTableWidget,
+                             QTableWidgetItem, QHeaderView, QApplication, QLabel, QDialog)
+
 import provider_map
 
+
 class SearchBox(QLineEdit):
+    """ A custom search field for the provider search dialog. """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent = parent
@@ -32,6 +34,12 @@ class SearchBox(QLineEdit):
             self.parent.clear_table_selection()
 
 class ProviderSearchDialog(QDialog):
+    """ A dialog to display a static list of known providers.  Offers a search field
+    to lookup a user-entered provider.  This dialog is only for reference and plays
+    no essential role in the application. If search finds a matching provider, the
+    provider name is copied to the clipboard.  The user may then choose to copy it
+    into the vault entry dialog.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.selected_provider = None
@@ -74,6 +82,7 @@ class ProviderSearchDialog(QDialog):
         # Connect signals
         self.search_box.textChanged.connect(self.filter_items)
         self.table.itemSelectionChanged.connect(self.handle_selection)
+
         # Install event filter on table for handling Backtab and Enter
         self.table.installEventFilter(self)
         self.table.viewport().installEventFilter(self)
@@ -87,6 +96,7 @@ class ProviderSearchDialog(QDialog):
                     self.search_box.setFocus()
                     self.clear_table_selection()
                     return True
+                # Return selects an item
                 if event.key() == Qt.Key_Return:
                     selected_row = self.table.currentRow()
                     item = self.table.item(selected_row, 1)
@@ -94,6 +104,7 @@ class ProviderSearchDialog(QDialog):
                     self.accept()   # close the dialog
                     return True
         if obj == self.table.viewport():
+            # Double-click the mouse to select an entry
             if event.type() == QEvent.MouseButtonDblClick:
                 selected_row = self.table.currentRow()
                 item = self.table.item(selected_row, 1)

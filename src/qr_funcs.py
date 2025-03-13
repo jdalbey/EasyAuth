@@ -1,4 +1,3 @@
-# Detects one or more QR codes on the screen.
 import logging
 
 import otp_funcs
@@ -10,6 +9,7 @@ from PIL import ImageGrab
 
 from qr_selection_dialog import QRselectionDialog
 
+""" Utilities for scanning QR codes from the screen. """
 
 def scan_screen_for_qr_codes():
     """
@@ -17,7 +17,6 @@ def scan_screen_for_qr_codes():
 
     Returns:
         list: A list of decoded data from QR codes found on the screen.
-
     """
     # Take a screenshot of the current screen
     bbox = None  # take fullscreen
@@ -36,6 +35,11 @@ def scan_screen_for_qr_codes():
     return results
 
 def obtain_qr_codes(parent):
+    """ Obtain the URI data from QR codes found on the screen.
+     If no QR codes could be found, displays an alert message.
+     If multiple QR codes were found, presents a selection dialog.
+     If a single QR code was found, returns an OTP record with the data from the QR code.
+     """
     # first go find_qr_codes
     urls = scan_screen_for_qr_codes()
     # Show alert if no QR codes found.
@@ -107,6 +111,7 @@ invalid_messages
                 return selected_account
 
 def open_qr_image(parent=None):
+    """ Obtain QR code data from an image file. """
     options = QFileDialog.Options()
     file_path, _ = QFileDialog.getOpenFileName(parent, f"Open QR image", "",
                                                "PNG Files (*.png);;All Files (*)", options=options)

@@ -1,38 +1,44 @@
+import datetime
 import json
+import logging
 import os
-import sys, logging
-import threading
+import sys
+import time
 from dataclasses import asdict
 
+import pyotp
+import pyperclip
+import qdarktheme
+from PyQt5.QtCore import Qt, QTimer, QUrl, QSettings, QPoint
+from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
 from PyQt5.QtWidgets import (QMainWindow, QApplication,
                              QSizePolicy, QAction, QToolBar, QScrollArea,
                              QDialog, QLabel, QPushButton, QLineEdit, QVBoxLayout,
-                             QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu, QFileDialog)
-from PyQt5.QtCore import Qt, QTimer, QUrl, QRect, QSettings, QPoint
-from PyQt5.QtGui import QFont, QDesktopServices, QPixmap, QKeySequence
-import pyotp
-import time, datetime
-import pyperclip
-import qdarktheme
-from permission_dialog import PermissionDialog, get_permission
+                             QHBoxLayout, QWidget, QMessageBox, QFrame, QMenu)
 
-import qr_funcs
-from provider_search_dialog import ProviderSearchDialog
-from utils import assets_dir
-from provider_map import Providers
+import about_dialog
 import cipher_funcs
-from quick_start_dialog import QuickStartDialog
-from preferences_dialog import PreferencesDialog
-from export_import_dialog import ExportImportDialog
-from reorder_dialog import ReorderDialog
+import qr_funcs
+from account_mgr import AccountManager
 from appconfig import AppConfig
-from account_mgr import AccountManager, Account, OtpRecord
+from export_import_dialog import ExportImportDialog
+from permission_dialog import PermissionDialog, get_permission
+from preferences_dialog import PreferencesDialog
+from provider_map import Providers
+from provider_search_dialog import ProviderSearchDialog
+from quick_start_dialog import QuickStartDialog
+from reorder_dialog import ReorderDialog
 from styles import dark_qss, light_qss
+from utils import assets_dir
 from vault_details_dialog import VaultDetailsDialog
 from vault_entry_dialog import VaultEntryDialog
 
 
 class AppView(QMainWindow):
+    """ This is the GUI main window.
+     Yes, this module is a monster as are most main window classes.
+     Someone with more Python knowledge should refactor it.
+     """
     def __init__(self, q_app):
         super().__init__()
         self.q_app = q_app
@@ -59,11 +65,11 @@ class AppView(QMainWindow):
         self.create_toolbar()
 
         self.start_timer()
-        self.display_accounts()
+        self.display_vault()
         self.logger.debug("view init complete")
 
     def create_menubar(self):
-        # Create menubar
+        # Create application menubar with File, Tools, Help
         menubar = self.menuBar()
 
         # File menu
@@ -149,7 +155,7 @@ class AppView(QMainWindow):
         help_menu.addAction(about_action)
 
     def create_toolbar(self):
-        # Create toolbar
+        # Create toolbar with Scan button, Search field, and countdown timer
         toolbar = QToolBar()
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
@@ -176,7 +182,7 @@ class AppView(QMainWindow):
         search_shortcut_action.setShortcut(QKeySequence("Alt+e"))  #alt+e for 'search'
         search_shortcut_action.triggered.connect(self.search_box.setFocus)
         self.addAction(search_shortcut_action)
-        self.search_box.textChanged.connect(lambda: self.display_accounts())  # Dynamic search
+        self.search_box.textChanged.connect(lambda: self.display_vault())  # Dynamic search
         self.search_box.setMaximumWidth(200)
         toolbar.addWidget(self.search_box)
 
@@ -205,6 +211,7 @@ class AppView(QMainWindow):
         self.set_theme()
 
     def set_theme(self):
+        """ Set the application theme (color scheme). """
         def adjust_theme_paths():
             """Return the correct path to images, whether in development or PyInstaller mode."""
             global dark_qss, light_qss
@@ -223,24 +230,8 @@ class AppView(QMainWindow):
         else:
             qdarktheme.setup_theme(chosen_theme,additional_qss=light_qss,custom_colors={"background": "#fff6e6"})
 
-    def check_for_file_changes(self):
-        current_accounts = self.account_manager._accounts
-        # Call get_accounts to force check for file modifications
-        if current_accounts != self.account_manager.get_accounts():
-            self.display_accounts()
-
-    def start_timer(self):
-        # Set up the QTimer to call update_timer every second
-        self.timer = QTimer(self.central_widget)
-        self.timer.timeout.connect(self.update_timer)
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
-
-        # Run the file check in a separate thread
-        # thread = threading.Thread(target=self.check_for_file_changes)
-        # thread.daemon = True  # Makes sure the thread exits when the program exits
-        # thread.start()
-
-    def display_accounts(self):
+    def display_vault(self):
+        """ Show the list of vault entries in the main content area. """
         search_term = self.search_box.text().lower()
         self.account_manager.get_accounts()
 
@@ -252,39 +243,34 @@ class AppView(QMainWindow):
 
         # Check if the accounts list is empty
         if len(self.account_manager.get_accounts()) == 0:
-            # See if a QR code is visible.  Would be nice on an initally empty vault.
-            # if not qr_hunting.process_qr_codes(called_from_Find_btn=False):
-                # If not show empty_vault message
-                self.vault_empty = True
-                # Display a three-line help message
-                help_message = [
-                    "Your vault is empty.",
-                    "The vault stores two-factor authentication keys",
-                    "provided by a website or other online service.",
-                    "Store your secret key by clicking 'Scan QR code'",
-                    "or"
-                ]
-                for line in help_message:
-                    help_label = QLabel(line)
-                    help_label.setAlignment(Qt.AlignCenter)
-                    self.scroll_layout.addWidget(help_label)
-                view_quick_btn = QPushButton("View Quick Start")
-                view_quick_btn.clicked.connect(self.show_quick_start_dialog)
-                view_quick_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
+            # show empty_vault message
+            self.vault_empty = True
+            # Display a three-line help message
+            help_message = [
+                "Your vault is empty.",
+                "The vault stores two-factor authentication keys",
+                "provided by a website or other online service.",
+                "Store your secret key by clicking 'Scan QR code'",
+                "or"
+            ]
+            for line in help_message:
+                help_label = QLabel(line)
+                help_label.setAlignment(Qt.AlignCenter)
+                self.scroll_layout.addWidget(help_label)
+            view_quick_btn = QPushButton("View Quick Start")
+            view_quick_btn.clicked.connect(self.show_quick_start_dialog)
+            view_quick_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            self.scroll_layout.addWidget(view_quick_btn,alignment=Qt.AlignCenter)
 
-        # If account list is not empty show it
+        # If account list is not empty place each item in the display
         if len(self.account_manager.get_accounts()) > 0:
             self.vault_empty = False
             # Adjust the spacing of the scroll_layout
             self.scroll_layout.setSpacing(1)  # Set vertical spacing between rows
+            # Iterate over all the vault entries
             for index, account in enumerate(self.account_manager.get_accounts()):
+                # See if we match the search term
                 if search_term in account.issuer.lower():
-                    secret_key = cipher_funcs.decrypt(account.secret)
-                    try:
-                        otp = pyotp.TOTP(secret_key).now()
-                    except:  # This would only happen from internal error
-                        otp = "??????"
                     row_frame = QFrame()
                     row_frame.setFrameShape(QFrame.NoFrame) #QFrame.StyledPanel)
                     # each row can expand horizontally but is fixed vertically, so they don't expand to fill up the scroll frame.
@@ -319,6 +305,12 @@ class AppView(QMainWindow):
                     user_label.setFont(QFont("Verdana",12))
 
                     # Show TOTP code
+                    # Generate the one-time password
+                    secret_key = cipher_funcs.decrypt(account.secret)
+                    try:
+                        otp = pyotp.TOTP(secret_key).now()
+                    except:  # This would only happen from internal error
+                        otp = "??????"
                     otplabel = QPushButton(f"{otp}") # display the 6-digit code in the label
                     otplabel.setObjectName("otpLabel")
                     otplabel.setToolTip("Copy code to clipboard")
@@ -333,6 +325,19 @@ class AppView(QMainWindow):
                     self.scroll_layout.addWidget(row_frame)
 
         self.scroll_layout.addStretch() # this keeps the rows bunched up at the top
+
+    def check_for_file_changes(self):
+        """ Invoked every second to check for external changes to the vault. """
+        current_accounts = self.account_manager._accounts
+        # Call get_accounts to force check for file modifications
+        if current_accounts != self.account_manager.get_accounts():
+            self.display_vault()
+
+    def start_timer(self):
+        # Set up the QTimer to call update_timer every second
+        self.timer = QTimer(self.central_widget)
+        self.timer.timeout.connect(self.update_timer)
+        self.timer.start(1000)  # 1000 milliseconds = 1 second
 
     def update_timer(self):
         """ Called every second to update the timer """
@@ -364,22 +369,28 @@ class AppView(QMainWindow):
         # refresh the display every 30 seconds
         # NB: assumes timer period is 30 seconds for all accounts
         if time_remaining == 30:
-            self.display_accounts()
+            self.display_vault()
 
+        # Also use this opportunity to check for external modifications to the vault
         self.check_for_file_changes()
 
     def copy_to_clipboard(self, totp_label, idx, account):
-        """ @param totp_label is the label of the one-time password """
+        """ When user clicks on the OTP we copy it to the clipboard.
+        We also update the usage statistics for account.
+        @param totp_label is the label of the one-time password.
+        @param idx the index of this account in the list
+        @param account with the usage data to be udpated.
+        """
         pyperclip.copy(totp_label.text())
         self.logger.debug(f"Copied OTP: {totp_label.text()}")
         now = datetime.datetime.now()
-        # update last used time
+        # update last used time and count
         account.last_used = now.strftime("%Y-%m-%d %H:%M:%S")
         account.used_frequency += 1
         self.account_manager.update_account(idx,account)
         self.logger.debug(f"Updated last_used time for: {idx} {account.issuer} ({account.label})")
 
-        # Show the floating message relative to the given label position
+        # Show a floating acknowledgement message relative to the given label position
         popup = QLabel("Copied", self)
         popup.setObjectName("copyPopup")
         popup.setAlignment(Qt.AlignCenter)
@@ -405,45 +416,52 @@ class AppView(QMainWindow):
             self.showMinimized()
 
     def show_add_account_form(self):
-        """ User clicked Add Account button """
-        self.logger.debug("Starting Show_add_account_form")
+        """ User chose 'Enter manually' from the menu.  """
         try:
             add_dialog = VaultEntryDialog(self)
             add_dialog.show()
             add_dialog.exec_()
         except Exception as e:
-            self.logger.error("AddAccountDialog not constructed.")
+            self.logger.error("VaultEntryDialog not constructed.")
 
         # Refresh the display
-        self.display_accounts()
+        self.display_vault()
 
     def show_edit_account_form(self,index,account):
-        self.logger.debug (f"entering show_edit_account_form with {index} {account.issuer}")
+        """ Show the dialog for viewing/updating vault entry.
+        @index the index of the account in the list.
+        @account the account info.
+        """
+        self.logger.debug (f"Entering show_edit_account_form with {index} {account.issuer}")
         try:
             dialog_EditAcct = VaultDetailsDialog(self, index, account)
             dialog_EditAcct.exec_()
         except Exception as e:
             self.logger.error("EditAccountDialog not constructed.")
-        self.display_accounts()
+        self.display_vault()
 
     def scan_QR_code_clickaction(self):
+        """ Handle request to scan QR code. """
+        # Check settings to see if we have permission
         if self.app_config.is_scan_permission():
-            self.fetch_QR_codes()
+            # Yes, go fetch the QR code
+            self.fetch_QR_code()
         else:
             # Display the permission dialog
             result = get_permission(self)
-
+            # Did we get permission?
             if result == PermissionDialog.ALWAYS_ALLOW:
                 # permanently granting permission
                 self.app_config.set_scan_permission(True)
-                self.fetch_QR_codes()
+                self.fetch_QR_code()
 
             elif result == PermissionDialog.JUST_THIS_TIME:
                 # one time permission
-                self.fetch_QR_codes()
+                self.fetch_QR_code()
 
 
-    def fetch_QR_codes(self):
+    def fetch_QR_code(self):
+        """ Go scan for QR code and save the result. """
         # check option to minimize window during QR scan
         if self.app_config.is_minimize_during_qr_search():
             self.hide()
@@ -458,11 +476,12 @@ class AppView(QMainWindow):
             self.show_popup()  # Popup announcing success
             # Save the result in the vault
             if self.account_manager.save_new_account(otprec):
-                self.display_accounts()
+                self.display_vault()
             else:
                 QMessageBox.information(self, "Warning", f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
 
     def show_popup(self):
+        """ Show a popup message announcing success. """
         # Show a floating message relative to the form fields
         popup = QLabel("QR code found!", self)
         popup.setObjectName("qr_code_found")
@@ -481,26 +500,30 @@ class AppView(QMainWindow):
         QTimer.singleShot(3000, popup.close)  # Hide after 3 seconds
 
     def get_qr_from_image(self):
+        """ Handle request to read QR code from an image file. """
         otprec = qr_funcs.open_qr_image(self)
         if otprec is not None:
             if self.account_manager.save_new_account(otprec):
-                self.display_accounts()
+                self.display_vault()
             else:
                 QMessageBox.information(self, "Warning",
                                         f"Account with provider {otprec.issuer} and user {otprec.label} already exists")
 
     def show_preferences_dialog(self):
+        """ Display the preferences dialog for user to adjust settings. """
         dialog = PreferencesDialog(parent=self)
         dialog.exec_()
-        self.display_accounts()
+        self.display_vault()
 
     def show_export_import_dialog(self):
+        """ Show Export / import dialog. """
         dialog = ExportImportDialog(self)
         dialog.exec_()
         # After restore, reload display
-        self.display_accounts()
+        self.display_vault()
 
     def show_reorder_dialog(self):
+        """ Show the dialog that allows the user to customize the order of vault entries in the display. """
         account_list = self.account_manager.get_accounts()
         dialog = ReorderDialog(account_list, self)
         if dialog.exec_() == QDialog.DialogCode.Accepted:
@@ -510,19 +533,19 @@ class AppView(QMainWindow):
             json_str = json.dumps(account_dicts)
             self.account_manager.set_accounts(json_str)
             # Update main window display
-            self.display_accounts()
+            self.display_vault()
 
     def do_alpha_sort_action(self):
         self.account_manager.sort_alphabetically()
-        self.display_accounts()
+        self.display_vault()
 
     def do_recency_sort_action(self):
         self.account_manager.sort_recency()
-        self.display_accounts()
+        self.display_vault()
 
     def do_frequency_sort_action(self):
         self.account_manager.sort_frequency()
-        self.display_accounts()
+        self.display_vault()
 
     def show_provider_search_dialog(self):
         dlg = ProviderSearchDialog(self)
@@ -543,49 +566,13 @@ class AppView(QMainWindow):
         QDesktopServices.openUrl(url)
 
     def show_about_dialog(self):
-        """ Show About dialog, including version and build date. """
-        # Find the build date
-        # If production mode, use path to bundled file created during build
-        if getattr(sys, 'frozen', False):
-            build_date_path = os.path.join(assets_dir(), "build_date.txt")
-            version_path = os.path.join(assets_dir(), "version_info.txt")
-            build_date = "Unknown"
-            version_number = "0.0"
-            # Read the build date from assets folder
-            if os.path.exists(build_date_path):
-                with open(build_date_path, "r") as f:
-                    date_string = f.read().strip()
-                    # Oddly, Windows date function prepends some junk, so here we skip over it by starting at [4:]
-                    build_date = date_string[4:]
-            # Read the version info from assets folder
-            if os.path.exists(version_path):
-                with open(version_path, "r") as f:
-                    version_number = f.read().strip()
-        else:  # For development version (running unbundled)
-            now = datetime.datetime.now()
-            build_date =  now.strftime("%Y-%m-%d %H:%M:%S")
-            version_number = "0.0"
-
-        msg = QMessageBox(self)
-        msg.setText(f'EasyAuth\n\n2FA authenticator.\n\n' +
-             f"Version {version_number}  {build_date}\n\n" +
-             "http://www.github.com/jdalbey/EasyAuth\n\n" +
-             f"Vault directory:\n" + self.app_config.get_os_data_dir())
-        msg.setWindowTitle("About")
-        pixmap = QPixmap(os.path.join(assets_dir(), "Vault.png"))
-        msg.setIconPixmap(pixmap)
-        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-        retval = msg.exec()
+        about_dialog.show(self)
 
     def closeEvent(self, event):
-        # Save window geometry and position for next startup
+        """ When window closes, save geometry and position for next startup. """
         self.window_settings.setValue("geometry", self.saveGeometry())
         self.window_settings.setValue("pos", self.pos())
         self.logger.debug("window geometry saved")
-        # geometry = self.geometry()
-        # self.logger.debug(f"Current window geometry:  {QRect(geometry)}")
-        # self.logger.debug(f"Current window position: {self.pos().x()} x {self.pos().y()}")
-        # Note that upon startup geometry says 100,100 but pos says 100,68.
         super().closeEvent(event)
 
     def restore_window_settings(self):
@@ -597,6 +584,7 @@ class AppView(QMainWindow):
             self.restoreGeometry(geometry)
             self.logger.debug("window geometry restored.")
         else:
+            # otherwise use default position/size.
             self.setGeometry(50, 50, 525, 600)
         if pos:
             self.logger.debug("window position restored.")

@@ -4,7 +4,10 @@ import sys
 """ Utility functions """
 
 def assets_dir():
-    """ Return the current path to project assets, depending on development or production environment. """
+    """ Return the current path to project assets, depending on development or production environment.
+    In production the assets have been packaged by PyInstaller and at runtime are
+    found in a temp folder.
+    """
     base_dir = ""
     # Are we in production mode?
     if getattr(sys, 'frozen', False):

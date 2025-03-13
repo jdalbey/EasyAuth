@@ -30,7 +30,7 @@ class TestView(unittest.TestCase):
 
         view.account_manager._accounts = [mock_account1, mock_account2]
 
-        view.display_accounts()
+        view.display_vault()
 
         # Find the edit button in the first row
         edit_btns = view.findChildren(QPushButton, "providerLabel")
@@ -71,7 +71,7 @@ class TestView(unittest.TestCase):
         mock_manager.get_accounts.return_value = [mock_account1, mock_account2]
 
         # Call the display_accounts method
-        view.display_accounts()
+        view.display_vault()
 
         # Find the first providerLabel in the layout
         provider_labels = view.findChildren(QPushButton, "providerLabel")
@@ -96,7 +96,7 @@ class TestView(unittest.TestCase):
 
         view.search_box.setText("k")
         # Call the display_accounts method
-        view.display_accounts()
+        view.display_vault()
 
         # Find the first providerLabel in the layout
         provider_labels = view.findChildren(QPushButton, "providerLabel")
@@ -117,7 +117,7 @@ class TestView(unittest.TestCase):
         mock_account2 = OtpRecord("Pennies", "label2", "AB34").toAccount()
 
         view.account_manager.accounts = [mock_account1, mock_account2]
-        view.display_accounts()
+        view.display_vault()
 
         # mock the actual sort call
         view.account_manager.sort_alphabetically = Mock()
@@ -143,7 +143,7 @@ class TestView(unittest.TestCase):
         # Configure the mock to return our test accounts when get_accounts() is called
         mock_manager.get_accounts.return_value = [mock_account1, mock_account2]
 
-        view.display_accounts()
+        view.display_vault()
         # Find the otplabel button in the first row
         otp_btns = view.findChildren(QPushButton, "otpLabel")
         self.assertGreater(len(otp_btns), 0, "No copy buttons found")
@@ -166,7 +166,7 @@ class TestView(unittest.TestCase):
         mock_account1 = OtpRecord("Rexall", "label1", "AB34").toAccount()
         mock_account2 = OtpRecord("Pennies", "label2", "AB34").toAccount()
         view.account_manager.accounts = [mock_account1, mock_account2]
-        view.display_accounts()
+        view.display_vault()
 
         # Find the Tools > Sort > Alphabetically action by object name
         reorder_action = view.findChild(QAction, "reorderAction")

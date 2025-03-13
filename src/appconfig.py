@@ -10,6 +10,7 @@ class AppConfig:
     kDefaultPath = ".config/EasyAuth/config.ini"
 
     def __new__(cls, filepath=None):
+        # Create the single instance of this class
         if cls._instance is None:
             cls._instance = super(AppConfig, cls).__new__(cls)
             cls._instance._initialized = False
@@ -53,6 +54,10 @@ class AppConfig:
                 self.config.write(configfile)
 
     def get(self, section, option, fallback=None):
+        """ Accessor to a specific setting.
+        @param section the desired section of the configu file
+        @param option the name of the option
+        @param fallback the default/fallback value if option isn't in the file. """
         return self.config.get(section, option, fallback=fallback)
 
     def set(self, section, option, value):
@@ -62,7 +67,7 @@ class AppConfig:
         self.config.set(section, option, value)
         self.save_config()
 
-    # Add methods to get and set the new settings
+    # Accessor / setters for each option
     def is_display_favicons(self):
         return self.get('Settings', 'display_favicons', fallback='False') == 'True'
 
@@ -99,34 +104,13 @@ class AppConfig:
     def set_language(self, value):
         self.set('Settings', 'language', value)
 
-    def is_smart_filtering_enabled(self):
-        """
-        Check if smart filtering is enabled.
-        """
-        return self.config.getboolean('Settings', 'smart_filtering', fallback=False)
-
-    def set_smart_filtering_enabled(self, enabled):
-        """
-        Set the smart filtering enabled status.
-        """
-        self.set('Settings', 'smart_filtering', str(enabled))
-
     def get_theme_name(self):
-        """
-        Get the name of the theme.
-        """
         return self.config.get('Settings', 'theme_name', fallback='light')
 
     def set_theme_name(self, theme_name):
-        """
-        Set the name of the theme.
-        """
         self.set('Settings', 'theme_name', theme_name)
 
     def get_alt_id(self):
-        """
-        Get the alternate id.
-        """
         alt_id_string = self.config.get('System', 'alt_id', fallback="")
         if alt_id_string == "":
             return None

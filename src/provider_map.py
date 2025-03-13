@@ -5,13 +5,19 @@ import zipfile
 
 from urllib.parse import urlparse
 
-from PyQt5.QtGui import QPixmap, QIcon, QImage
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QByteArray
-from PyQt5.QtWidgets import QLabel, QApplication, QMessageBox
+from PyQt5.QtWidgets import QLabel, QApplication
 from appconfig import AppConfig
 from utils import assets_dir
 
 class Providers:
+    """ Providers represents a static list of known online services that use 2FA via one-time passwords.
+    This list is available to the user as a reference via the provider_search_dialog.
+    A provider has a name, a website, and a favorite icon.
+    The provider name and website(domain) are loaded from a JSON file.
+    The favorite icon is loaded from a zip file.
+    """
     logwriter = logging.getLogger(__name__)
 
     def __init__(self):
@@ -78,7 +84,10 @@ class Providers:
 
     @staticmethod
     def make_pixmap(raw_img):
-        # Assuming you have raw binary image data in variable 'raw_data'
+        """ Convert raw image into pixmap.
+        @param raw binary image data
+        @return 16x16 pixmap
+        """
         # Read image data into a QByteArray
         pixmap = QPixmap()
         image_data = QByteArray(raw_img)
@@ -88,10 +97,10 @@ class Providers:
         return pixmap
 
     def get_provider_icon_pixmap(self, provider):
+        """ Lookup the icon for a given provider."""
         # REFS: https://favicon.im/  https://opendata.stackexchange.com/questions/14007/list-of-top-10k-websites-and-their-favicons
         # https://github.com/opendns/public-domain-lists/blob/master/opendns-top-domains.txt
         # https://pypi.org/project/favicon/
-        # Look up provider icon
         try:
             img_raw = self.provider_map[provider]['raw_image']
         except KeyError:
@@ -99,16 +108,15 @@ class Providers:
         pixmap = self.make_pixmap(img_raw)
         return pixmap
 
-    def find(self, provider):
-        """Lookup provider in map"""
-        provider_icon_pixmap = self.get_provider_icon_pixmap(provider)
-        if provider_icon_pixmap:
-            return True
-        return False
-
     def get_provider_icon(self,provider):
+        """ Retrieve the icon for the given provider.
+        @param provider string name of the provider.
+        @return If provider exists in the provider map, returns a QLabel with the icon.
+        Otherwise, returns a label with the first letter of provider name.
+        """
         my_icon_label = QLabel()
         provider_icon_pixmap = self.get_provider_icon_pixmap(provider)
+        # Does the provider exist in our map?
         if provider_icon_pixmap:
             # Set the QPixmap to the QLabel
             my_icon_label.setPixmap(provider_icon_pixmap)
@@ -137,6 +145,9 @@ class Providers:
 
 def get_color_for_letter(letter):
     """
+    Provides a mapping of colors for each letter of the alphabet.
+    If provider doesn't have an icon, the first letter of provider name is
+    used as input to this function.
     Returns the color associated with the given letter.
 
     Args:
@@ -174,7 +185,7 @@ def get_color_for_letter(letter):
         'Y': 'lightgray',
         'Z': 'lavender',
     }
-
+    # If parameter isn't valid return white
     if not letter or len(letter) != 1 or not letter.isalpha():
         return 'white'
     return letter_to_color.get(letter.upper())

@@ -1,12 +1,12 @@
-import sys
-from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
-                             QLabel, QPushButton, QSpacerItem, QSizePolicy)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
+                             QLabel, QPushButton, QSpacerItem, QSizePolicy)
 
 
 class PermissionDialog(QDialog):
-    # Define custom button roles as class constants
+    """ A confirmation dialog with custom buttons for responding.
+    This is used to request permission from the user to scan the screen for a QR code.
+    """
     ALWAYS_ALLOW = 1
     JUST_THIS_TIME = 2
     DENY = 0

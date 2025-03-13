@@ -1,19 +1,18 @@
-import os
-
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QLineEdit
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton
-from PyQt5.QtGui import QIcon
-from utils import assets_dir
-import otp_funcs, logging
+
+import logging
+import otp_funcs
 from account_mgr import OtpRecord
 from appconfig import AppConfig
 from provider_search_dialog import ProviderSearchDialog
+from utils import assets_dir
 
 """ Utility functions shared by Add and Edit dialogs"""
 
 def set_tab_order(dialog):
-    # Set tab order for subclass fields, maintaining parent order
+    """ Set tab order for subclass fields, maintaining parent order. """
     # First clear any existing tab order by setting all widgets to NoFocus
     for child in dialog.findChildren(QWidget):
         child.setFocusPolicy(Qt.NoFocus)
@@ -39,7 +38,9 @@ def validate_form(dialog):
     dialog.btn_Save.setEnabled(all_filled)
     
 def provider_lookup(dialog):
-    # Create and show the search page
+    """ Create and show the provider search page.
+    @param dialog is the parent dialog
+    """
     search_page = ProviderSearchDialog()
     search_page.load_data()
     search_page.lower()
@@ -49,6 +50,7 @@ def provider_lookup(dialog):
         dialog.provider_entry.setText(selected)
           
 def save_fields(dialog):
+    """ Retrieve the data entry fields from the dialog and save them in the vault. """
     issuer = dialog.provider_entry.text()
     label = dialog.label_entry.text()
     secret = dialog.secret_entry.text()
@@ -57,6 +59,7 @@ def save_fields(dialog):
     otp_record = OtpRecord(issuer, label, secret)
     # Validate secret key
     if otp_funcs.is_valid_secretkey(secret):
+        # Create a new vault entry
         if dialog.account_manager.save_new_account(otp_record):
             dialog.accept()
         else:

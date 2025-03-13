@@ -3,41 +3,43 @@ import logging
 import os
 import shutil
 import threading
-import urllib
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-import platform
-from typing import List, Optional
+from typing import List
 
 import cryptography.fernet
 import pyotp
 
 import cipher_funcs
-from dataclasses import dataclass
 from appconfig import AppConfig
+
 
 @dataclass
 class Account:
-    """ The information that authenticates someone with a provider. """
+    """ An entry in the vault: A secret key and associated identifiers and usage info. """
     issuer: str  # Referred to as "provider" in the GUI.
-    label: str
+    label: str  # Referred to as "user" in the GUI
     secret: str # encrypted secret key
     last_used: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     used_frequency: int = 0
-    favorite: bool = False
+    favorite: bool = False  # for future use
     icon: str = None
 
     def get_otp_auth_uri(self):
-        """ Convert account to otpauth URI """
+        """ Convert this account to otpauth URI string. """
         decrypted_secret = cipher_funcs.decrypt(self.secret)
         totp = pyotp.TOTP(decrypted_secret)
         uri = totp.provisioning_uri(name=self.label, issuer_name=self.issuer)
         return uri
 
     def __post_init__(self):
+        """ Post init validation. """
+        # Check for non-empty secret
         if self.secret == "":
             raise ValueError("Can't create Account with empty secret.")
         try:
+            # Check for valid secret (must be encrypted before constructing Account)
             cipher_funcs.decrypt(self.secret)
         except cryptography.fernet.InvalidToken as e:
             raise ValueError("Can't create Account with plain-text secret.")
@@ -47,23 +49,29 @@ class Account:
 @dataclass(frozen=True)
 class OtpRecord:
     """ An OTP record as received from the provider with plain-text secret key """
-    issuer: str
-    label: str
+    issuer: str  # Provider
+    label: str   # user identifier
     secret: str  # plain-text secret key
 
     def toAccount(self):
-        """ Convert to account by encrypting the secret key and adding last used date."""
+        """ Convert to account by encrypting the secret key and adding default last used date."""
         encryped_secret = cipher_funcs.encrypt(self.secret)
         return Account(self.issuer, self.label, encryped_secret, "1980-01-01 00:00:00")
 
-# Constant indicates vault data file format
+# Constant identifier for vault data file format
 kCurrent_Vault_Version = '1'
 
 class AccountManager:
+    """ AccountManager is the list of accounts. It is a singleton.
+        New accounts can be created, updated, deleted.
+        The list of accounts can be loaded from the vault, or saved to the vault.
+        The list of accounts can be exported or imported.
+    """
     _instance = None
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
+        """ Create the single instance of this class. """
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
@@ -71,13 +79,18 @@ class AccountManager:
         return cls._instance
 
     def __init__(self, filename=None):
-        """ Create an account manager using a vault at the given filename """
+        """ Create an account manager using a vault at the given filename.
+            @param filename - the filename of the vault.
+        """
+        # If no filename was provided
         if filename is None:
+            # Get the configuration settings
             config = AppConfig()
             # Note: if os_data_dir is absolute, prepending Path.home() has no effect
             # if os_data_dir is '.' it results in path to home directory
             # slash in following line is an operator to join the paths
             self.data_dir = Path.home() / config.get_os_data_dir()
+            # Use the default filename
             filename = str(self.data_dir.joinpath("vault.json"))
         # does vault directory exist?  If not, make it.
         if not Path(os.path.dirname(filename)).exists():
@@ -86,6 +99,7 @@ class AccountManager:
         if not os.access(os.path.dirname(filename), os.W_OK):
             raise ValueError(f"The directory for the file '{filename}' is not writable.")
 
+        # If the instance has not been initialized
         if not hasattr(self, 'initialized'):
             # Configure logging with more detail
             self.logger = logging.getLogger(__name__)
@@ -108,7 +122,7 @@ class AccountManager:
             # Track file modification time to detect external changes
             self._last_modified_time = None
             
-            # Initialize accounts as None - lazy loading
+            # Initialize accounts as None - (will be lazy loaded)
             self._accounts = None
             self.initialized = True
 
@@ -253,7 +267,7 @@ class AccountManager:
         It encrypts the secret key before saving and logs the operation.
 
         Args:
-            otp_record (OtpRecord): The OTP record containing account details to be saved.
+            otp_record: The OTP record containing account details to be saved.
 
         Returns:
             bool: True if the account was saved successfully, False if a duplicate account exists.
@@ -314,8 +328,10 @@ class AccountManager:
             # does info match and is it not me?
             if acc.issuer == account.issuer and acc.label == account.label and item != index:
                 return False
-                
+
+        # Replace the list item
         self._accounts[index] = account
+        # Save to disk
         self.save_accounts()
         self.logger.debug(f"Updated account: {account.issuer} ({account.label})")
         return True
@@ -336,14 +352,14 @@ class AccountManager:
             Exception: If any error occurs during the deletion process.
         """
         # Get latest accounts
-        accounts = self.get_accounts()
-        
+        self.get_accounts()
+
+        # Delete the specified account
         self._accounts.remove(account)
+        # Save to disk
         self.save_accounts()
         self.logger.debug(f"Deleted account: {account.issuer} ({account.label})")
 
-    # Update any method that directly accessed self.accounts to use get_accounts() instead
-    # For example:
     def sort_alphabetically(self):
         """
         Sort the accounts alphabetically by issuer.
@@ -520,7 +536,7 @@ class AccountManager:
             return -5
 
     def parse_uris(self, uris):
-        """ (Helper method) Parse URIs and return account objects
+        """ (Import helper method) Parse URIs and return account objects
         """
         accounts = []
         for uri in uris:
@@ -536,7 +552,7 @@ class AccountManager:
         return accounts
 
     def parse_json(self, accounts_data, import_mode):
-        """ (Helper method) Parse JSON and return account objects
+        """ (Import helper method) Parse JSON and return account objects
         """
         restored_accounts = []
         for json_account in accounts_data:
@@ -571,16 +587,16 @@ class AccountManager:
     def _handle_external_modification(self) -> List['Account']:
         """
         Handle detected external modifications to the vault file.
-        Returns merged accounts list.
         """
         self.logger.debug("Attempting to load external changes")
         try:
-            # Load both current memory state and disk state with correct structure
+            # Load the vault and validate the content
             with open(self.vault_path, 'r') as f:
                 disk_content = json.load(f)
                 if not self._validate_vault_data(disk_content):
                     raise ValueError("Invalid vault format in external modifications")
-                    
+
+                # Recreate the accounts from the vault entries
                 disk_accounts = {
                     self._account_key(acc): Account(**acc)
                     for acc in disk_content["vault"]["entries"]
@@ -589,25 +605,9 @@ class AccountManager:
                 self.logger.debug("Successfully read external changes")
                 return list(disk_accounts.values())
 
-            # memory_accounts = {
-            #     self._account_key(acc.__dict__): acc
-            #     for acc in self._accounts
-            # }
-            # self.logger.debug(f"memory: {memory_accounts}")
-            # self.logger.debug(f"disk: {disk_accounts}")
-            #
-            # # Merge changes, preferring memory state for conflicts
-            # merged = {**disk_accounts, **memory_accounts}
-            # merged_accounts = list(merged.values())
-            #
-            # # Update the modified time
-            # self._last_modified_time = os.path.getmtime(self.vault_path)
-            #
-            # self.logger.debug("Successfully merged external changes")
-            # return merged_accounts
-
         except Exception as e:
             self.logger.error(f"Failed to handle external modifications: {str(e)}")
+            # something went wrong so recover from backup
             return self._recover_from_backup()
 
     def _recover_from_backup(self) -> List['Account']:
@@ -638,6 +638,7 @@ class AccountManager:
 
         if "vault" in content:
             if "version" in content['vault']:
+                # Check for current version number
                 if content['vault']['version'] == kCurrent_Vault_Version:
                     if "entries" in content["vault"]:
                         # Detected vaultv1 format
@@ -646,6 +647,7 @@ class AccountManager:
             print("ERROR - Vault data not in correct format.")
             return False
 
+        # Check that all required fields are present
         required_fields = {'issuer', 'label', 'secret', 'last_used', 'used_frequency', 'favorite', 'icon'}
         for acct in accounts_data:
             if not isinstance(acct, dict):

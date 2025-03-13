@@ -3,6 +3,7 @@ from appconfig import AppConfig
 import hashlib
 import base64
 import machineid
+""" Utility functions for converting the secret key. """
 
 def encrypt(secret):
     """@param secret is the shared secret key to be encrypted"""
@@ -18,8 +19,8 @@ def decrypt(encrypted_secret):
     decrypted_secret = cipher_suite.decrypt(encrypted_secret.encode())
     return decrypted_secret.decode()  # Return as string
 
-# Derive a Fernet Key from the Machine UUID
 def derive_key_from_uuid():
+    """ Derive a Fernet Key from the Machine UUID """
     config = AppConfig()
     alt_id = config.get_alt_id()
     if alt_id:
@@ -31,15 +32,3 @@ def derive_key_from_uuid():
     key = hashlib.sha256(uuid.encode()).digest()
     # Encode the key to Base64 (required by Fernet)
     return base64.urlsafe_b64encode(key)
-
-    # def load_key(self):
-    #     """ load key from a local file """
-    #     if os.path.exists(self.key_file):
-    #         with open(self.key_file, 'rb') as key_file:
-    #             return key_file.read()
-    #     else:
-    #         key = Fernet.generate_key()
-    #         with open(self.key_file, 'wb') as key_file:
-    #             key_file.write(key)
-    #         return key
-

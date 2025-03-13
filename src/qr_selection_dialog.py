@@ -1,12 +1,18 @@
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QRadioButton, QPushButton, \
-    QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup, QShortcut
+    QLabel, QSpacerItem, QSizePolicy, QWidget, QButtonGroup
 from account_mgr import OtpRecord
 
 class QRselectionDialog(QDialog):
+    """ This dialog is displayed when the QR code scan finds multiple QR codes.
+    It shows the list of accounts and lets the user choose one.
+    """
     def __init__(self, accounts, parent=None):
+        """ Initialize the dialog.
+        @param accounts is the list of accounts to be displayed.
+        @param parent the parent dialog.
+        """
         super().__init__(parent)
         self.setWindowTitle("Select a QR code")
         self.setWindowFlags(Qt.WindowTitleHint | Qt.Dialog | Qt.WindowCloseButtonHint)  # x-platform consistency
@@ -60,7 +66,7 @@ class QRselectionDialog(QDialog):
         button_layout = QHBoxLayout()
         self.ok_button = QPushButton("&OK")
         self.ok_button.setEnabled(False)  #initially disabled
-        self.ok_button.clicked.connect(self.on_ok)
+        self.ok_button.clicked.connect(self.ok_clicked)
         button_layout.addWidget(self.ok_button)
 
         self.cancel_button = QPushButton("&Cancel")
@@ -76,7 +82,7 @@ class QRselectionDialog(QDialog):
     def enable_ok_button(self):
         self.ok_button.setEnabled(True)
 
-    def on_ok(self):
+    def ok_clicked(self):
         # Check which radio button is selected
         for button in self.button_group.buttons():
             if button.isChecked():

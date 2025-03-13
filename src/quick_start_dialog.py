@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
 
 class QuickStartDialog(QDialog):
+    """ A dialog that displays the Quick Start Guide. """
     def __init__(self,parent):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ class QuickStartDialog(QDialog):
         display_window.setReadOnly(True)
         display_window.setLineWrapMode(QTextEdit.WidgetWidth)
         display_window.setStyleSheet("body {font-size: 30px}")
+        # Load the text and set in the window
         content = self.load_quickstart_text()
         if len(content) > 0:
             display_window.setHtml(content)
@@ -42,8 +44,6 @@ class QuickStartDialog(QDialog):
         x = parent.geometry().x() + 250 if parent else 250
         y = parent.geometry().y() if parent else 100  # Fallback y if no parent
         self.move(x, y)
-        # y = parent.geometry().y()   # use parent's y position
-        # self.move(self.pos().x() + 250, y)  # offset from original x position
 
     def load_quickstart_text(self):
         """ Convert the markdown document to html and add style """

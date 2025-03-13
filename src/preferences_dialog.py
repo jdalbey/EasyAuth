@@ -1,20 +1,11 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, QComboBox, \
-    QFontDialog, QSizePolicy, QApplication, QFormLayout
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QPushButton, QComboBox, \
+    QSizePolicy, QApplication, QFormLayout
 from appconfig import AppConfig
 import qdarktheme
-"""GUI design ideas.
-buttons:   OK | CANCEL | APPLY
-Category tabs: vertical for many, horizontal for few
-   Appearance (theme, font), Keyboard (shortcuts), Behavior, Advanced (e.g. alt machine ID)
-Typora has a nice layout and monochrome (?)
-Use dimmed text for explanation:
-  [ ] Frazzle on exit
-      some dim text explanation here
-See Oracle Dialog style guide.      
-"""
-class PreferencesDialog(QDialog):
 
+class PreferencesDialog(QDialog):
+    """ Dialog with user settings (preferences). """
     def __init__(self, parent=None, ):
         super(PreferencesDialog, self).__init__(parent)
         self.app_config = AppConfig()
@@ -49,18 +40,11 @@ class PreferencesDialog(QDialog):
         self.minimize_after_copy.setEnabled(True)
         layout.addWidget(self.minimize_after_copy)
 
-        # Font button
-        # self.font_button = QPushButton("Font")
-        # self.font_button.setEnabled(False)
-        # self.font_button.clicked.connect(self.select_font)
-        # layout.addWidget(self.font_button)
-
         # Theme label and drop down box
         theme_label = QLabel("Theme:")
 
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(["light","dark"])
-        #self.theme_combo.currentTextChanged.connect(self.set_theme)
         self.theme_combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.theme_combo.setFixedSize(100,self.theme_combo.size().height())
 
@@ -107,6 +91,7 @@ class PreferencesDialog(QDialog):
         self.load_settings()
 
     def load_settings(self):
+        """ Initially load the settings into the form. """
         self.display_favicons.setChecked(self.app_config.is_display_favicons())
         self.secret_key_hidden.setChecked(self.app_config.is_secret_key_hidden())
         self.scan_permission.setChecked(self.app_config.is_scan_permission())
@@ -115,6 +100,7 @@ class PreferencesDialog(QDialog):
         self.theme_combo.setCurrentText(self.app_config.get_theme_name())
 
     def apply_settings(self):
+        """ Immediately apply the settings. """
         self.app_config.set_display_favicons(self.display_favicons.isChecked())
         self.app_config.set_secret_key_hidden(self.secret_key_hidden.isChecked())
         self.app_config.set_scan_permission(self.scan_permission.isChecked())
@@ -122,25 +108,20 @@ class PreferencesDialog(QDialog):
         self.app_config.set_minimize_during_qr_search(self.minimize_during_qr_search.isChecked())
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.parent().set_theme()  # set theme in application
-        self.parent().display_accounts() # redisplay accounts
+        self.parent().display_vault() # redisplay accounts
 
     def save_settings(self):
+        """ Apply the settings and close the dialog. """
         self.apply_settings()
         self.accept()
 
-
-    def select_font(self):
-        font, ok = QFontDialog.getFont()
-        if ok:
-            # Save the selected font to the configuration if needed
-            pass
-
     def set_theme(self):
-        # Save chosen theme in Configuration
+        """ Save chosen theme in Configuration."""
         self.app_config.set_theme_name(self.theme_combo.currentText())
         self.parent().set_theme()
 
     def restore_defaults(self):
+        """ Restore the default settings. """
         self.app_config.restore_defaults()
         self.load_settings()
 

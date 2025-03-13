@@ -1,13 +1,14 @@
 import json
 
-from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QPixmap, QDrag, QFont
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget,
-                             QListWidgetItem, QPushButton, QWidget, QLabel, QApplication, QSizePolicy)
-
+                             QListWidgetItem, QPushButton, QLabel, QApplication, QSizePolicy)
 from account_mgr import AccountManager
 
+""" The reorder dialog lets the user create a custom ordering of items in the vault."""
+
 class CustomListWidget(QListWidget):
+    """ A custom list widget that allows drag and drop. """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.dragged_row = None
@@ -49,6 +50,7 @@ class CustomListWidget(QListWidget):
 
 
 class ReorderDialog(QDialog):
+    """ Display a list of accounts and allow user to reorder them. """
     def __init__(self, accounts, parent=None):
         super().__init__(parent)
         # Create copies of each account
@@ -90,14 +92,14 @@ class ReorderDialog(QDialog):
         layout.addLayout(button_layout)
 
     def populate_list(self):
-        #font = QFont("Serif", 12)
+        """ Put the items from accounts into the list. """
         for account in self.accounts:
             display_text = f"⇳ {account.issuer} - {account.label}"
             item = QListWidgetItem(display_text)
-            #item.setFont(font)
             self.list_widget.addItem(item)
 
     def get_ordered_accounts(self):
+        """ Accessor to the final list. """
         return self.accounts
 
 

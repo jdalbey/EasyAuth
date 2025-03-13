@@ -22,7 +22,6 @@ language = English\nscan_permission = False"""
         filepath = Path.home().joinpath(home_dir_str, kConfigPath)
         config = AppConfig(filepath)
 
-        smart_filter = config.is_smart_filtering_enabled()
         theme = config.get_theme_name()
         alt_id = config.get_alt_id()
 

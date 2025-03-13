@@ -52,7 +52,10 @@ QLineEdit:read-only {
 QPushButton { background-color: #ebecf0 }  
 /*toolbar background #ebebeb */
 
-QPushButton#providerLabel {background: transparent; border:none; color: #212f3c; /* near black */ }
+QPushButton#providerLabel {
+    background: transparent; 
+    border:none; color: #212f3c; /* near black */ 
+}
 QPushButton#providerLabel:hover {color: blue}
 
 QPushButton#addAccountButton { background-color: #f0f0f0; }

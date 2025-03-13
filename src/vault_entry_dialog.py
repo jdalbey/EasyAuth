@@ -1,25 +1,24 @@
 import logging
 import os
 
-import pyotp
 import qdarktheme
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QDialog, QLabel, QMessageBox, QApplication, QFileDialog, QCompleter
+from PyQt5.QtWidgets import QDialog, QMessageBox, QApplication, QCompleter
 # from account_entry_panel import AccountEntryPanel
 from PyQt5.uic import loadUi
 
-import qr_funcs
-from account_mgr import AccountManager, OtpRecord
+from account_mgr import AccountManager
 from appconfig import AppConfig
-from common_dialog_funcs import set_tab_order, validate_form, provider_lookup, save_fields
+from common_dialog_funcs import set_tab_order, validate_form, save_fields
 from provider_map import Providers
-from qr_selection_dialog import QRselectionDialog
 from utils import assets_dir
 
+
 class VaultEntryDialog(QDialog):
-    """ Dialog to create a new vault entry """
+    """ Dialog to create a new vault entry.
+     This is used when the user wants to enter the secret key manually.
+     """
     def __init__(self, parent ):
         super().__init__(parent)
         self.logger = logging.getLogger(__name__)
@@ -32,11 +31,12 @@ class VaultEntryDialog(QDialog):
         self.setMinimumSize(380, 280)
 
         try:
+            # The ui was built with Qt5 Designer, we load it here.
             filepath = os.path.join(assets_dir(), "VaultDetails.ui")
             loadUi(filepath, self)
-            self.logger.debug("NewVaultEntry.ui loaded.")
+            self.logger.debug("VaultDetails.ui loaded.")
         except FileNotFoundError as e:
-            self.logger.error("NewVaultEntry.ui not found, can't display dialog.")
+            self.logger.error("VaultDetails.ui not found, can't display dialog.")
             QMessageBox.critical(self, "Error", f"Failed to load UI: {e}")
             raise RuntimeError("Failed to load UI")  # Prevents dialog from appearing
 
@@ -51,13 +51,6 @@ class VaultEntryDialog(QDialog):
         self.completer.setCaseSensitivity(False)  # Makes it case-insensitive
         self.completer.setFilterMode(Qt.MatchContains)  # Allows substring matching
         self.provider_entry.setCompleter(self.completer)
-        # Connect activated signal to update icon_name when a match is selected
-        # Ensures that when the user picks a provider, the first letter is copied to icon_name.
-        # Will call update_icon_name with the string from activated()
-        #self.completer.activated[str].connect(self.update_icon_name)
-        # Connect text changed signal to monitor matches dynamically
-        # If only one match remains, it preemptively updates icon_name without requiring user selection.
-        #self.provider_entry.textEdited.connect(self.check_single_match)
         # Connect editingFinished signal
         self.provider_entry.editingFinished.connect(self.on_provider_entry_editting_finished)
 
@@ -84,11 +77,15 @@ class VaultEntryDialog(QDialog):
         self.icon_label.setPixmap(pixmap)
 
     def on_provider_entry_editting_finished(self):
-        """ Check if only one match remains and update icon_name. """
+        """ When user presses tab or enter, check if only one match remains in the autocomplete list and update icon_name. """
+
+        # Get list of matching names
         match_list = [name for name in self.provider_names if self.provider_entry.text().lower() in name.lower()]
+        # If there's just a single match, we can use it.
         if len(match_list) == 1:
             pixmap = self.providers.get_provider_icon_pixmap(match_list[0])
             self.icon_label.setPixmap(pixmap)
+            # Update the entry field with the matched provider
             self.provider_entry.setText(match_list[0])
         else:
             # Use default icon if provider name not found

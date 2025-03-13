@@ -6,7 +6,7 @@ from view import AppView
 import qdarktheme
 """
    EasyAuth - 2FA secrets manager and TOTP generator.
-   Copyright 2025 John Dalbey
+   Copyright © 2025 John Dalbey
    MIT License
 """
 def main():
@@ -42,6 +42,7 @@ def main():
     # Start the application
     sys.exit(app.exec_())
 
+# Entry point for the application
 if __name__ == '__main__':
     handle_args()
     main()
