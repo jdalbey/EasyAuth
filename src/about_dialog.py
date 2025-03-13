@@ -1,6 +1,8 @@
 import os
 import sys
 import datetime
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QPixmap
 
@@ -31,10 +33,11 @@ def show(parent):
         version_number = "0.0"
 
     msg = QMessageBox(parent)
-    msg.setText(f'EasyAuth\n\n2FA authenticator.\n\n' +
-                f"Version {version_number}  {build_date}\n\n" +
-                "http://www.github.com/jdalbey/EasyAuth\n\n" +
-                f"Vault directory:\n" + parent.app_config.get_os_data_dir())
+    msg.setTextFormat(Qt.RichText)  # Use rich text for HTML links
+    msg.setText(f'EasyAuth<br><br>\n2FA authenticator.<br><br>\n' +
+                f"Version {version_number}  {build_date}<br><br>\n" +
+                "<a href=\"https://jdalbey.github.io/EasyAuth/\">Website</a><br><br>\n" +
+                f"Vault directory:<br>" + parent.app_config.get_os_data_dir())
     msg.setWindowTitle("About")
     # Include our application icon
     pixmap = QPixmap(os.path.join(assets_dir(), "Vault.png"))
