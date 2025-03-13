@@ -3,7 +3,7 @@ import qdarktheme
 
 dark_qss = """
 QLineEdit:read-only {
-                background-color: darkgray; 
+                background-color: gray; 
                 color: Gainsboro;
                 border: 1px solid darkgray;
 }
