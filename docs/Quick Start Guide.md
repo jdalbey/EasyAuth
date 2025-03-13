@@ -35,7 +35,8 @@ The main window appears with the new entry listed at the top.
 
 
 EasyAuth's goal is to achieve two-factor authentication of your online identify in three mouse clicks. 
-Leave feedback or contribute to the project on [Github](https://www.github.com/jdalbey/EasyAuth)  
+Leave feedback or contribute to the project on 
+[Github](https://www.github.com/jdalbey/EasyAuth).  
 
 
 

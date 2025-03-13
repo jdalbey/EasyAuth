@@ -6,7 +6,8 @@ from appconfig import AppConfig
 from utils import assets_dir
 import markdown
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QDialogButtonBox, QTextBrowser
+
 
 class QuickStartDialog(QDialog):
     """ A dialog that displays the Quick Start Guide. """
@@ -19,7 +20,8 @@ class QuickStartDialog(QDialog):
         self.resize(700,550)
         layout = QVBoxLayout()
 
-        display_window = QTextEdit(self)
+        display_window = QTextBrowser(self)
+        display_window.setOpenExternalLinks(True)  # Enable clickable links
         display_window.setReadOnly(True)
         display_window.setLineWrapMode(QTextEdit.WidgetWidth)
         display_window.setStyleSheet("body {font-size: 30px}")
