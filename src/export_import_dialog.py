@@ -157,7 +157,7 @@ class ExportImportDialog(QDialog):
                     self.close()
                     return
                 sample_msg, remainder = self.build_provider_preview(account_list)
-                confirm_msg = f"Import will merge these files with your current vault:\n"
+                confirm_msg = f"Import will merge these items with your current vault:\n"
                 confirm_msg += sample_msg + f"and {remainder} others.  Proceed?"
                 reply = QMessageBox.question(self, "Confirm import to vault", confirm_msg)
                 if reply == QMessageBox.Yes:
