@@ -285,6 +285,9 @@ class AppView(QMainWindow):
                         rowframe_layout.addWidget(icon_label)
                     # Show Provider
                     provider_string = account.issuer
+                    # Limit field length
+                    if len(provider_string) > 31:
+                        provider_string = provider_string[:31] + "..."
                     provider_label = QPushButton(provider_string)
                     provider_font = QFont("Verdana", 12)
                     provider_font.setUnderline(True)
@@ -297,10 +300,9 @@ class AppView(QMainWindow):
                     # Show user
                     user_string = account.label
                     # Limit field length
-                    label_length =  len(provider_string) + len(user_string)
-                    if label_length > 31:
-                        adjusted_length = 31 - len(provider_string)
-                        user_string = user_string[:adjusted_length] + "..."
+                    if len(user_string) > 31:
+                        user_string = user_string[:31] + "..."
+
                     user_label = QLabel(user_string)
                     user_label.setFont(QFont("Verdana",12))
 
