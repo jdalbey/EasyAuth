@@ -40,6 +40,23 @@ sample_vault_string = """
 """
 
 
+@pytest.fixture
+def account_manager(request):
+    """Create an AccountManager instance with a test home directory."""
+    temp_dir = tempfile.TemporaryDirectory()
+    print(f"Setup: Creating {temp_dir.name}")  # Debugging output
+    test_vault_dir = Path(temp_dir.name) / "data"
+    test_vault_dir.mkdir()
+    test_vault_path = test_vault_dir / "vault.json"
+    test_vault_path.touch()
+    manager = AccountManager(filename=test_vault_path)
+    yield manager  # Provide the fixture to the test
+
+    # Teardown code executes after the test
+    print(f"Teardown: Removing temporary directory {temp_dir.name}")
+    temp_dir.cleanup()
+
+
 
 @pytest.fixture
 def sample_accounts():
@@ -66,7 +83,7 @@ def sample_accounts():
     ]
 
 
-class TestAccountManagerImport:
+class TestAccountManagerImportMerge:
     def test_parse_json(self, sample_accounts):
         """Test parsing import data."""
         # a record with essential fields and a record with optional fields
@@ -90,7 +107,7 @@ class TestAccountManagerImport:
 
         account_manager = AccountManager()  # Uses only the first tmp dir
         # Force vault path
-        account_manager.vault_path = "/tmp/test_vault.json"
+        account_manager.vault_path = Path("/tmp/test_vault.json")
         print (f"Vault path: {account_manager.vault_path}")
 
         accounts_data = json.loads(json_data)
@@ -98,11 +115,39 @@ class TestAccountManagerImport:
         assert len(result) == 2
         assert result[1].icon == "favicon"
 
-    def test_import_preview(self, sample_accounts):
-        account_manager = AccountManager()  # Uses only the first tmp dir
+    def test_import_merge_preview(self, sample_accounts, account_manager):
+        # Put 2 sample accounts into the list, Google and Github
+        account_manager._accounts = [Account(**acc) for acc in sample_accounts]
+
         result = account_manager.import_preview("tests/test_data/import_preview_test.json")
 
         assert len(result) == 3
         assert result[0].issuer == 'Slack'
         assert result[1].issuer == 'LinkedIn'
         assert result[2].issuer == 'Dropbox'
+
+    def test_import_merge(self, sample_accounts, account_manager):
+        # Put 2 sample accounts into the list, Google and Github
+        account_manager._accounts = [Account(**acc) for acc in sample_accounts]
+
+        # Import 3 more accounts
+        account_manager.import_accounts("tests/test_data/import_preview_test.json")
+        result = account_manager.get_accounts()
+        assert len(result) == 5
+        assert result[2].issuer == 'Slack'
+        assert result[3].issuer == 'LinkedIn'
+        assert result[4].issuer == 'Dropbox'
+
+    def test_import_merge_conflict(self, sample_accounts, account_manager):
+        # Put 2 sample accounts into the list, Google and Github
+        account_manager._accounts = [Account(**acc) for acc in sample_accounts]
+
+        # Import 2 accounts with duplicate issuer & label. 1 has same secret (ignore), 1 has different secret (conflict)
+        conflict_count = account_manager.import_accounts("tests/test_data/import_merge_conflict_test.json")
+        result = account_manager.get_accounts()
+        assert len(result) == 3
+        assert result[2].issuer == 'GitHub!'
+        assert conflict_count == 1
+
+
+

@@ -21,10 +21,18 @@ class TestExportDialog(unittest.TestCase):
         mockFileDialog.return_value = ("/tmp/test_export.json", "")
         # Act
         dialog.file_choose_btn.click()
+        # Vault is empty, so export should not be called
+        dialog.account_manager.export_accounts.assert_not_called()
+        # Verify Alert messagebox called
+        mock_messagebox.assert_called_once()
+
+        dialog.account_manager.get_accounts.return_value = [1]
+        # Act
+        dialog.file_choose_btn.click()
         # Verify calling export_accounts
         dialog.account_manager.export_accounts.assert_called_once()
-        # Verify Ack messagebox called
-        mock_messagebox.assert_called_once()
+        # Verify Ack messagebox called twice
+        self.assertEqual(mock_messagebox.call_count, 2)
 
     @patch('export_import_dialog.QMessageBox.information')
     @patch('export_import_dialog.QMessageBox.question')
@@ -41,6 +49,7 @@ class TestExportDialog(unittest.TestCase):
         mock_infobox.return_value = QMessageBox.Yes
         acct = OtpRecord("Woogle","joe@gmail","CD34").toAccount()
         dialog.account_manager.import_preview.return_value = [acct]
+        dialog.account_manager.import_accounts.return_value = 0
         # Act
         dialog.import_easy_auth_btn.click()
         # Verify calling import_preview

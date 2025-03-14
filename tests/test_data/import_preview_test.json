@@ -1,0 +1,26 @@
+[
+    {
+        "issuer": "Slack",
+        "label": "person@email.me",
+        "secret": "OMFGTZW3YNRKBDXV",
+        "last_used": "2025-02-01 08:25:50",
+        "used_frequency": 0,
+        "favorite": false
+    },
+    {
+        "issuer": "LinkedIn",
+        "label": "earthling@planet.com",
+        "secret": "NVKC2J65RLXMBYQT",
+        "last_used": "2025-02-01 08:25:44",
+        "used_frequency": 0,
+        "favorite": false
+    },
+    {
+        "issuer": "Dropbox",
+        "label": "human@world.com",
+        "secret": "QWYHTVZGLOBXINRU",
+        "last_used": "2025-02-01 08:27:17",
+        "used_frequency": 3,
+        "favorite": false
+    }
+]

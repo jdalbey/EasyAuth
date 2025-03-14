@@ -140,8 +140,9 @@ class AccountManager:
         
         # Check for external modifications
         if self.vault_path.exists():
-            current_mtime = os.path.getmtime(self.vault_path)
-            if self._last_modified_time and current_mtime != self._last_modified_time:
+            vault_time = os.path.getmtime(self.vault_path)
+            # Is vault_file modified after internal accounts?
+            if self._last_modified_time and vault_time > self._last_modified_time:
                 self.logger.info("Detected external modifications to vault file")
                 self._accounts = self._handle_external_modification()
         
@@ -463,19 +464,21 @@ class AccountManager:
             self.logger.error(f"Unexpected error during {target_label}: {e}")
 
     def restore_accounts(self, file_path):
-        """Read the accounts from the given file_path. Autodetect file type.
-           """
+        """ DEPRECATED: This method is no longer used. Now uses _recover_from_backup.
+           Read the accounts from the given file_path. Autodetect file type.
+        """
         self.read_accounts_file(file_path, import_mode=False)
 
     def import_accounts(self, file_path):
         """Read the accounts from the given file_path. Autodetect file type.
            Secret keys from a plain-text file are encrypted before being put in the vault.
+           Result is merged accounts in the vault.
+           return the count of the number of conflicts
            """
         return self.read_accounts_file(file_path, import_mode=True)
     
     def import_preview(self, file_path):
-        """Read the accounts from the given file_path. Autodetect file type.
-           Secret keys from a plain-text file are encrypted before being put in the vault.
+        """Read the accounts from the given file_path. Autodetect file type. Don't save.
            return the accounts so they can be displayed as a preview.
            """
         return self.read_accounts_file(file_path, import_mode=True, preview=True)
@@ -486,7 +489,10 @@ class AccountManager:
             1. for restore, the accounts from the file need no encryption.
             2. for import, the accounts from the file need to be encrypted.
          @param file_path location of file
-         @param import_mode encrypt the keys before rebuilding the accounts."""
+         @param import_mode encrypt the keys before rebuilding the accounts
+         @return (preview mode) list of accounts to be imported.
+         @return conflict count.
+         """
         self.logger.debug("Starting read_accounts_file")
         target = "Restore"
         if import_mode:
@@ -510,17 +516,19 @@ class AccountManager:
                     accounts_data = json.load(f)
                     accounts = self.parse_json(accounts_data, import_mode)
 
+            # In preview mode we return only the accounts without saving them.
             if preview:
                 return accounts
 
-            # Update the active accounts from the restored data
-            self._accounts = accounts
+            # Merge the restored data into the current accounts
+            result, conflicts = AccountManager.merge_account_lists(self._accounts, accounts)
+            self._accounts = result
             self.logger.debug(f"Updating active accounts from restored data")
             self.save_accounts()
             self.logger.debug(f"Read completed for  {len(accounts)} accounts from {file_path}")
             self.logger.debug(self._accounts)
-
             self.logger.debug(f"Successful {target} of accounts from {file_path}")
+            return conflicts
 
         except (OSError, IOError) as e:
             self.logger.error(f"{target} failed to read from {file_path}: {e}")
@@ -583,6 +591,63 @@ class AccountManager:
                 self.logger.error(f"Failed to read account from data {json_account}: {e}")
         return restored_accounts
 
+    @staticmethod
+    def merge_account_lists(current: List[Account], to_merge: List[Account]) -> List[Account]:
+        """
+        Merges two lists of Account objects with the following rules:
+        - If an account in list2 has the same issuer and label as one in list1:
+          - If the secret is also the same, ignore it (duplicate)
+          - If the secret is different, append '!' to the issuer and add to list1 (conflict)
+        - If an account in list2 has a unique issuer/label combination, add it to list1
+
+        Args:
+            current: The primary list of Account objects
+            to_merge: The secondary list of Account objects to merge into list1
+
+        Returns:
+            A merged list of Account objects following the specified rules
+        """
+        """Implementation notes:
+        Creates a copy of the first list to avoid modifying the original
+        Builds a dictionary for quick lookup of existing accounts using (issuer, label) as keys
+        For each account in the second list:
+            Checks if an account with the same issuer and label exists in the first list
+            If it exists and has the same secret, ignores it (duplicate)
+            If it exists but has a different secret, appends '!' to the issuer and adds it to the result (conflict)
+            If it doesn't exist, adds it to the result (new unique account)
+        """
+        result = current.copy()  # Create a copy of list1 to avoid modifying the original
+        conflict_count = 0  # Initialize conflict counter
+
+        # Create a dictionary for quick lookup of existing accounts by (issuer, label)
+        existing_accounts = {(account.issuer, account.label): account.secret for account in current}
+
+        for account in to_merge:
+            key = (account.issuer, account.label)
+
+            if key in existing_accounts:
+                # Check if this is a duplicate (same secret) or a conflict (different secret)
+                if cipher_funcs.decrypt(account.secret) == cipher_funcs.decrypt(existing_accounts[key]):
+                    # Duplicate - ignore
+                    continue
+                else:
+                    # Conflict - append '!' to issuer and add to result
+                    conflict_count += 1  # Increment conflict counter
+                    conflict_account = Account(
+                        issuer=account.issuer + "!",
+                        label=account.label,
+                        secret=account.secret,
+                        last_used=account.last_used,
+                        used_frequency=account.used_frequency,
+                        favorite=account.favorite,
+                        icon=account.icon
+                    )
+                    result.append(conflict_account)
+            else:
+                # New unique account - add to result
+                result.append(account)
+
+        return result, conflict_count
 
     def _handle_external_modification(self) -> List['Account']:
         """

@@ -157,13 +157,17 @@ class ExportImportDialog(QDialog):
                     self.close()
                     return
                 sample_msg, remainder = self.build_provider_preview(account_list)
-                confirm_msg = f"WARNING: Import will overwrite your current vault.\n"
-                confirm_msg += "Do you really want to import "
-                confirm_msg += sample_msg + f"and {remainder} others?"
+                confirm_msg = f"Import will merge these files with your current vault:\n"
+                confirm_msg += sample_msg + f"and {remainder} others.  Proceed?"
                 reply = QMessageBox.question(self, "Confirm import to vault", confirm_msg)
                 if reply == QMessageBox.Yes:
-                    # Don't need to check result code here because it was checked during preview above
-                    self.account_manager.import_accounts(file_path)
+                    # get return value for # of conflicts
+                    conflict_count = self.account_manager.import_accounts(file_path)
+                    # Report number of conflicts if > 0 and note (marked by !)
+                    if conflict_count > 0:
+                        QMessageBox.information(self,"Alert", f"Import resulted in {conflict_count} conflicts (flagged with '!').")
+                        self.close()
+                        return
                     QMessageBox.information(self, "Success", f"Vault successfully imported from  {file_path}")
                     self.close()
             except Exception as e:
