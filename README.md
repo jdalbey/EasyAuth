@@ -1,8 +1,9 @@
 # EasyAuth
-A 2FA secrets manager and TOTP generator for the desktop.
-Focus on ease of use for beginners using TOTP authentication.  
-  
-[Download](https://github.com/jdalbey/EasyAuth/releases) ... [Website](https://jdalbey.github.io/EasyAuth/) ... [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) ... [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
+A 2FA secrets manager and TOTP generator for the desktop
+with a focus on ease of use for beginners.  
+
+[Download](https://github.com/jdalbey/EasyAuth/releases) &nbsp;&nbsp;&nbsp; [Website](https://jdalbey.github.io/EasyAuth/) &nbsp;&nbsp;&nbsp; [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md) &nbsp;&nbsp;&nbsp; [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)
+
 ## Features
  - Stores your secret keys encrypted in a vault on your local machine (doesn't rely on third-party cloud services).
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
@@ -21,17 +22,16 @@ Focus on ease of use for beginners using TOTP authentication.
    1. Open the application. 
    2. Click the TOTP code for the account you are logging in to. 
    3. Paste into verification form.
- 
+
    No text messages to your phone, no email to check. Quick and hassle-free.
 
 
 ### Status
-In active development.  
+All features above are implemented, but still in active development.  
 Expect breaking changes, features to be added and removed, and non-backwards compatibility.
-All features above are implemented.
 A production release is available for download but no support is provided. 
 
-First draft of [Website](https://jdalbey.github.io/EasyAuth/) is complete.
+[Website](https://jdalbey.github.io/EasyAuth/),  [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual), and [Video tutorial](https://www.youtube.com/watch?v=-LsL8Jgswqo) are available.
 
 ### Download
 
@@ -55,9 +55,8 @@ This software is issued with no guarantee.  There is a risk of data loss, includ
 ## Usage
 Practice storing a new secret key using the sample QR code below.
 1. Launch the application.
-2. Make sure the QR code below is visible on the screen. Click 'Add Account".
-3. The form fields are filled automatically with the data from the QR code. Click "Add".
-4. Observe the new account in the main window.
+2. Make sure the QR code below is visible on the screen. Click 'Scan QR code".
+3. Observe the new account in the main window.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
 
