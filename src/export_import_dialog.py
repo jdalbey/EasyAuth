@@ -93,8 +93,18 @@ class ExportImportDialog(QDialog):
 
         self.setLayout(layout)
 
+    def is_empty_vault(self):
+        """ Check that we have any entries to export. """
+        entries = self.account_manager.get_accounts()
+        return len(entries) == 0
+
     def export(self):
         """ Export the vault to an external file. """
+        if self.is_empty_vault():
+            QMessageBox.information(self, "Alert", f"Vault is empty, nothing to export.")
+            self.close()
+            return
+
         # Find out which radio button is selected
         export_file_types = ['json','uri']
         # Oddly radio button checkedId is -2 or -3, so map to 0,1
