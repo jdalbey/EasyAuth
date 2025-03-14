@@ -71,7 +71,7 @@ class ExportImportDialog(QDialog):
         import_label.setFont(QFont("Sans-serif",12))
         import_panel.addWidget(import_label)
         import_info_btn = QToolButton()
-        import_info_btn.setToolTip("Read an external file into the vault. Existing vault will be overwritten!")
+        import_info_btn.setToolTip("Merge an external file into the vault.")
         info_icon = QIcon(os.path.join(assets_dir(), "question_mark_icon.svg"))
         import_info_btn.setIcon(info_icon)
         import_info_btn.setIconSize(QSize(16, 16))
