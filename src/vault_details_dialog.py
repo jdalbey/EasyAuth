@@ -181,6 +181,9 @@ class VaultDetailsDialog(VaultEntryDialog):
 
         # Create the message box
         msg_box = QMessageBox(self)
+        ok_btn = msg_box.addButton(QMessageBox.Ok)
+        ok_btn.setText('O\u0332' + 'K')
+        ok_btn.setShortcut('Alt+o')
 
         # Load the image
         pixmap = QPixmap()
