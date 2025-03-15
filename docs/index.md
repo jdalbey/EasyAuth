@@ -13,7 +13,7 @@ EasyAuth is a desktop application that helps you authenticate with a website or 
 It's quicker and less hassle than other 2FA methods or applications.
 Since it's a desktop application it doesn't require a smartphone or a cell connection.
 It doesn't require manually typing verification codes.
-During setup of an account it scans QR codes for you. 
+During setup of an account it scans QR codes for you.
 
 ### How do I use it?  
 1. When setting up 2FA a QR code will be displayed in your browser. Launch EasyAuth and click the ![Scan QR code button](assets/ScanQRcode-button.png) button.
@@ -29,12 +29,13 @@ During setup of an account it scans QR codes for you.
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
  - Generates Time-based One-time Passwords from your secret keys.
  - Familiar easy-to-navigate desktop GUI.
- - Accounts are displayed in a scrollable list with a search feature.
+ - The vault is displayed as a scrollable list with a search feature.
  - The list can be sorted alphabetically, by usage frequency, by most recently used, or manually reordered to achieve a custom ordering. 
- - Export and Import vault to plain-text JSON file or otpauth URI format.
- - Vault entries can be displayed as QR codes for migration to other applications.
+ - Website icons are displayed for easily identifying each entry.
+ - Export and Import vault for transfer to/from other applications.
  - GUI includes light and dark themes.
  - Preferences dialog has useful customization settings.
+ - Free and open source.
 
 ### Learn More
  [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md)  

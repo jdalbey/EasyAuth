@@ -9,18 +9,18 @@ with a focus on ease of use for beginners.
  - Automatically finds QR codes displayed on the screen.  No need to scan QR codes with your phone.
  - QR codes can be read from an image file.
  - Generates Time-based One-time Passwords from your secret keys.
- - Accounts are displayed in a scrollable list with a search feature.
+ - The vault is displayed as a scrollable list with a search feature.
+ - Website icons are displayed for easily identifying each entry.
  - The list can be sorted alphabetically, by usage frequency, or by most recently used.
  - The list can be manually reordered to achieve a custom ordering. 
  - Vault entries can be displayed as QR codes for migration to other applications.
  - Export and Import vault to plain-text JSON file or otpauth URI format.
  - Familiar easy-to-navigate desktop GUI.
- - Automatically finds favicons for many sites that offer TOTP verification.
  - GUI includes light and dark themes.
  - Preferences dialog has useful customization settings.
  - Verifying with TOTP in three easy steps: 
    1. Open the application. 
-   2. Click the TOTP code for the account you are logging in to. 
+   2. Click the TOTP code for the website you are logging in to. 
    3. Paste into verification form.
 
    No text messages to your phone, no email to check. Quick and hassle-free.
@@ -56,7 +56,7 @@ This software is issued with no guarantee.  There is a risk of data loss, includ
 Practice storing a new secret key using the sample QR code below.
 1. Launch the application.
 2. Make sure the QR code below is visible on the screen. Click 'Scan QR code".
-3. Observe the new account in the main window.
+3. Observe the new entry in the main window.
 
 <img src="https://i.ibb.co/GPMh7Rq/Sample-QRcode-easyauth-demo.png" alt="Sample QR code">
 
