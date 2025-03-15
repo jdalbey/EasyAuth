@@ -25,6 +25,7 @@ class QuickStartDialog(QDialog):
         display_window.setReadOnly(True)
         display_window.setLineWrapMode(QTextEdit.WidgetWidth)
         display_window.setStyleSheet("body {font-size: 30px}")
+
         # Load the text and set in the window
         content = self.load_quickstart_text()
         if len(content) > 0:
@@ -35,7 +36,11 @@ class QuickStartDialog(QDialog):
 
         layout.addWidget(display_window)
 
-        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
+        buttonBox = QDialogButtonBox()
+        ok_btn = buttonBox.addButton(QDialogButtonBox.Ok)
+        ok_btn.setText('O\u0332' + 'K')
+        ok_btn.setShortcut('Alt+o')
+
         buttonBox.accepted.connect(self.accept)
 
         layout.addWidget(buttonBox)

@@ -38,6 +38,9 @@ def show(parent):
                 f"Version {version_number}  {build_date}<br><br>\n" +
                 "<a href=\"https://jdalbey.github.io/EasyAuth/\">Website</a><br><br>\n" +
                 f"Vault directory:<br>" + parent.app_config.get_os_data_dir())
+    ok_btn = msg.addButton(QMessageBox.Ok)
+    ok_btn.setText('O\u0332' + 'K')
+    ok_btn.setShortcut('Alt+o')
     msg.setWindowTitle("About")
     # Include our application icon
     pixmap = QPixmap(os.path.join(assets_dir(), "Vault.png"))

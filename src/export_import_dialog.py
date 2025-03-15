@@ -145,9 +145,8 @@ class ExportImportDialog(QDialog):
 
     def importer(self):
         """ Import items from saved file into vault. """
-        app_name= "EasyAuth"
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, f"Import {app_name} Accounts", "", "All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, f"Import vault entries", "", "All Files (*)", options=options)
         if file_path:
             try:
                 # Since import is destructive, get confirmation
