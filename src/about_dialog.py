@@ -45,5 +45,4 @@ def show(parent):
     # Include our application icon
     pixmap = QPixmap(os.path.join(assets_dir(), "Vault.png"))
     msg.setIconPixmap(pixmap)
-    msg.setStandardButtons(QMessageBox.StandardButton.Ok)
     msg.exec()

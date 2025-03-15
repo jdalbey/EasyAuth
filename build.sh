@@ -56,6 +56,7 @@ echo "   "$(date) > /tmp/build_date.txt
     --add-data "assets:assets" \
     --add-data "docs/Quick Start Guide.md:assets" \
     --add-data "/tmp/build_date.txt:assets" \
+    --noconsole \
     --onefile \
     src/main.py
 
