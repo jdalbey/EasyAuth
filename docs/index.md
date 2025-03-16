@@ -1,5 +1,5 @@
 
-The easiest (and fastest) way to 2FA verification.
+The easiest (and fastest) way to two-factor authentication.
 
 ![Main Window](assets/EasyAuth_setup_demo.gif)  
 <h3 style="text-align: center;"> 
@@ -7,21 +7,24 @@ The easiest (and fastest) way to 2FA verification.
 </h3>
 
 ### What is it?  
-EasyAuth is a desktop application that helps you authenticate with a website or online service that uses two-factor authentication. EasyAuth stores the secret keys that websites provide when you enroll in two-factor authentication and then generates the one-time passcodes that you use to verify your identity.
+EasyAuth is a desktop application that helps you login to a website or online service 
+that uses two-factor authentication (2FA). EasyAuth stores the secret keys that websites provide when 
+you enroll in two-factor authentication and then generates the one-time passcodes that you use to verify your identity.
 
 ### What's unique about it?  
-It's quicker and less hassle than other 2FA methods or applications.
-Since it's a desktop application it doesn't require a smartphone or a cell connection.
-It doesn't require manually typing verification codes.
-During setup of an account it scans QR codes for you.
+* It's quicker and less hassle than other 2FA methods or applications.  
+* Since it's a desktop application it doesn't require a smartphone or a cell connection.  
+* It doesn't require manually typing verification codes.  
+* It's free and open-source software without advertising or tracking.  
 
 ### How do I use it?  
-1. When setting up 2FA a QR code will be displayed in your browser. Launch EasyAuth and click the ![Scan QR code button](assets/ScanQRcode-button.png) button.
-2. The secret key is stored in the vault.
-    ![QR code found](assets/Step1-scan.png)
-3. Click on the passcode button to copy it to the clipboard.
-4. Paste the code into the verification form.
-   ![Step2](assets/Step2-paste.png)
+1. When setting up 2FA the website will display a QR code. 
+Launch EasyAuth and click the ![Scan QR code button](assets/ScanQRcode-button.png) button.
+2. The secret key is stored in the vault.  
+![QR code found](assets/Step1-scan.png)
+3. Click on the 6-digit passcode to copy it to the clipboard.
+4. Paste the code into the verification form.  
+![Step2](assets/Step2-paste.png)
 
 
 ### Features
