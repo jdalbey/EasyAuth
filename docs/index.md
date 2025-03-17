@@ -43,7 +43,7 @@ Launch EasyAuth and click the ![Scan QR code button](assets/ScanQRcode-button.pn
 ### Learn More
  [Quick Start](https://github.com/jdalbey/EasyAuth/blob/master/docs/Quick%20Start%20Guide.md)  
  [User Manual](https://github.com/jdalbey/EasyAuth/wiki/User-Manual#easyauth-user-manual)  
- [Video tutorial](https://www.youtube.com/watch?v=-LsL8Jgswqo) (11 minutes)  
+ [Video tutorial](https://youtu.be/YNa94wg6nqo) (10 minutes)  
 
 ### Screenshot gallery
 [View Screenshots](screenshot_gallery.md)  
