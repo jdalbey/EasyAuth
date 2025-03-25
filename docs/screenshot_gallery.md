@@ -1,6 +1,6 @@
 ### Screenshot Gallery
 ![Main Window](assets/Account-List.png)  
-_The main window showing accounts in the vault and the generated TOTP codes._
+_The main window showing entries in the vault and the generated TOTP codes._
 <br><br><br>  
 ![Add Vault Entry](assets/AddVaultEntry.png)  
 _The Add Vault Entry Dialog with form fields completed._
