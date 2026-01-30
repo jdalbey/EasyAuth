@@ -25,19 +25,22 @@ class CustomListWidget(QListWidget):
             super().dropEvent(event)
             # Target is where the item was dropped
             target_row = self.indexAt(event.pos()).row()
+            # Handle drop in empty space below all items
             if target_row == -1:
+                # set target to end of list
                 target_row = self.count() - 1
+            else:
+                # Drop on actual item - apply adjustments
+                # In the list widget there's a dropindicator that appears BETWEEN rows,
+                # so we need to adjust the target_row depending on where the
+                # actual drop happened.
+                if self.dropIndicatorPosition() == QListWidget.BelowItem:
+                    target_row += 1
 
-            # In the list widget there's a dropindicator that appears BETWEEN rows,
-            # so we need to adjust the target_row depending on where the
-            # actual drop happened.
-            if self.dropIndicatorPosition() == QListWidget.BelowItem:
-                target_row += 1
-
-            # If source row < target row then subtract 1 from target row because
-            # the source is taken away, moving every one up one spot.
-            if self.dragged_row < target_row:
-                target_row -= 1
+                # If source row < target row then subtract 1 from target row because
+                # the source is taken away, moving every one up one spot.
+                if self.dragged_row < target_row:
+                    target_row -= 1
 
             # Update the underlying model (accounts in ReorderDialog)
             # moving the item from original spot to new spot
@@ -110,11 +113,11 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     mgr = AccountManager()
-    dialog = ReorderDialog(mgr.accounts, None)
+    dialog = ReorderDialog(mgr.get_accounts(), None)
     if dialog.exec() == QDialog.DialogCode.Accepted:
         accounts = dialog.get_ordered_accounts()
-        print (f"First account: {accounts[0].provider}")
-        [print (item.provider) for item in accounts]
+        print (f"First account: {accounts[0].issuer}")
+        [print (item.issuer) for item in accounts]
         account_dicts = [asdict(account) for account in accounts]
         json_str = json.dumps(account_dicts)
         print(json_str)
