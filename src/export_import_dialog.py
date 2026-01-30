@@ -30,6 +30,13 @@ class ExportImportDialog(QDialog):
         export_info_btn.setIcon(info_icon)
         export_info_btn.setIconSize(QSize(16, 16))
         export_info_btn.setStyleSheet(info_btn_style)
+        # Add a message box to the button
+        export_info_btn.clicked.connect(lambda: QMessageBox.information(
+            self,
+            "Information",
+            "Save the vault to an external file. Secret keys are NOT encrypted!"
+        ))
+
         export_panel.addStretch()
         export_panel.addWidget(export_info_btn,alignment=Qt.AlignRight)
         layout.addLayout(export_panel)
@@ -76,6 +83,13 @@ class ExportImportDialog(QDialog):
         import_info_btn.setIcon(info_icon)
         import_info_btn.setIconSize(QSize(16, 16))
         import_info_btn.setStyleSheet(info_btn_style)
+        # Add a message box to the button
+        import_info_btn.clicked.connect(lambda: QMessageBox.information(
+            self,
+            "Information",
+            "Merge an external file into the vault."
+        ))
+
         import_panel.addStretch()
         import_panel.addWidget(import_info_btn,alignment=Qt.AlignRight)
         layout.addLayout(import_panel)

@@ -100,7 +100,12 @@ class VaultDetailsDialog(VaultEntryDialog):
         info_icon = QIcon(os.path.join(assets_dir(),"question_mark_icon.svg"))
         user_info_btn.setIcon(info_icon)
         user_info_btn.setIconSize(QSize(16, 16))
-
+        # Add a message box to the button
+        user_info_btn.clicked.connect(lambda: QMessageBox.information(
+            self,
+            "Information",
+            "This QR code can be used to transfer this vault item to another application."
+        ))
         # Make square button invisible so only circular icon shows
         user_info_btn.setStyleSheet(info_btn_style)
 
