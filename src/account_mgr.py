@@ -726,6 +726,7 @@ class AccountManager:
             except cryptography.fernet.InvalidToken as e:
                 print (f"Found invalid secret loading accounts for {acct['issuer']}")
                 print (e)
+                print ("Tip: If you are trying to copy your vault from a different machine, use Import.")
                 return False
         return True
 
