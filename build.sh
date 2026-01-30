@@ -1,9 +1,12 @@
 #!/bin/bash
+# Usage: build.sh path_to_venv (E.g. ~/Python-environments/EasyAuth/)
+# Requires: Pyinstaller (pip install pyinstaller in the projects virtual environment)
+# Results: Packages this project into a binary file named 'main' in the dist folder
 
 # Check if VENV_PATH is provided via command line argument
 # e.g.:  build.sh /home/user/Py-venvs/EasyAuth/
 if [ -z "$1" ]; then
-  echo "Error: VENV_PATH is required."
+  echo "Error: VENV_PATH is required, E.g., ~/Python-environments/EasyAuth"
   exit 1
 else
   export VENV_PATH="$1"
@@ -11,7 +14,7 @@ fi
 
 # Set the PYINSTALLER_PATH if it's not already set
 if [ -z "$PYINSTALLER_PATH" ]; then
-  export PYINSTALLER_PATH=$VENV_PATH"venv/bin"
+  export PYINSTALLER_PATH=$VENV_PATH"bin"
 fi
 
 # Check if the version info file exists
